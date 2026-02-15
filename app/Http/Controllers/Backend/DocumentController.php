@@ -50,18 +50,31 @@ class DocumentController extends Controller
 
         if ($request->hasFile('file_path')) {
             $file = $request->file('file_path');
+            $fileSize = $file->getSize();
+
+            // Check Storage Limit
+            $tenant = auth()->user()->tenant; // User (Operator/AdminLembaga) belongs to tenant
+            if ($tenant && !$tenant->checkStorageLimit($fileSize)) {
+                return redirect()->back()->withErrors(['file_path' => 'Kapasitas penyimpanan sekolah sudah penuh. Hubungi Super Admin.'])->withInput();
+            }
+
             $path = $file->store('documents/' . $validated['student_id'], 'public');
 
             \App\Models\Document::create([
                 'student_id' => $validated['student_id'],
                 'document_type' => $validated['document_type'],
                 'file_path' => $path,
-                'file_size' => $file->getSize(),
+                'file_size' => $fileSize,
                 'mime_type' => $file->getMimeType(),
                 'uploaded_by' => auth()->id(),
                 'keterangan' => $validated['keterangan'],
-                'verified_at' => now(), // Auto-verify if uploaded by admin? Or leave null? Let's auto-verify for admin.
+                'verified_at' => now(),
             ]);
+
+            // Update Storage Usage
+            if ($tenant) {
+                $tenant->updateStorageUsage($fileSize, true);
+            }
         }
 
         return redirect()->route((auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.') . 'documents.index')->with('success', 'Dokumen berhasil diupload.');
@@ -103,7 +116,16 @@ class DocumentController extends Controller
         $document = \App\Models\Document::findOrFail($id);
 
         if ($document->file_path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($document->file_path);
+            $fileSize = $document->file_size; // Ensure file_size exists in model
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($document->file_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($document->file_path);
+            }
+
+            // Update Storage Usage (Decrement)
+            $tenant = auth()->user()->tenant;
+            if ($tenant) {
+                $tenant->updateStorageUsage($fileSize, false);
+            }
         }
 
         $document->delete();

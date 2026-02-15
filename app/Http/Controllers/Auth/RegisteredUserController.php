@@ -47,7 +47,7 @@ class RegisteredUserController extends Controller
             'nama_sekolah' => $request->nama_sekolah,
             'jenjang' => $request->jenjang,
             'alamat' => $request->alamat,
-            'status_aktif' => 1, // Active by default
+            'status_aktif' => 0, // Pending Approval by default
         ]);
 
         // Create Domain

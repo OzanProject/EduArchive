@@ -51,4 +51,41 @@ class Tenant extends BaseTenant
       'storage_limit',
     ];
   }
+
+  public function storageUsage()
+  {
+    return $this->hasOne(StorageUsage::class);
+  }
+
+  public function getUsedStorage()
+  {
+    return $this->storageUsage?->used_space ?? 0;
+  }
+
+  public function checkStorageLimit(int $newFileSize)
+  {
+    if (is_null($this->storage_limit)) {
+      return true; // Unlimited
+    }
+
+    $currentUsage = $this->getUsedStorage();
+    if (($currentUsage + $newFileSize) > $this->storage_limit) { // storage_limit is in Bytes
+      return false;
+    }
+
+    return true;
+  }
+
+  public function updateStorageUsage(int $bytes, bool $increment = true)
+  {
+    $usage = $this->storageUsage()->firstOrCreate([], ['used_space' => 0]);
+
+    if ($increment) {
+      $usage->increment('used_space', $bytes);
+    } else {
+      $usage->decrement('used_space', $bytes);
+    }
+
+    $usage->touch('last_calculated');
+  }
 }

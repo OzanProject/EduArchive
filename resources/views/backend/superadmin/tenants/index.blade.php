@@ -69,7 +69,7 @@
                     @if($tenant->status_aktif)
                       <span class="badge badge-success">Aktif</span>
                     @else
-                      <span class="badge badge-danger">Suspended</span>
+                      <span class="badge badge-warning">Non-Aktif (Pending)</span>
                     @endif
                   </td>
                   <td>

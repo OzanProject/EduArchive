@@ -78,11 +78,19 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="storage_limit">Batas Penyimpanan (MB)</label>
-                  <input type="number" name="storage_limit"
-                    class="form-control @error('storage_limit') is-invalid @enderror" id="storage_limit"
-                    placeholder="Contoh: 1024" value="{{ old('storage_limit', 1024) }}">
-                  <small class="form-text text-muted">0 = Unlimited.</small>
-                  @error('storage_limit') <span class="invalid-feedback">{{ $message }}</span> @enderror
+                  <div class="input-group">
+                    <input type="number" name="storage_limit" class="form-control @error('storage_limit') is-invalid @enderror"
+                      id="storage_limit" placeholder="Contoh: 1024"
+                      value="{{ old('storage_limit', 1024) }}">
+                    <div class="input-group-append">
+                      <div class="input-group-text">
+                        <input type="checkbox" id="unlimited_storage">
+                        <label class="form-check-label ml-1" for="unlimited_storage" style="cursor: pointer;">Unlimited</label>
+                      </div>
+                    </div>
+                  </div>
+                  <small class="form-text text-muted">Jika <strong>Unlimited</strong> dicentang, batas penyimpanan tidak akan dibatasi.</small>
+                  @error('storage_limit') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
             </div>
@@ -153,6 +161,25 @@
           $('#logo-preview-container').show();
         }
         reader.readAsDataURL(this.files[0]);
+      });
+
+      // Storage Limit Toggle
+      const storageInput = $('#storage_limit');
+      const unlimitedCheckbox = $('#unlimited_storage');
+
+      function toggleStorage() {
+        if (unlimitedCheckbox.is(':checked')) {
+          storageInput.val('').prop('disabled', true);
+        } else {
+          storageInput.prop('disabled', false);
+        }
+      }
+
+      // Initial State
+      toggleStorage();
+
+      unlimitedCheckbox.on('change', function () {
+        toggleStorage();
       });
     });
   </script>

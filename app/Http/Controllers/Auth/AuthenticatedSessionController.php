@@ -58,6 +58,11 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        // Check if Tenant is Active
+        if (tenant() && !tenant()->status_aktif) {
+            return $this->logoutAndRedirectError($request, 'Akun sekolah Anda belum diaktifkan oleh Super Admin. Harap tunggu persetujuan.');
+        }
+
         return match ($user->role) {
             'superadmin' => redirect()->route('superadmin.dashboard'),
             'admin_sekolah', 'operator' => tenant()

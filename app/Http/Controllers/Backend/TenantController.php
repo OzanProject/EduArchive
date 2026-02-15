@@ -65,7 +65,7 @@ class TenantController extends Controller
             'jenjang' => $request->jenjang,
             'alamat' => $request->alamat,
             'subscription_plan' => $request->subscription_plan,
-            'storage_limit' => $request->storage_limit ?? 1073741824, // Default 1GB
+            'storage_limit' => $request->filled('storage_limit') && $request->storage_limit > 0 ? ($request->storage_limit * 1024 * 1024) : null, // Convert MB to Bytes, null if 0/empty
             'status_aktif' => $request->has('status_aktif'),
         ]);
 
@@ -78,6 +78,15 @@ class TenantController extends Controller
         // However, standard `run` method usually switches context.
         // For Single DB with BelongsToTenant, we need `tenancy()->initialize($tenant)` 
         // OR manually set the tenant if the trait relies on `Tenant::current()`.
+
+        // Use manual initialization for seeding/creation consistency if needed, 
+        // but here we just need to create the user with the correct tenant_id.
+        // Creating user via relation or manually setting tenant_id is proper.
+        // But the original code uses $tenant->run(). Let's stick to it if it works, 
+        // or replace with manual tenant_id assignment if it fails like the seeder.
+        // Since we are in Controller (Web), tenancy might behave differently than Console.
+        // Checks: tenacy()->initialize is called inside run().
+        // If DatabaseTenancyBootstrapper is disabled, it should be fine.
 
         $tenant->run(function () use ($request) {
             \App\Models\User::create([
@@ -140,7 +149,7 @@ class TenantController extends Controller
             'npsn' => $request->npsn,
             'jenjang' => $request->jenjang,
             'alamat' => $request->alamat,
-            'storage_limit' => $request->storage_limit,
+            'storage_limit' => $request->filled('storage_limit') && $request->storage_limit > 0 ? ($request->storage_limit * 1024 * 1024) : null, // Convert MB to Bytes
             'subscription_plan' => $request->subscription_plan,
             'status_aktif' => $request->has('status_aktif'),
         ]);
