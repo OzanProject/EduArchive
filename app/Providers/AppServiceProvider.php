@@ -80,11 +80,15 @@ class AppServiceProvider extends ServiceProvider
                 $count = 0;
                 try {
                     \App\Models\Tenant::all()->each(function ($tenant) use (&$count) {
-                        $tenant->run(function () use (&$count) {
-                            if (\Illuminate\Support\Facades\Schema::hasTable('students')) {
-                                $count += \App\Models\Student::count();
-                            }
-                        });
+                        try {
+                            $tenant->run(function () use (&$count) {
+                                if (\Illuminate\Support\Facades\Schema::hasTable('students')) {
+                                    $count += \App\Models\Student::count();
+                                }
+                            });
+                        } catch (\Throwable $e) {
+                            // Ignore broken tenants
+                        }
                     });
                 } catch (\Exception $e) {
                     $count = 0;

@@ -9,8 +9,6 @@ class Student extends Model
 {
   use HasFactory;
 
-  protected $connection = 'tenant';
-
   protected $fillable = [
     'nama',
     'classroom_id',
