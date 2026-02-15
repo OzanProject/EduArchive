@@ -51,7 +51,7 @@ Route::group([
             return redirect()->route('operator.dashboard', ['tenant' => tenant('id')]);
         }
         return abort(403, 'Unauthorized access.');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+    })->middleware(['auth', 'verified'])->name('tenant.dashboard');
 
     // Tenant Profile Routes
     Route::middleware('auth')->group(function () {
