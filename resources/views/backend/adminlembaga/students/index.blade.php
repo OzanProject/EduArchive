@@ -1,10 +1,13 @@
+@php
+  $prefix = request()->routeIs('operator.*') ? 'operator.' : 'adminlembaga.';
+@endphp
 @extends('backend.layouts.app')
 
 @section('title', $pageTitle ?? 'Manajemen Siswa')
 @section('page_title', $pageTitle ?? 'Data Siswa')
 
 @section('breadcrumb')
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.dashboard') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'dashboard') }}">Dashboard</a></li>
   <li class="breadcrumb-item active">{{ $pageTitle ?? 'Data Siswa' }}</li>
 @endsection
 
@@ -21,7 +24,7 @@
             <button class="btn btn-info btn-sm d-none ml-1" id="btn-bulk-print" onclick="bulkPrint()">
               <i class="fas fa-print"></i> Cetak Masal
             </button>
-            <a href="{{ route('adminlembaga.students.create') }}" class="btn btn-primary btn-sm ml-2">
+            <a href="{{ route($prefix . 'students.create') }}" class="btn btn-primary btn-sm ml-2">
               <i class="fas fa-plus"></i> Tambah Baru
             </a>
             <button type="button" class="btn btn-success btn-sm ml-2" data-toggle="modal" data-target="#importModal">
@@ -80,28 +83,28 @@
                       </button>
                       <div class="dropdown-menu">
                         <a class="dropdown-item"
-                          href="{{ route('adminlembaga.documents.create', ['student_id' => $student->id, 'type' => 'Kartu Keluarga']) }}">Upload
+                          href="{{ route($prefix . 'documents.create', ['student_id' => $student->id, 'type' => 'Kartu Keluarga']) }}">Upload
                           KK</a>
                         <a class="dropdown-item"
-                          href="{{ route('adminlembaga.documents.create', ['student_id' => $student->id, 'type' => 'KTP']) }}">Upload
+                          href="{{ route($prefix . 'documents.create', ['student_id' => $student->id, 'type' => 'KTP']) }}">Upload
                           KTP</a>
                         <a class="dropdown-item"
-                          href="{{ route('adminlembaga.documents.create', ['student_id' => $student->id, 'type' => 'Ijazah']) }}">Upload
+                          href="{{ route($prefix . 'documents.create', ['student_id' => $student->id, 'type' => 'Ijazah']) }}">Upload
                           Ijazah</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item"
-                          href="{{ route('adminlembaga.documents.index', ['student_id' => $student->id]) }}">Lihat Semua</a>
+                          href="{{ route($prefix . 'documents.index', ['student_id' => $student->id]) }}">Lihat Semua</a>
                       </div>
                     </div>
-                    <a href="{{ route('adminlembaga.students.print', $student->id) }}" class="btn btn-info btn-sm"
+                    <a href="{{ route($prefix . 'students.print', $student->id) }}" class="btn btn-info btn-sm"
                       target="_blank" title="Cetak Biodata">
                       <i class="fas fa-print"></i>
                     </a>
-                    <a href="{{ route('adminlembaga.students.edit', $student->id) }}" class="btn btn-warning btn-sm"
+                    <a href="{{ route($prefix . 'students.edit', $student->id) }}" class="btn btn-warning btn-sm"
                       title="Edit">
                       <i class="fas fa-edit"></i>
                     </a>
-                    <form action="{{ route('adminlembaga.students.destroy', $student->id) }}" method="POST"
+                    <form action="{{ route($prefix . 'students.destroy', $student->id) }}" method="POST"
                       style="display:inline-block;">
                       @csrf
                       @method('DELETE')

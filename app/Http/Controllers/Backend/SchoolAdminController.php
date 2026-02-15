@@ -32,6 +32,13 @@ class SchoolAdminController extends Controller
         $data['storage_usage'] = $usage->used_space;
         $data['storage_limit'] = tenant('storage_limit') ?? 1073741824; // Default 1GB if not set on tenant
 
-        return view('backend.adminlembaga.dashboard', compact('broadcasts', 'data'));
+        // Fetch Recent Activity (Audit Logs) for this Tenant
+        $recent_logs = \App\Models\AuditLog::where('tenant_id', tenant('id'))
+            ->with('user')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('backend.adminlembaga.dashboard', compact('broadcasts', 'data', 'recent_logs'));
     }
 }

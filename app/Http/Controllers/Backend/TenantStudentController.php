@@ -73,7 +73,8 @@ class TenantStudentController extends Controller
 
         \App\Models\Student::create($validated);
 
-        return redirect()->route('adminlembaga.students.index', ['status' => $validated['status_kelulusan']])->with('success', 'Siswa berhasil ditambahkan.');
+        $prefix = auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.';
+        return redirect()->route($prefix . 'students.index', ['status' => $validated['status_kelulusan']])->with('success', 'Siswa berhasil ditambahkan.');
     }
 
     public function edit(string $id)
@@ -116,7 +117,8 @@ class TenantStudentController extends Controller
 
         $student->update($validated);
 
-        return redirect()->route('adminlembaga.students.index', ['status' => $student->status_kelulusan])->with('success', 'Data Siswa berhasil diperbarui.');
+        $prefix = auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.';
+        return redirect()->route($prefix . 'students.index', ['status' => $student->status_kelulusan])->with('success', 'Data Siswa berhasil diperbarui.');
     }
 
     public function import(Request $request)
@@ -143,7 +145,8 @@ class TenantStudentController extends Controller
 
         $student->delete();
 
-        return redirect()->route('adminlembaga.students.index', ['status' => $student->status_kelulusan])->with('success', 'Data Siswa berhasil dihapus.');
+        $prefix = auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.';
+        return redirect()->route($prefix . 'students.index', ['status' => $student->status_kelulusan])->with('success', 'Data Siswa berhasil dihapus.');
     }
 
     public function print(string $id)

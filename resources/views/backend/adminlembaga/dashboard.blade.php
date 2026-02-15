@@ -109,5 +109,61 @@
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header border-transparent">
+            <h3 class="card-title">Aktivitas Terbaru</h3>
+
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table m-0">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>User</th>
+                    <th>Aksi</th>
+                    <th>Detail</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($recent_logs as $log)
+                    @php
+                      $details = json_decode($log->details, true);
+                    @endphp
+                    <tr>
+                      <td>{{ $log->created_at->diffForHumans() }}</td>
+                      <td>{{ $log->user->name }}</td>
+                      <td><span class="badge badge-info">{{ $log->action }}</span></td>
+                      <td>
+                        @if(isset($details['document_name']))
+                          Akses Dokumen: {{ $details['document_name'] }}
+                          @if(isset($details['student_nisn']))
+                            (NISN: {{ $details['student_nisn'] }})
+                          @endif
+                        @else
+                          {{ Str::limit($log->details, 50) }}
+                        @endif
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="4" class="text-center">Belum ada aktivitas tercatat.</td>
+                    </tr>
+                  @endforelse
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 @endsection

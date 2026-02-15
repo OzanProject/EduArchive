@@ -1,10 +1,13 @@
+@php
+  $prefix = request()->routeIs('operator.*') ? 'operator.' : 'adminlembaga.';
+@endphp
 @extends('backend.layouts.app')
 
 @section('title', 'Arsip Dokumen Lembaga')
 @section('page_title', 'Arsip Dokumen Lembaga')
 
 @section('breadcrumb')
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.dashboard') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'dashboard') }}">Dashboard</a></li>
   <li class="breadcrumb-item active">Arsip Dokumen</li>
 @endsection
 
@@ -51,7 +54,7 @@
                     <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="btn btn-info btn-xs">
                       <i class="fas fa-download"></i>
                     </a>
-                    <form action="{{ route('adminlembaga.school-documents.destroy', $doc->id) }}" method="POST"
+                    <form action="{{ route($prefix . 'school-documents.destroy', $doc->id) }}" method="POST"
                       style="display:inline-block;">
                       @csrf
                       @method('DELETE')
@@ -87,7 +90,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form action="{{ route('adminlembaga.school-documents.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route($prefix . 'school-documents.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
           <div class="modal-body">
             <div class="form-group">

@@ -1,10 +1,13 @@
+@php
+  $prefix = request()->routeIs('operator.*') ? 'operator.' : 'adminlembaga.';
+@endphp
 @extends('backend.layouts.app')
 
 @section('title', 'Manajemen Dokumen')
 @section('page_title', 'Data Dokumen Siswa')
 
 @section('breadcrumb')
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.dashboard') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'dashboard') }}">Dashboard</a></li>
   <li class="breadcrumb-item active">Dokumen Siswa</li>
 @endsection
 
@@ -15,7 +18,7 @@
         <div class="card-header">
           <h3 class="card-title">Daftar Dokumen</h3>
           <div class="card-tools">
-            <a href="{{ route('adminlembaga.documents.create', ['student_id' => request('student_id')]) }}"
+            <a href="{{ route($prefix . 'documents.create', ['student_id' => request('student_id')]) }}"
               class="btn btn-primary btn-sm">
               <i class="fas fa-upload"></i> Upload Dokumen
             </a>
@@ -41,7 +44,7 @@
                   <td>{{ $loop->iteration + ($documents->currentPage() - 1) * $documents->perPage() }}</td>
                   <td>
                     @if($document->student)
-                      <a href="{{ route('adminlembaga.students.edit', $document->student_id) }}">
+                      <a href="{{ route($prefix . 'students.edit', $document->student_id) }}">
                         {{ $document->student->nama }}
                       </a>
                     @else
@@ -50,14 +53,14 @@
                   </td>
                   <td>{{ $document->document_type }}</td>
                   <td>
-                    <a href="{{ route('adminlembaga.documents.show', $document->id) }}" target="_blank">
+                    <a href="{{ route($prefix . 'documents.show', $document->id) }}" target="_blank">
                       <i class="fas fa-file-alt"></i> Lihat File
                     </a>
                   </td>
                   <td>{{ number_format($document->file_size / 1024, 2) }} KB</td>
                   <td>{{ $document->uploader ? $document->uploader->name : '-' }}</td>
                   <td>
-                    <form action="{{ route('adminlembaga.documents.destroy', $document->id) }}" method="POST"
+                    <form action="{{ route($prefix . 'documents.destroy', $document->id) }}" method="POST"
                       style="display:inline-block;">
                       @csrf
                       @method('DELETE')

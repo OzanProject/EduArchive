@@ -9,7 +9,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('adminlembaga.students.import') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route($prefix . 'students.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-body">
           <div class="form-group">
@@ -22,7 +22,7 @@
           <div class="form-group">
             <label>Download Template</label>
             <br>
-            <a href="{{ route('adminlembaga.students.template', ['status' => $status]) }}" id="downloadTemplateBtn"
+            <a href="{{ route($prefix . 'students.template', ['status' => $status]) }}" id="downloadTemplateBtn"
               class="btn btn-success btn-sm">
               <i class="fas fa-file-excel"></i> Download Format Excel
             </a>
@@ -48,7 +48,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const statusSelect = document.getElementById('importStatus');
     const downloadBtn = document.getElementById('downloadTemplateBtn');
-    const baseUrl = "{{ route('adminlembaga.students.template') }}";
+    const baseUrl = "{{ route($prefix . 'students.template') }}";
 
     if (statusSelect && downloadBtn) {
       statusSelect.addEventListener('change', function () {

@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SuperAdminSeeder::class,
-            SchoolLevelSeeder::class, // Add this
+            SchoolLevelSeeder::class,
+            DocumentTypeSeeder::class, // Add this
             TenantSeeder::class,
         ]);
     }

@@ -86,6 +86,7 @@ Route::group([
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
         Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class)->except(['edit', 'update']);
         Route::resource('school-documents', \App\Http\Controllers\Backend\SchoolDocumentController::class)->except(['show', 'edit', 'update']);
+        Route::resource('users', \App\Http\Controllers\Backend\TenantUserController::class); // Manage Operators
         Route::get('reports', [\App\Http\Controllers\Backend\ReportController::class, 'index'])->name('reports.index');
 
         // Settings
@@ -96,6 +97,15 @@ Route::group([
     // Operator Routes
     Route::middleware(['auth', 'verified'])->prefix('operator')->name('operator.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Backend\OperatorController::class, 'index'])->name('dashboard');
+        Route::get('students/template', [\App\Http\Controllers\Backend\TenantStudentController::class, 'downloadTemplate'])->name('students.template');
+        Route::post('students/import', [\App\Http\Controllers\Backend\TenantStudentController::class, 'import'])->name('students.import');
+        Route::post('students/bulk-delete', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkDelete'])->name('students.bulkDestroy');
+        Route::get('students/bulk-print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPrint'])->name('students.bulkPrint');
+        Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
+        Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
+
+        Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class)->except(['edit', 'update']);
+        Route::resource('school-documents', \App\Http\Controllers\Backend\SchoolDocumentController::class)->except(['show', 'edit', 'update']);
     });
 });
 

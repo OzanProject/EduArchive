@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Graduation extends Model
 {
-  use HasFactory;
+  use HasFactory, BelongsToTenant;
+
+  protected $connection = 'mysql';
 
   protected $fillable = [
     'student_id',

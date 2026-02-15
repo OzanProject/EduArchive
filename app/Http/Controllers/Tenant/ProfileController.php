@@ -44,7 +44,6 @@ class ProfileController extends Controller
     // Ensure we are working with the latest user instance from the correct DB
     $user = Auth::user();
     if ($user) {
-      $user->setConnection('tenant');
       $user = $user->fresh();
     }
 

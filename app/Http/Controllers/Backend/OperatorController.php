@@ -9,6 +9,9 @@ class OperatorController extends Controller
 {
     public function index()
     {
-        return view('backend.operator.dashboard');
+        $total_siswa = \App\Models\Student::where('status_kelulusan', 'Aktif')->count();
+        $total_dokumen = \App\Models\Document::count();
+
+        return view('backend.operator.dashboard', compact('total_siswa', 'total_dokumen'));
     }
 }

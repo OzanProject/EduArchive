@@ -57,64 +57,28 @@ class TenantController extends Controller
             'status_aktif' => 'boolean',
         ]);
 
-        try {
-            $tenant = Tenant::create([
-                'id' => $request->id, // Use the provided ID (Kode Sekolah)
-                'npsn' => $request->npsn,
-                'nama_sekolah' => $request->nama_sekolah,
-                'jenjang' => $request->jenjang,
-                'alamat' => $request->alamat,
-                'subscription_plan' => $request->subscription_plan,
-                'storage_limit' => $request->storage_limit ?? 1073741824, // Default 1GB if null
-                'status_aktif' => $request->has('status_aktif'),
-            ]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // Check error codes directly
-            $errorCode = $e->errorInfo[1] ?? 0;
-            $msg = $e->getMessage();
-
-            // 1. Handle "Database already exists" (Error 1007)
-            if ($errorCode == 1007 || str_contains($msg, 'database exists')) {
-                $tenant = Tenant::find($request->id);
-                if ($tenant) {
-                    try {
-                        \Illuminate\Support\Facades\Artisan::call('tenants:migrate', [
-                            '--tenants' => [$tenant->id],
-                            '--force' => true,
-                        ]);
-                    } catch (\Exception $ex) {
-                        \Illuminate\Support\Facades\Log::error("Manual migration failed: " . $ex->getMessage());
-                    }
-                }
-            }
-            // 2. Handle "Access denied" (Error 1044)
-            elseif ($errorCode == 1044 || str_contains($msg, 'Access denied')) {
-                $prefix = config('tenancy.database.prefix');
-                $suffix = config('tenancy.database.suffix');
-                $dbName = $prefix . $request->id . $suffix;
-
-                // Cleanup using query builder to bypass events
-                Tenant::where('id', $request->id)->delete();
-
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', "GAGAL MEMBUAT DATABASE OTOMATIS (Izin Ditolak).<br>
-                    Silakan buat database secara <b>MANUAL</b> di cPanel dengan nama: <code>{$dbName}</code><br>
-                    Setelah database dibuat, silakan KLIK SIMPAN LAGI.");
-            } else {
-                throw $e;
-            }
-        }
+        // Create Tenant (Single DB Mode - just a record)
+        $tenant = Tenant::create([
+            'id' => $request->id,
+            'npsn' => $request->npsn,
+            'nama_sekolah' => $request->nama_sekolah,
+            'jenjang' => $request->jenjang,
+            'alamat' => $request->alamat,
+            'subscription_plan' => $request->subscription_plan,
+            'storage_limit' => $request->storage_limit ?? 1073741824, // Default 1GB
+            'status_aktif' => $request->has('status_aktif'),
+        ]);
 
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('tenant_logos', 'public');
             $tenant->update(['logo' => $path]);
         }
 
-        // Domain creation is NOT needed for Path-Based Tenancy
-        // We rely on the 'id' column in the tenants table.
+        // Initialize Tenancy to Switch Scope (Even if Single DB, this sets the global scope)
+        // However, standard `run` method usually switches context.
+        // For Single DB with BelongsToTenant, we need `tenancy()->initialize($tenant)` 
+        // OR manually set the tenant if the trait relies on `Tenant::current()`.
 
-        // Create Admin User for this Tenant
         $tenant->run(function () use ($request) {
             \App\Models\User::create([
                 'name' => $request->admin_name,
@@ -242,53 +206,12 @@ class TenantController extends Controller
     public function destroy(string $id)
     {
         $tenant = Tenant::findOrFail($id);
-        $dbName = $tenant->database()->getName();
 
-        // 1. Attempt to delete database (Optional on Shared Hosting)
-        $dbDeletionStatus = 'success';
-        try {
-            $tenant->database()->manager()->deleteDatabase($tenant);
-        } catch (\Exception $e) {
-            $dbDeletionStatus = 'failed';
-            // Log error but continue to delete the tenant record
-            \Illuminate\Support\Facades\Log::warning("Failed to delete database for tenant {$id}: " . $e->getMessage());
-        }
+        // Single DB Mode: Deleting the tenant record automatically cascades to related data via foreign keys.
+        // No manual database deletion needed.
+        $tenant->delete();
 
-        // 2. Delete Tenant Record
-        // We use delete() which triggers events. Since we already tried deleting DB manually/failed,
-        // we might need to prevent the event from firing or handle it. 
-        // Stancl Tenancy hooks into 'deleting' event.
-        // To avoid double deletion attempt or error, we can disable events if needed,
-        // BUT the package might not have a way to skip just the DB deletion listener easily without removing the job.
-
-        // BETTER APPROACH: 
-        // The package deletes DB on the 'deleted' event via Job.
-        // If we want to suppress the crash, we should catch the error during $tenant->delete() if it's synchronous,
-        // or removing the event listener?
-        // 
-        // Actually, if QUEUE is not set up, it runs synchronously.
-        // The simple fix is to wrap $tenant->delete() in try-catch logic specifically for the DB permission error.
-
-        try {
-            $tenant->delete();
-        } catch (\Illuminate\Database\QueryException $e) {
-            if (str_contains($e->getMessage(), 'Access denied') && str_contains($e->getMessage(), 'DROP DATABASE')) {
-                // Force delete the record if DB deletion failed due to permissions
-                // We can temporary disable events to delete the record
-                $tenant->unsetEventDispatcher();
-                $tenant->delete();
-                $dbDeletionStatus = 'failed_permission';
-            } else {
-                throw $e;
-            }
-        }
-
-        if ($dbDeletionStatus === 'failed' || $dbDeletionStatus === 'failed_permission') {
-            return redirect()->route('superadmin.tenants.index')
-                ->with('success', 'Data Sekolah dihapus. WARNING: Database harus dihapus MANUAL via cPanel karena keterbatasan izin hosting.');
-        }
-
-        return redirect()->route('superadmin.tenants.index')->with('success', 'Sekolah dan Database berhasil dihapus!');
+        return redirect()->route('superadmin.tenants.index')->with('success', 'Sekolah berhasil dihapus!');
     }
 
     /**
@@ -309,7 +232,6 @@ class TenantController extends Controller
 
         $message = $isActive ? 'Sekolah berhasil diaktifkan kembali.' : 'Sekolah berhasil disuspend.';
 
-        return redirect()->back()->with('success', $message);
         return redirect()->back()->with('success', $message);
     }
 

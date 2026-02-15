@@ -20,22 +20,31 @@
   </ul>
 
   <!-- GLOBAL SEARCH (Center) -->
-  <div class="mx-auto col-md-5 d-none d-md-block">
-    <div class="input-group shadow-sm"
-      style="max-width: 450px; margin: 0 auto; border-radius: 0.5rem; overflow: hidden;">
-      <div class="input-group-prepend">
-        <span class="input-group-text bg-light border-0 pl-3"><i class="fas fa-search text-muted"></i></span>
-      </div>
-      @if(auth()->user()->role === 'superadmin')
-        <input class="form-control bg-light border-0 py-2" type="search" placeholder="Cari Siswa, Sekolah, atau NPSN..."
-          aria-label="Search">
-      @else
+  <div class="mx-auto d-none d-md-flex align-items-center justify-content-center flex-grow-1" style="max-width: 500px;">
+    <div class="w-100 position-relative">
+      @if(auth()->user()->role !== 'superadmin')
         <form action="{{ route('adminlembaga.students.index') }}" method="GET" class="w-100">
-          <input class="form-control bg-light border-0 py-2" type="search" name="search" placeholder="Cari Siswa..."
-            aria-label="Search">
-          <input type="hidden" name="status" value="Aktif">
-        </form>
       @endif
+
+        <div class="input-group shadow-sm border"
+          style="border-radius: 0.5rem; overflow: hidden; background-color: #f4f6f9;">
+          <div class="input-group-prepend">
+            <span class="input-group-text border-0 pl-3" style="background-color: transparent;"><i
+                class="fas fa-search text-muted"></i></span>
+          </div>
+          <input class="form-control border-0 py-2" style="background-color: transparent;" type="search"
+            name="{{ auth()->user()->role !== 'superadmin' ? 'search' : '' }}"
+            placeholder="{{ auth()->user()->role === 'superadmin' ? 'Cari Siswa, Sekolah, atau NPSN...' : 'Cari Siswa...' }}"
+            aria-label="Search">
+
+          @if(auth()->user()->role !== 'superadmin')
+            <input type="hidden" name="status" value="Aktif">
+          @endif
+        </div>
+
+        @if(auth()->user()->role !== 'superadmin')
+          </form>
+        @endif
     </div>
   </div>
 

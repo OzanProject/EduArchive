@@ -64,7 +64,7 @@ class DocumentController extends Controller
             ]);
         }
 
-        return redirect()->route('adminlembaga.documents.index')->with('success', 'Dokumen berhasil diupload.');
+        return redirect()->route((auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.') . 'documents.index')->with('success', 'Dokumen berhasil diupload.');
     }
 
     /**
@@ -108,6 +108,6 @@ class DocumentController extends Controller
 
         $document->delete();
 
-        return redirect()->route('adminlembaga.documents.index')->with('success', 'Dokumen berhasil dihapus.');
+        return redirect()->route((auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.') . 'documents.index')->with('success', 'Dokumen berhasil dihapus.');
     }
 }

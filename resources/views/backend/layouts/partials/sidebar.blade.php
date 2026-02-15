@@ -256,6 +256,13 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{{ route('adminlembaga.users.index') }}"
+                  class="nav-link {{ Request::routeIs('adminlembaga.users.*') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Operator Sekolah</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{{ route('adminlembaga.classrooms.index') }}"
                   class="nav-link {{ Request::routeIs('adminlembaga.classrooms.*') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
@@ -327,6 +334,30 @@
               class="nav-link {{ Request::routeIs('operator.dashboard') ? 'active' : '' }}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>Dashboard</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{{ route('operator.students.index') }}"
+              class="nav-link {{ Request::routeIs('operator.students.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-user-graduate"></i>
+              <p>Data Siswa</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{{ route('operator.documents.index') }}"
+              class="nav-link {{ Request::routeIs('operator.documents.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-folder-open"></i>
+              <p>Dokumen Siswa</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{{ route('operator.school-documents.index') }}"
+              class="nav-link {{ Request::routeIs('operator.school-documents.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-file-archive"></i>
+              <p>Arsip Dokumen</p>
             </a>
           </li>
         @endif

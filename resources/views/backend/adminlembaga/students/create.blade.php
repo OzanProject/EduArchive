@@ -1,16 +1,19 @@
+@php
+  $prefix = request()->routeIs('operator.*') ? 'operator.' : 'adminlembaga.';
+@endphp
 @extends('backend.layouts.app')
 
 @section('title', 'Tambah Siswa')
 @section('page_title', 'Tambah Data Siswa')
 
 @section('breadcrumb')
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.dashboard') }}">Dashboard</a></li>
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.students.index') }}">Data Siswa</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'dashboard') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'students.index') }}">Data Siswa</a></li>
   <li class="breadcrumb-item active">Tambah Baru</li>
 @endsection
 
 @section('content')
-  <form action="{{ route('adminlembaga.students.store') }}" method="POST" enctype="multipart/form-data">
+  <form action="{{ route($prefix . 'students.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="row">
       <!-- Left Column: Personal & Academic Info -->
@@ -134,7 +137,7 @@
           <div class="card-body">
             <button type="submit" class="btn btn-primary btn-block btn-lg"><i class="fas fa-save mr-1"></i> Simpan
               Data</button>
-            <a href="{{ route('adminlembaga.students.index') }}" class="btn btn-default btn-block mt-2">Kembali</a>
+            <a href="{{ route($prefix . 'students.index') }}" class="btn btn-default btn-block mt-2">Kembali</a>
           </div>
         </div>
       </div>

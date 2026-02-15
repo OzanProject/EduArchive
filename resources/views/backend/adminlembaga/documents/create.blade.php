@@ -1,11 +1,14 @@
+@php
+  $prefix = request()->routeIs('operator.*') ? 'operator.' : 'adminlembaga.';
+@endphp
 @extends('backend.layouts.app')
 
 @section('title', 'Upload Dokumen')
 @section('page_title', 'Upload Dokumen Siswa')
 
 @section('breadcrumb')
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.dashboard') }}">Dashboard</a></li>
-  <li class="breadcrumb-item"><a href="{{ route('adminlembaga.documents.index') }}">Dokumen Siswa</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'dashboard') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'documents.index') }}">Dokumen Siswa</a></li>
   <li class="breadcrumb-item active">Upload Baru</li>
 @endsection
 
@@ -16,7 +19,7 @@
         <div class="card-header">
           <h3 class="card-title">Form Upload Dokumen</h3>
         </div>
-        <form action="{{ route('adminlembaga.documents.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route($prefix . 'documents.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
           <div class="card-body">
             <div class="row">
@@ -71,7 +74,7 @@
           </div>
           <div class="card-footer">
             <button type="submit" class="btn btn-primary">Upload</button>
-            <a href="{{ route('adminlembaga.documents.index') }}" class="btn btn-default">Kembali</a>
+            <a href="{{ route($prefix . 'documents.index') }}" class="btn btn-default">Kembali</a>
           </div>
         </form>
       </div>
