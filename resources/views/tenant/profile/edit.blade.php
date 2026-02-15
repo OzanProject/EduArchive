@@ -67,8 +67,8 @@
                                 </div>
                             @endif
 
-                            <form method="post" action="{{ route('tenant.profile.update', ['tenant' => tenant('id')]) }}" class="form-horizontal"
-                                enctype="multipart/form-data">
+                            <form method="post" action="{{ route('tenant.profile.update', ['tenant' => tenant('id')]) }}"
+                                class="form-horizontal" enctype="multipart/form-data">
                                 @csrf
                                 @method('patch')
 
@@ -118,7 +118,9 @@
                                 </div>
                             @endif
 
-                             <form method="post" action="{{ route('tenant.password.update', ['tenant' => tenant('id')]) }}" class="form-horizontal">
+                            <form method="post"
+                                action="{{ route('tenant.profile.password.update', ['tenant' => tenant('id')]) }}"
+                                class="form-horizontal">
                                 @csrf
                                 @method('put')
 
@@ -175,8 +177,8 @@
                 }
                 reader.readAsDataURL(this.files[0]);
             });
-            
-             // File Input name fix for BS4 Custom File Input
+
+            // File Input name fix for BS4 Custom File Input
             bsCustomFileInput.init();
         });
     </script>

@@ -57,7 +57,7 @@ Route::group([
     Route::middleware('auth')->group(function () {
         Route::get('/profile', [\App\Http\Controllers\Tenant\ProfileController::class, 'edit'])->name('tenant.profile.edit');
         Route::patch('/profile', [\App\Http\Controllers\Tenant\ProfileController::class, 'update'])->name('tenant.profile.update');
-        Route::put('/profile/password', [\App\Http\Controllers\Tenant\ProfileController::class, 'updatePassword'])->name('tenant.password.update');
+        Route::put('/profile/password', [\App\Http\Controllers\Tenant\ProfileController::class, 'updatePassword'])->name('tenant.profile.password.update');
         Route::delete('/profile', [\App\Http\Controllers\Tenant\ProfileController::class, 'destroy'])->name('tenant.profile.destroy');
     });
 
