@@ -22,6 +22,32 @@ if ($userPrefix) {
     }
 }
 
+// Logic for central domains
+$centralDomains = [
+    '127.0.0.1',
+    'localhost',
+    'eduarchive.test',
+];
+
+// Add APP_URL host
+if ($appUrl = env('APP_URL')) {
+    $host = parse_url($appUrl, PHP_URL_HOST);
+    if ($host && !in_array($host, $centralDomains)) {
+        $centralDomains[] = $host;
+    }
+}
+
+// Add explicit CENTRAL_DOMAINS from .env (comma-separated)
+if ($extras = env('CENTRAL_DOMAINS')) {
+    $extras = explode(',', $extras);
+    foreach ($extras as $extra) {
+        $extra = trim($extra);
+        if ($extra && !in_array($extra, $centralDomains)) {
+            $centralDomains[] = $extra;
+        }
+    }
+}
+
 return [
     'tenant_model' => \App\Models\Tenant::class,
     'id_generator' => Stancl\Tenancy\UUIDGenerator::class,
@@ -33,11 +59,7 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    'central_domains' => [
-        '127.0.0.1',
-        'localhost',
-        'eduarchive.test', // Added for Laragon support
-    ],
+    'central_domains' => $centralDomains,
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
