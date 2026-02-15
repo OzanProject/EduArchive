@@ -9,6 +9,8 @@ class Document extends Model
 {
   use HasFactory;
 
+  protected $connection = 'tenant';
+
   protected $fillable = [
     'student_id',
     'document_type',
