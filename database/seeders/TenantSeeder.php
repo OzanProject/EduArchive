@@ -38,12 +38,13 @@ class TenantSeeder extends Seeder
 
     // Create Admin User for this Tenant
     // Create Admin User for this Tenant
-    // Initialize tenancy context so that User::create automatically sets tenant_id
-    \Stancl\Tenancy\Facades\Tenancy::initialize($tenant);
+    // Manually set tenant_id to avoid initializing tenancy (which causes database method error in single-db mode)
+    // \Stancl\Tenancy\Facades\Tenancy::initialize($tenant); // REMOVED
 
     $user = User::updateOrCreate(
       ['email' => $adminEmail],
       [
+        'tenant_id' => $tenant->id, // Manual assignment
         'name' => 'Admin ' . $tenantName,
         'password' => Hash::make('12345678'),
         'role' => 'admin_sekolah',
@@ -58,6 +59,6 @@ class TenantSeeder extends Seeder
 
     $this->command->info("Admin user '{$adminEmail}' created for tenant.");
 
-    \Stancl\Tenancy\Facades\Tenancy::end();
+    // \Stancl\Tenancy\Facades\Tenancy::end(); // REMOVED
   }
 }
