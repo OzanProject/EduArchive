@@ -17,15 +17,24 @@ class SuperAdminController extends Controller
 
         // Iterate through tenants to count students and documents
         foreach ($tenants as $tenant) {
-            $tenant->run(function () use (&$total_siswa, &$total_dokumen) {
-                // Check if table exists to avoid errors on empty/broken tenants
-                if (\Illuminate\Support\Facades\Schema::hasTable('students')) {
-                    $total_siswa += \App\Models\Student::count();
-                }
-                if (\Illuminate\Support\Facades\Schema::hasTable('documents')) {
-                    $total_dokumen += \App\Models\Document::count();
-                }
-            });
+            try {
+                $tenant->run(function () use (&$total_siswa, &$total_dokumen) {
+                    // Check if table exists to avoid errors on empty/broken tenants
+                    if (\Illuminate\Support\Facades\Schema::hasTable('students')) {
+                        $total_siswa += \App\Models\Student::count();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasTable('documents')) {
+                        $total_dokumen += \App\Models\Document::count();
+                    }
+                });
+            } catch (\Stancl\Tenancy\Exceptions\TenantDatabaseDoesNotExistException $e) {
+                // Ignore missing databases, just skip this tenant
+                continue;
+            } catch (\Exception $e) {
+                // Log other errors but don't crash dashboard
+                \Illuminate\Support\Facades\Log::error("Failed to fetch stats for tenant {$tenant->id}: " . $e->getMessage());
+                continue;
+            }
         }
 
         // Fetch Recent Activity (Audit Logs)
