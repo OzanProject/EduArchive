@@ -81,22 +81,34 @@
             @php
               $used = $data['storage_usage'];
               $limit = $data['storage_limit'];
-              $percentage = ($used / $limit) * 100;
 
-              // Format Bytes
+              if ($limit === null || $limit <= 0) {
+                $percentage = 0; // Or handle as "Unlimited"
+                $limitFormatted = 'Unlimited';
+              } else {
+                $percentage = ($used / $limit) * 100;
+
+                $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                $bytesLimit = max($limit, 0);
+                $powLimit = floor(($bytesLimit ? log($bytesLimit) : 0) / log(1024));
+                $powLimit = min($powLimit, count($units) - 1);
+                $limitFormatted = round($bytesLimit / (1024 ** $powLimit), 2) . ' ' . $units[$powLimit];
+              }
+
+              // Format Used Bytes
               $units = ['B', 'KB', 'MB', 'GB', 'TB'];
               $bytes = max($used, 0);
               $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
               $pow = min($pow, count($units) - 1);
               $usedFormatted = round($bytes / (1024 ** $pow), 2) . ' ' . $units[$pow];
-
-              $bytesLimit = max($limit, 0);
-              $powLimit = floor(($bytesLimit ? log($bytesLimit) : 0) / log(1024));
-              $powLimit = min($powLimit, count($units) - 1);
-              $limitFormatted = round($bytesLimit / (1024 ** $powLimit), 2) . ' ' . $units[$powLimit];
             @endphp
-            <h3>{{ round($percentage, 1) }}<sup style="font-size: 20px">%</sup></h3>
-            <p>Penyimpanan: {{ $usedFormatted }} / {{ $limitFormatted }}</p>
+            @if($limit === null || $limit <= 0)
+              <h3>{{ $usedFormatted }}</h3>
+              <p>Penyimpanan: Unlimited</p>
+            @else
+              <h3>{{ round($percentage, 1) }}<sup style="font-size: 20px">%</sup></h3>
+              <p>Penyimpanan: {{ $usedFormatted }} / {{ $limitFormatted }}</p>
+            @endif
           </div>
           <div class="icon">
             <i class="fas fa-hdd"></i>
