@@ -57,16 +57,54 @@ class TenantController extends Controller
             'status_aktif' => 'boolean',
         ]);
 
-        $tenant = Tenant::create([
-            'id' => $request->id, // Use the provided ID (Kode Sekolah)
-            'npsn' => $request->npsn,
-            'nama_sekolah' => $request->nama_sekolah,
-            'jenjang' => $request->jenjang,
-            'alamat' => $request->alamat,
-            'subscription_plan' => $request->subscription_plan,
-            'storage_limit' => $request->storage_limit ?? 1073741824, // Default 1GB if null
-            'status_aktif' => $request->has('status_aktif'),
-        ]);
+        try {
+            $tenant = Tenant::create([
+                'id' => $request->id, // Use the provided ID (Kode Sekolah)
+                'npsn' => $request->npsn,
+                'nama_sekolah' => $request->nama_sekolah,
+                'jenjang' => $request->jenjang,
+                'alamat' => $request->alamat,
+                'subscription_plan' => $request->subscription_plan,
+                'storage_limit' => $request->storage_limit ?? 1073741824, // Default 1GB if null
+                'status_aktif' => $request->has('status_aktif'),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Check error codes directly
+            $errorCode = $e->errorInfo[1] ?? 0;
+            $msg = $e->getMessage();
+
+            // 1. Handle "Database already exists" (Error 1007)
+            if ($errorCode == 1007 || str_contains($msg, 'database exists')) {
+                $tenant = Tenant::find($request->id);
+                if ($tenant) {
+                    try {
+                        \Illuminate\Support\Facades\Artisan::call('tenants:migrate', [
+                            '--tenants' => [$tenant->id],
+                            '--force' => true,
+                        ]);
+                    } catch (\Exception $ex) {
+                        \Illuminate\Support\Facades\Log::error("Manual migration failed: " . $ex->getMessage());
+                    }
+                }
+            }
+            // 2. Handle "Access denied" (Error 1044)
+            elseif ($errorCode == 1044 || str_contains($msg, 'Access denied')) {
+                $prefix = config('tenancy.database.prefix');
+                $suffix = config('tenancy.database.suffix');
+                $dbName = $prefix . $request->id . $suffix;
+
+                // Cleanup using query builder to bypass events
+                Tenant::where('id', $request->id)->delete();
+
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', "GAGAL MEMBUAT DATABASE OTOMATIS (Izin Ditolak).<br>
+                    Silakan buat database secara <b>MANUAL</b> di cPanel dengan nama: <code>{$dbName}</code><br>
+                    Setelah database dibuat, silakan KLIK SIMPAN LAGI.");
+            } else {
+                throw $e;
+            }
+        }
 
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('tenant_logos', 'public');
