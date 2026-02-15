@@ -52,7 +52,22 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'tenant',
+        'prefix' => function () {
+            $userPrefix = env('TENANT_DB_PREFIX');
+            if ($userPrefix)
+                return $userPrefix;
+
+            // Auto-detect prefix from DB_USERNAME (common in shared hosting)
+            // e.g., 'uswahgar_dbuser' -> prefix 'uswahgar_tenant'
+            $dbUser = env('DB_USERNAME', '');
+            $parts = explode('_', $dbUser);
+
+            if (count($parts) > 1 && !empty($parts[0])) {
+                return $parts[0] . '_tenant';
+            }
+
+            return 'tenant';
+        },
         'suffix' => '',
 
         /**
