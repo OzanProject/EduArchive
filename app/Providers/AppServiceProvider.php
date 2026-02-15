@@ -103,12 +103,17 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('global_student_count', $formatted_count);
 
-            // Tenant Specific Stats (if tenant context exists)
-            if (tenant()) {
-                $tenant_student_count = \Illuminate\Support\Facades\Cache::remember('tenant_student_count_' . tenant('id'), 300, function () {
-                    return \App\Models\Student::count();
-                });
-                $view->with('tenant_student_count', $tenant_student_count);
+            // Tenant Specific Stats (if tenant context exists AND user is NOT superadmin)
+            if (tenant() && auth()->check() && auth()->user()->role !== 'superadmin') {
+                try {
+                    $tenant_student_count = \Illuminate\Support\Facades\Cache::remember('tenant_student_count_' . tenant('id'), 300, function () {
+                        return \App\Models\Student::count();
+                    });
+                    $view->with('tenant_student_count', $tenant_student_count);
+                } catch (\Exception $e) {
+                    // Fallback if table doesn't exist or connection fails
+                    $view->with('tenant_student_count', 0);
+                }
             }
         });
 
