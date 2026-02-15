@@ -58,7 +58,11 @@ class TenantSeeder extends Seeder
           $this->command->warn("1. Go to your cPanel -> MySQL Databases.");
           $this->command->warn("2. Create a database named: {$dbName}");
           // Extract username from env or config
-          $dbUser = config('database.connections.central.username');
+          $defaultConnection = config('database.default');
+          $dbUser = config("database.connections.{$defaultConnection}.username");
+          if (!$dbUser) {
+            $dbUser = env('DB_USERNAME', 'your_db_user');
+          }
           $this->command->warn("3. Add user '{$dbUser}' to database '{$dbName}' with ALL PRIVILEGES.");
           $this->command->warn("4. Run this seed command again.");
           return; // Stop here
