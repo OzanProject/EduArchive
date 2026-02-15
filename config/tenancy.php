@@ -5,6 +5,23 @@ declare(strict_types=1);
 use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant;
 
+// Logic for calculating prefix (Must be done before return to be cacheable)
+$userPrefix = env('TENANT_DB_PREFIX');
+$calculatedPrefix = 'tenant';
+
+if ($userPrefix) {
+    $calculatedPrefix = $userPrefix;
+} else {
+    // Auto-detect prefix from DB_USERNAME (common in shared hosting)
+    // e.g., 'uswahgar_dbuser' -> prefix 'uswahgar_tenant'
+    $dbUser = env('DB_USERNAME', '');
+    $parts = explode('_', $dbUser);
+
+    if (count($parts) > 1 && !empty($parts[0])) {
+        $calculatedPrefix = $parts[0] . '_tenant';
+    }
+}
+
 return [
     'tenant_model' => \App\Models\Tenant::class,
     'id_generator' => Stancl\Tenancy\UUIDGenerator::class,
@@ -52,22 +69,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => function () {
-            $userPrefix = env('TENANT_DB_PREFIX');
-            if ($userPrefix)
-                return $userPrefix;
-
-            // Auto-detect prefix from DB_USERNAME (common in shared hosting)
-            // e.g., 'uswahgar_dbuser' -> prefix 'uswahgar_tenant'
-            $dbUser = env('DB_USERNAME', '');
-            $parts = explode('_', $dbUser);
-
-            if (count($parts) > 1 && !empty($parts[0])) {
-                return $parts[0] . '_tenant';
-            }
-
-            return 'tenant';
-        },
+        'prefix' => $calculatedPrefix,
         'suffix' => '',
 
         /**
