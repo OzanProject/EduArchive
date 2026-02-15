@@ -37,24 +37,27 @@ class TenantSeeder extends Seeder
     $this->command->info("Tenant '{$tenantName}' is ready.");
 
     // Create Admin User for this Tenant
+    // Create Admin User for this Tenant
     // Initialize tenancy context so that User::create automatically sets tenant_id
-    $tenant->run(function () use ($tenantName, $adminEmail) {
-      $user = User::updateOrCreate(
-        ['email' => $adminEmail],
-        [
-          'name' => 'Admin ' . $tenantName,
-          'password' => Hash::make('12345678'),
-          'role' => 'admin_sekolah',
-          'email_verified_at' => now(),
-        ]
-      );
+    \Stancl\Tenancy\Facades\Tenancy::initialize($tenant);
 
-      // Assign Role if using Spatie (optional check)
-      // if (method_exists($user, 'assignRole')) {
-      //   $user->assignRole('admin_sekolah');
-      // }
+    $user = User::updateOrCreate(
+      ['email' => $adminEmail],
+      [
+        'name' => 'Admin ' . $tenantName,
+        'password' => Hash::make('12345678'),
+        'role' => 'admin_sekolah',
+        'email_verified_at' => now(),
+      ]
+    );
 
-      $this->command->info("Admin user '{$adminEmail}' created for tenant.");
-    });
+    // Assign Role if using Spatie (optional check)
+    // if (method_exists($user, 'assignRole')) {
+    //   $user->assignRole('admin_sekolah');
+    // }
+
+    $this->command->info("Admin user '{$adminEmail}' created for tenant.");
+
+    \Stancl\Tenancy\Facades\Tenancy::end();
   }
 }
