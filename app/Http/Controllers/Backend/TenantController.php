@@ -64,7 +64,7 @@ class TenantController extends Controller
             'jenjang' => $request->jenjang,
             'alamat' => $request->alamat,
             'subscription_plan' => $request->subscription_plan,
-            'storage_limit' => $request->storage_limit,
+            'storage_limit' => $request->storage_limit ?? 1073741824, // Default 1GB if null
             'status_aktif' => $request->has('status_aktif'),
         ]);
 
