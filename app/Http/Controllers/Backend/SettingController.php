@@ -39,12 +39,19 @@ class SettingController extends Controller
     return view('backend.superadmin.settings.smtp', compact('settings'));
   }
 
+  public function whatsapp()
+  {
+    $settings = AppSetting::all()->pluck('value', 'key');
+    return view('backend.superadmin.settings.whatsapp', compact('settings'));
+  }
+
   public function update(Request $request)
   {
     // Define file keys to exclude from general text update
     $fileKeys = [
       'app_logo',
       'app_favicon',
+      'login_cover_image',
       'landing_hero_image',
       'landing_arch_image',
       'landing_partner_logo_1',

@@ -213,6 +213,13 @@
                   <p>Email Server</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.settings.whatsapp') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.settings.whatsapp') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>WhatsApp Gateway</p>
+                </a>
+              </li>
             </ul>
           </li>
         @endif

@@ -51,7 +51,14 @@
   </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark text-[#0d121b]">
+<body
+  class="bg-background-light dark:bg-background-dark text-[#0d121b] relative selection:bg-primary/20 selection:text-primary">
+  <div
+    class="fixed inset-0 -z-10 h-full w-full bg-white dark:bg-slate-950 [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)] opacity-20 dark:opacity-0 pointer-events-none">
+  </div>
+  <div
+    class="fixed inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none">
+  </div>
 
   @include('frontend.partials.navbar')
 

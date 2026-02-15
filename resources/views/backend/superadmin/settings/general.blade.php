@@ -92,14 +92,31 @@
                     </div>
                   </div>
                 </div>
+
+                <div class="form-group">
+                  <label for="login_cover_image">Gambar Sampul Login (Split Layout)</label>
+                  <div class="input-group">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="login_cover_image" name="login_cover_image">
+                      <label class="custom-file-label" for="login_cover_image">Choose file</label>
+                    </div>
+                  </div>
+                  <div class="mt-2" id="login_cover_image_preview_container"
+                    style="{{ isset($settings['login_cover_image']) ? '' : 'display:none' }}">
+                    <img id="login_cover_image_preview"
+                      src="{{ isset($settings['login_cover_image']) ? asset($settings['login_cover_image']) : '' }}"
+                      alt="Login Cover" style="max-height: 100px; border-radius: 8px;">
+                  </div>
+                </div>
               </div>
-              <div class="card-footer">
-                <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
-              </div>
-            </form>
           </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+          </div>
+          </form>
         </div>
       </div>
+    </div>
     </div>
   </section>
 

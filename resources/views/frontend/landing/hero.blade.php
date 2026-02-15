@@ -20,11 +20,11 @@
             class="px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-xl shadow-primary/30 hover:scale-[1.02] transition-transform">Ke
             Dashboard</a>
         @else
-          <a href="{{ route('login') }}"
-            class="px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-xl shadow-primary/30 hover:scale-[1.02] transition-transform">Mulai
-            Demo Sekarang</a>
+          <a href="{{ route('register') }}"
+            class="px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-xl shadow-primary/30 hover:scale-[1.02] transition-transform">Daftarkan
+            Sekolah</a>
         @endauth
-        <button
+        <button onclick="window.location.href='{{ route('features') }}'"
           class="px-8 py-4 bg-white border border-[#e7ebf3] text-[#0d121b] font-bold rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2">
           Pelajari Selengkapnya
           <span class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -32,10 +32,42 @@
       </div>
     </div>
     <div class="relative">
-      <div class="absolute -inset-4 bg-primary/5 rounded-[2rem] blur-2xl"></div>
-      <div class="relative bg-white p-4 rounded-2xl shadow-2xl border border-[#e7ebf3]">
-        <img class="w-full h-auto rounded-lg" data-alt="Dashboard EduArchive"
-          src="{{ isset($settings['landing_hero_image']) ? asset($settings['landing_hero_image']) : 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGYZYQVB6MnIw4sXp_0L-u-6d3DP0yb48gyB91kqGSVbrTn75OxFO9gDeTI-3UgTP3zgja_QAgvnBvDRkPsoEL5LFOAkT1fbDiLLGyHZWXDjFdKZBddXv870mGGnB_H2tGhw5lIRC0r00eSzuIw2ssWyt-r3WZOySeTyzV59fCInaL0GGXFI7XIbpY884EEQNXRh9wOpw0AmVh6jday2tNS3miVSxjsFR6h8BJTz3ugzKTN3fwg1Q6MEfapjMcdiio7vkRkEbbKfrK' }}" />
+      <div
+        class="absolute -inset-4 bg-gradient-to-r from-primary/30 to-purple-600/30 rounded-[2rem] blur-3xl opacity-50 animate-pulse">
+      </div>
+      <div
+        class="relative bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-2xl shadow-primary/20 border border-white/50">
+        <img class="w-full h-auto rounded-lg shadow-inner" data-alt="Dashboard EduArchive"
+          src="{{ isset($settings['landing_hero_image']) ? asset($settings['landing_hero_image']) : 'https://placehold.co/800x600/e2e8f0/64748b?text=Dashboard+Preview' }}" />
+
+        <!-- Floating Badge 1 -->
+        <div
+          class="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 animate-bounce"
+          style="animation-duration: 3s;">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+              <span class="material-symbols-outlined">verified_user</span>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Status Sistem</p>
+              <p class="text-sm font-black text-slate-800">100% Aman</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Badge 2 -->
+        <div class="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 animate-bounce"
+          style="animation-duration: 4s;">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+              <span class="material-symbols-outlined">cloud_upload</span>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Arsip</p>
+              <p class="text-sm font-black text-slate-800">1M+ Dokumen</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

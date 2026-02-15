@@ -74,6 +74,26 @@
                 </div>
 
                 <hr>
+                <h5 class="text-primary mb-3"><i class="fas fa-file-contract mr-2"></i> Link Legal / Kebijakan (Global)
+                </h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>URL Kebijakan Privasi (Privacy Policy)</label>
+                      <input type="text" name="link_privacy" class="form-control"
+                        value="{{ $settings['link_privacy'] ?? '#' }}" placeholder="https://...">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>URL Syarat & Ketentuan (Terms of Service)</label>
+                      <input type="text" name="link_terms" class="form-control"
+                        value="{{ $settings['link_terms'] ?? '#' }}" placeholder="https://...">
+                    </div>
+                  </div>
+                </div>
+
+                <hr>
                 <h5 class="text-primary mb-3"><i class="fas fa-link mr-2"></i> Link Footer</h5>
 
                 <div class="row">

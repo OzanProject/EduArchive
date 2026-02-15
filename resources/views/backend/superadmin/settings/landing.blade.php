@@ -30,6 +30,7 @@
                 <li class="nav-item"><a class="nav-link" href="#features" data-toggle="tab">Fitur</a></li>
                 <li class="nav-item"><a class="nav-link" href="#architecture" data-toggle="tab">Arsitektur</a></li>
                 <li class="nav-item"><a class="nav-link" href="#cta" data-toggle="tab">CTA Section</a></li>
+                <li class="nav-item"><a class="nav-link" href="#partners" data-toggle="tab">Partners</a></li>
               </ul>
             </div>
             <form action="{{ route('superadmin.settings.update') }}" method="POST" enctype="multipart/form-data">
@@ -167,6 +168,46 @@
                       <label>Deskripsi CTA</label>
                       <textarea name="landing_cta_desc" class="form-control summernote-simple"
                         rows="2">{{ $settings['landing_cta_desc'] ?? 'Bergabunglah dengan puluhan instansi lain yang telah meningkatkan efisiensi administrasi mereka.' }}</textarea>
+                    </div>
+                  </div>
+                  
+                  <!-- Partners Tab -->
+                  <div class="tab-pane" id="partners">
+                    <div class="form-group">
+                      <label>Judul Seksi Partner</label>
+                      <input type="text" name="landing_partner_title" class="form-control"
+                        value="{{ $settings['landing_partner_title'] ?? 'Dipercaya Oleh' }}">
+                    </div>
+                     <div class="form-group">
+                      <label>Deskripsi/Subjudul Partner</label>
+                      <textarea name="landing_partner_desc" class="form-control summernote-simple"
+                        rows="2">{{ $settings['landing_partner_desc'] ?? 'Kami bekerja sama dengan berbagai instansi pendidikan terkemuka.' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        @for($i = 1; $i <= 5; $i++)
+                        <div class="col-md-4">
+                            <div class="form-group">
+                              <label>Logo Partner {{ $i }}</label>
+                              <div class="input-group">
+                                <div class="custom-file">
+                                  <input type="file" class="custom-file-input" id="landing_partner_logo_{{ $i }}" name="landing_partner_logo_{{ $i }}">
+                                  <label class="custom-file-label" for="landing_partner_logo_{{ $i }}">Choose file</label>
+                                </div>
+                              </div>
+                              @if(isset($settings['landing_partner_logo_'.$i]))
+                                <div class="mt-2" id="landing_partner_logo_{{ $i }}_preview_container">
+                                  <img id="landing_partner_logo_{{ $i }}_preview" src="{{ asset($settings['landing_partner_logo_'.$i]) }}"
+                                    alt="Partner Logo {{ $i }}" style="max-height: 50px;">
+                                </div>
+                              @else
+                                <div class="mt-2" id="landing_partner_logo_{{ $i }}_preview_container" style="display:none">
+                                  <img id="landing_partner_logo_{{ $i }}_preview" src="" alt="Partner Logo {{ $i }}" style="max-height: 50px;">
+                                </div>
+                              @endif
+                            </div>
+                        </div>
+                        @endfor
                     </div>
                   </div>
 

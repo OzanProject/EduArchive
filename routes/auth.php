@@ -33,6 +33,13 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+    // WhatsApp OTP Routes
+    Route::post('forgot-password/otp', [App\Http\Controllers\Auth\PasswordResetOtpController::class, 'sendOtp'])
+        ->name('password.otp.send');
+    Route::post('forgot-password/otp/verify', [App\Http\Controllers\Auth\PasswordResetOtpController::class, 'verifyOtp'])
+        ->name('password.otp.verify');
+    Route::post('reset-password/otp', [App\Http\Controllers\Auth\PasswordResetOtpController::class, 'resetPassword'])
+        ->name('password.otp.update');
 });
 
 Route::middleware('auth')->group(function () {

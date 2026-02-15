@@ -10,6 +10,13 @@
         $logo = $dinas_logo ?? asset('adminlte/dist/img/AdminLTELogo.png');
         $appName = \App\Models\AppSetting::getSetting('app_name', config('app.name'));
     }
+
+    // Legal Links Logic
+    $privacyLink = \App\Models\AppSetting::getSetting('link_privacy');
+    $privacyLink = ($privacyLink && $privacyLink !== '#') ? $privacyLink : route('page.show', 'privacy-policy');
+
+    $termsLink = \App\Models\AppSetting::getSetting('link_terms');
+    $termsLink = ($termsLink && $termsLink !== '#') ? $termsLink : route('page.show', 'terms-of-service');
 @endphp
 
 <!DOCTYPE html>
@@ -19,6 +26,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Masuk - {{ $appName }}</title>
+    <link rel="icon" type="image/x-icon"
+        href="{{ \App\Models\AppSetting::getSetting('app_favicon') ? asset(\App\Models\AppSetting::getSetting('app_favicon')) : asset('favicon.ico') }}">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet" />
@@ -68,171 +77,192 @@
 </head>
 
 <body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col">
-    <!-- Navigation Header -->
-    <header
-        class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7ebf3] dark:border-slate-800 bg-white dark:bg-slate-900 px-6 md:px-10 py-3">
-        <div class="flex items-center gap-3 text-primary">
-            <div class="size-8 flex items-center justify-center">
-                <img src="{{ $logo }}" alt="Logo" class="w-full h-full object-contain">
-            </div>
-            <h2 class="text-[#0d121b] dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">
-                {{ $appName }}</h2>
-        </div>
-        <div class="flex items-center gap-4">
-            <button
-                class="hidden sm:flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary/10 text-primary text-sm font-bold leading-normal">
-                <span class="truncate">Akses Institusi</span>
-            </button>
-            <button
-                class="flex min-w-[40px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                <span class="material-symbols-outlined">help</span>
-            </button>
-        </div>
-    </header>
+
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex items-center justify-center p-4 md:p-8">
+    <main class="flex-1 w-full flex">
+        <!-- Left Side (Image & branding) - Hidden on Mobile -->
+        <div class="hidden lg:flex w-1/2 bg-slate-100 flex-col justify-between p-12 relative overflow-hidden">
+            <!-- Dynamic Background Image -->
+            <div class="absolute inset-0 z-0">
+                <img src="{{ isset(\App\Models\AppSetting::all()->pluck('value', 'key')['login_cover_image']) ? asset(\App\Models\AppSetting::all()->pluck('value', 'key')['login_cover_image']) : 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop' }}"
+                    class="w-full h-full object-cover" alt="Login Cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
+            </div>
+
+            <div class="relative z-10">
+                <div
+                    class="size-24 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 border border-white/20 p-4">
+                    <img src="{{ \App\Models\AppSetting::getSetting('app_logo') ? asset(\App\Models\AppSetting::getSetting('app_logo')) : asset('adminlte/dist/img/AdminLTELogo.png') }}"
+                        class="w-full h-full object-contain" alt="App Logo">
+                </div>
+                <h2 class="text-4xl font-bold text-white mb-4 leading-tight">
+                    {{ \App\Models\AppSetting::getSetting('app_name', 'EduArchive') }}
+                </h2>
+                <p class="text-white/80 text-lg max-w-md">
+                    {{ \App\Models\AppSetting::getSetting('app_description', 'Solusi terintegrasi untuk manajemen surat, arsip digital, dan legalisir ijazah yang aman dan efisien.') }}
+                </p>
+            </div>
+
+            <div class="relative z-10 flex gap-4 text-white/60 text-sm font-medium">
+                <span>&copy; {{ date('Y') }} {{ $appName }}</span>
+                <span>&bull;</span>
+                <a href="{{ $privacyLink }}" class="hover:text-white transition-colors">Privacy Policy</a>
+                <span>&bull;</span>
+                <a href="{{ $termsLink }}" class="hover:text-white transition-colors">Terms of Service</a>
+            </div>
+        </div>
+
+        <!-- Right Side (Login Form) -->
         <div
-            class="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <!-- Welcome Section -->
-            <div class="p-8 pb-4">
-                <h1 class="text-[#0d121b] dark:text-white text-3xl font-extrabold leading-tight tracking-tight mb-2">
-                    Masuk ke {{ $appName }}</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-base">Akses arsip dan data akademik sekolah Anda.</p>
-            </div>
+            class="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-white dark:bg-slate-900 overflow-y-auto">
+            <div class="w-full max-w-[420px]">
 
-            <!-- Role Switcher (Hidden Input) -->
-            <input type="hidden" id="selected_role" value="{{ $isTenant ? 'school' : 'dinas' }}">
-
-            <!-- Role Tabs -->
-            <div class="px-8 pb-2">
-                <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                    <button type="button" id="btn_dinas"
-                        class="flex-1 py-2 text-sm font-bold rounded-md transition-all text-slate-500 hover:text-slate-700 dark:text-slate-400"
-                        onclick="selectRole('dinas')">
-                        Dinas Pendidikan
-                    </button>
-                    <button type="button" id="btn_school"
-                        class="flex-1 py-2 text-sm font-bold rounded-md transition-all text-slate-500 hover:text-slate-700 dark:text-slate-400"
-                        onclick="selectRole('school')">
-                        Sekolah / Operator
-                    </button>
-                </div>
-            </div>
-
-            <!-- Alerts -->
-            <div id="alert_central_school" class="mx-8 mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm hidden">
-                <span class="font-bold">Info:</span> Masukkan Kode Sekolah untuk dialihkan ke portal login sekolah.
-            </div>
-            <div id="alert_tenant_dinas" class="mx-8 mt-4 p-3 bg-amber-50 text-amber-700 rounded-lg text-sm hidden">
-                <span class="font-bold">Perhatian:</span> Akun Dinas login melalui Portal Pusat. Anda akan dialihkan.
-            </div>
-
-            <!-- Login Form -->
-            <form class="p-8 pt-4 space-y-6" id="loginForm" method="POST"
-                action="{{ $isTenant && Route::has('tenant.login') ? route('tenant.login', ['tenant' => tenant('id')]) : route('login') }}">
-                @csrf
-
-                <!-- School ID Field (Dynamic) -->
-                <div class="space-y-2 hidden" id="school_selector_group">
-                    <label class="text-[#0d121b] dark:text-slate-200 text-sm font-semibold leading-normal">Kode
-                        Sekolah</label>
-                    <div class="relative">
-                        <input type="text" id="school_id"
-                            class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[#0d121b] dark:text-white h-12 px-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all placeholder:text-slate-400"
-                            placeholder="Contoh: smpn1" autocomplete="off" />
-                        <p class="text-xs text-slate-500 mt-1">Masukkan kode sekolah untuk masuk ke portal sekolah.</p>
-                    </div>
+                <!-- Mobile Logo (Visible only on small screens) -->
+                <div class="lg:hidden mb-8 flex items-center gap-2">
+                    <img src="{{ $logo }}" alt="Logo" class="h-10 w-auto">
+                    <span class="text-xl font-bold text-slate-900 dark:text-white">{{ $appName }}</span>
                 </div>
 
-                <!-- Email Field -->
-                <div class="space-y-2">
-                    <label class="text-[#0d121b] dark:text-slate-200 text-sm font-semibold leading-normal">Email /
-                        Username</label>
-                    <div class="relative">
-                        <input type="email" name="email" id="email" value="{{ old('email') ?? request('email') }}"
-                            class="w-full rounded-lg border {{ $errors->has('email') ? 'border-red-500' : 'border-slate-300' }} dark:border-slate-700 bg-white dark:bg-slate-800 text-[#0d121b] dark:text-white h-12 px-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all placeholder:text-slate-400"
-                            placeholder="admin@sekolah.sch.id" required />
-                    </div>
-                    @error('email')
-                        <p class="text-xs text-red-500">{{ $message }}</p>
-                    @enderror
+                <!-- Welcome Section -->
+                <div class="mb-8">
+                    <h1
+                        class="text-[#0d121b] dark:text-white text-3xl font-extrabold leading-tight tracking-tight mb-2">
+                        Selamat Datang! 👋</h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-base">Silakan masuk ke akun Anda untuk
+                        melanjutkan.</p>
                 </div>
 
-                <!-- Password Field -->
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                        <label
-                            class="text-[#0d121b] dark:text-slate-200 text-sm font-semibold leading-normal">Password</label>
-                        <a class="text-primary text-sm font-semibold hover:underline"
-                            href="{{ route('password.request') }}">Lupa Password?</a>
-                    </div>
-                    <div class="relative flex items-center">
-                        <input type="password" name="password" id="password"
-                            class="w-full rounded-lg border {{ $errors->has('password') ? 'border-red-500' : 'border-slate-300' }} dark:border-slate-700 bg-white dark:bg-slate-800 text-[#0d121b] dark:text-white h-12 px-4 pr-12 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all placeholder:text-slate-400"
-                            placeholder="••••••••" required />
-                        <button class="absolute right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                            type="button" onclick="togglePassword()">
-                            <span class="material-symbols-outlined" id="eyeIcon">visibility</span>
+                <!-- Role Switcher (Hidden Input) -->
+                <input type="hidden" id="selected_role" value="{{ $isTenant ? 'school' : 'dinas' }}">
+
+                <!-- Role Tabs -->
+                <div class="mb-6">
+                    <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                        <button type="button" id="btn_dinas"
+                            class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                            onclick="selectRole('dinas')">
+                            Dinas Pendidikan
+                        </button>
+                        <button type="button" id="btn_school"
+                            class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                            onclick="selectRole('school')">
+                            Sekolah / Operator
                         </button>
                     </div>
-                    @error('password')
-                        <p class="text-xs text-red-500">{{ $message }}</p>
-                    @enderror
                 </div>
 
-                <!-- Remember Me -->
-                <div class="flex items-center gap-3">
-                    <input
-                        class="size-5 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary/20 cursor-pointer"
-                        id="remember" name="remember" type="checkbox" />
-                    <label class="text-slate-600 dark:text-slate-400 text-sm font-medium cursor-pointer"
-                        for="remember">Ingat saya</label>
+                <!-- Alerts -->
+                <div id="alert_central_school"
+                    class="mb-6 p-4 bg-blue-50 text-blue-700 rounded-xl text-sm hidden border border-blue-100 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-lg mt-0.5">info</span>
+                    <div>
+                        <span class="font-bold block mb-1">Portal Sekolah</span>
+                        Masukkan Kode Sekolah Anda untuk dialihkan ke halaman login khusus sekolah Anda.
+                    </div>
+                </div>
+                <div id="alert_tenant_dinas"
+                    class="mb-6 p-4 bg-amber-50 text-amber-700 rounded-xl text-sm hidden border border-amber-100 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-lg mt-0.5">warning</span>
+                    <div>
+                        <span class="font-bold block mb-1">Akses Dinas</span>
+                        Akun Dinas Login melalui Portal Pusat. Anda akan dialihkan.
+                    </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="space-y-3 pt-2">
-                    <button
-                        class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-lg transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-                        type="submit">
-                        <span>Masuk</span>
-                        <span class="material-symbols-outlined text-xl">login</span>
-                    </button>
+                <!-- Login Form -->
+                <form class="space-y-5" id="loginForm" method="POST"
+                    action="{{ $isTenant && Route::has('tenant.login') ? route('tenant.login', ['tenant' => tenant('id')]) : route('login') }}">
+                    @csrf
 
-                    @if(config('app.env') === 'local' && isset($demoUsers))
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <button type="button"
-                                onclick="$('#email').val('{{ $demoUsers['dinas']->email ?? '' }}');$('#password').val('password');selectRole('dinas')"
-                                class="text-xs bg-gray-100 p-2 rounded text-gray-600 hover:bg-gray-200">Demo Dinas</button>
-                            <button type="button"
-                                onclick="$('#email').val('{{ $demoUsers['school_admin']->email ?? '' }}');$('#password').val('password');selectRole('school')"
-                                class="text-xs bg-gray-100 p-2 rounded text-gray-600 hover:bg-gray-200">Demo
-                                Sekolah</button>
+                    <!-- School ID Field (Dynamic) -->
+                    <div class="space-y-2 hidden animate-fade-in-down" id="school_selector_group">
+                        <label class="text-[#0d121b] dark:text-slate-200 text-sm font-bold">Kode Sekolah</label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-3.5 text-slate-400 material-symbols-outlined text-[20px]">domain</span>
+                            <input type="text" id="school_id"
+                                class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[#0d121b] dark:text-white h-12 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 font-medium"
+                                placeholder="Contoh: smpn1" autocomplete="off" />
                         </div>
-                    @endif
-                </div>
-            </form>
+                    </div>
 
-            <!-- Card Footer -->
-            @if(!$isTenant)
-                <div
-                    class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-center text-sm">
-                    <p class="text-slate-500 dark:text-slate-400">
-                        Sekolah baru?
-                        <a class="text-primary font-bold hover:underline" href="{{ route('register') }}">Daftarkan
-                            Sekolah</a>
-                    </p>
-                </div>
-            @endif
+                    <!-- Email Field -->
+                    <div class="space-y-2">
+                        <label class="text-[#0d121b] dark:text-slate-200 text-sm font-bold">Email / Username</label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-3.5 text-slate-400 material-symbols-outlined text-[20px]">mail</span>
+                            <input type="email" name="email" id="email" value="{{ old('email') ?? request('email') }}"
+                                class="w-full rounded-xl border {{ $errors->has('email') ? 'border-red-500' : 'border-slate-200' }} dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[#0d121b] dark:text-white h-12 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 font-medium"
+                                placeholder="nama@email.com" required />
+                        </div>
+                        @error('email')
+                            <p class="text-xs text-red-500 font-bold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[#0d121b] dark:text-slate-200 text-sm font-bold">Password</label>
+                            <a class="text-primary text-sm font-bold hover:underline"
+                                href="{{ route('password.request') }}">Lupa Password?</a>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-3.5 text-slate-400 material-symbols-outlined text-[20px]">lock</span>
+                            <input type="password" name="password" id="password"
+                                class="w-full rounded-xl border {{ $errors->has('password') ? 'border-red-500' : 'border-slate-200' }} dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[#0d121b] dark:text-white h-12 pl-12 pr-12 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 font-medium"
+                                placeholder="••••••••" required />
+                            <button
+                                class="absolute right-4 top-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                                type="button" onclick="togglePassword()">
+                                <span class="material-symbols-outlined text-[20px]" id="eyeIcon">visibility</span>
+                            </button>
+                        </div>
+                        @error('password')
+                            <p class="text-xs text-red-500 font-bold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center gap-3">
+                        <input
+                            class="size-5 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary/20 cursor-pointer"
+                            id="remember" name="remember" type="checkbox" />
+                        <label class="text-slate-600 dark:text-slate-400 text-sm font-medium cursor-pointer"
+                            for="remember">Ingat saya</label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-4 pt-2">
+                        <button
+                            class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/30 hover:shadow-primary/50 flex items-center justify-center gap-2 transform active:scale-[0.98]"
+                            type="submit">
+                            <span>Masuk Sekarang</span>
+                            <span class="material-symbols-outlined text-xl">login</span>
+                        </button>
+
+
+                    </div>
+                </form>
+
+                <!-- Footer Links -->
+                @if(!$isTenant)
+                    <div class="mt-8 text-center">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">
+                            Belum mendaftarkan sekolah?
+                            <a class="text-primary font-bold hover:underline ml-1" href="{{ route('register') }}">Daftar
+                                Sekarang</a>
+                        </p>
+                    </div>
+                @endif
+            </div>
         </div>
     </main>
 
-    <!-- Page Footer -->
-    <footer class="p-6 text-center">
-        <p class="text-slate-400 dark:text-slate-600 text-xs">
-            © {{ date('Y') }} {{ $appName }}. Secure Institutional Information Systems.
-        </p>
-    </footer>
+
 
     <!-- Logic Script -->
     <script>

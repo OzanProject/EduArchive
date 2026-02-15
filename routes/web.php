@@ -36,7 +36,11 @@ Route::get('storage/{path}', function ($path) {
 
 // Root Route
 // Root Route
+// Root Route
 Route::get('/', [\App\Http\Controllers\FrontendController::class, 'index'])->name('home');
+Route::get('/fitur', [\App\Http\Controllers\FrontendController::class, 'features'])->name('features');
+Route::get('/arsitektur', [\App\Http\Controllers\FrontendController::class, 'architecture'])->name('architecture');
+Route::get('/keamanan', [\App\Http\Controllers\FrontendController::class, 'security'])->name('security');
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -89,6 +93,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/landing', [SettingController::class, 'landing'])->name('landing');
             Route::get('/footer', [SettingController::class, 'footer'])->name('footer');
             Route::get('/smtp', [SettingController::class, 'smtp'])->name('smtp');
+            Route::get('/whatsapp', [SettingController::class, 'whatsapp'])->name('whatsapp');
             Route::post('/update', [SettingController::class, 'update'])->name('update');
         });
 
