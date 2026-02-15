@@ -22,6 +22,7 @@ class TenantSeeder extends Seeder
 
     $tenant = Tenant::find($tenantId);
 
+    // Create Tenant if not exists
     if (!$tenant) {
       $tenant = Tenant::create([
         'id' => $tenantId,
@@ -36,19 +37,28 @@ class TenantSeeder extends Seeder
     // Ensure Domain Record Exists
     $tenant->domains()->firstOrCreate(['domain' => $tenantId]);
 
-    // self-healing db and migration
+    // Initialize Tenant Database
     try {
       $tenant->database()->makeCredentials();
-      if (!$tenant->database()->manager()->databaseExists($tenant->database()->getName())) {
-        $tenant->database()->manager()->createDatabase($tenant);
+      $manager = $tenant->database()->manager();
+
+      // Check if database exists, if not create it
+      if (!$manager->databaseExists($tenant->database()->getName())) {
+        $this->command->info("Creating database for tenant: {$tenant->id}");
+        $manager->createDatabase($tenant);
+      } else {
+        $this->command->info("Database for tenant {$tenant->id} already exists.");
       }
 
+      // Run Migrations
+      $this->command->info("Migrating tenant database...");
       Artisan::call('tenants:migrate', [
         '--tenants' => [$tenant->id],
         '--force' => true,
       ]);
+
     } catch (\Exception $e) {
-      // Ignore
+      $this->command->error("Error setting up tenant database: " . $e->getMessage());
     }
 
     // Create Admin User
@@ -62,6 +72,7 @@ class TenantSeeder extends Seeder
           'email_verified_at' => now(),
         ]
       );
+      $this->command->info("Admin user created for tenant.");
     });
   }
 }
