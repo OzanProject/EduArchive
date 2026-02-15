@@ -203,10 +203,54 @@ class TenantController extends Controller
      */
     public function destroy(string $id)
     {
-        $tenant = Tenant::find($id);
-        $tenant->delete();
+        $tenant = Tenant::findOrFail($id);
+        $dbName = $tenant->database()->getName();
 
-        return redirect()->route('superadmin.tenants.index')->with('success', 'Sekolah berhasil dihapus!');
+        // 1. Attempt to delete database (Optional on Shared Hosting)
+        $dbDeletionStatus = 'success';
+        try {
+            $tenant->database()->manager()->deleteDatabase($tenant);
+        } catch (\Exception $e) {
+            $dbDeletionStatus = 'failed';
+            // Log error but continue to delete the tenant record
+            \Illuminate\Support\Facades\Log::warning("Failed to delete database for tenant {$id}: " . $e->getMessage());
+        }
+
+        // 2. Delete Tenant Record
+        // We use delete() which triggers events. Since we already tried deleting DB manually/failed,
+        // we might need to prevent the event from firing or handle it. 
+        // Stancl Tenancy hooks into 'deleting' event.
+        // To avoid double deletion attempt or error, we can disable events if needed,
+        // BUT the package might not have a way to skip just the DB deletion listener easily without removing the job.
+
+        // BETTER APPROACH: 
+        // The package deletes DB on the 'deleted' event via Job.
+        // If we want to suppress the crash, we should catch the error during $tenant->delete() if it's synchronous,
+        // or removing the event listener?
+        // 
+        // Actually, if QUEUE is not set up, it runs synchronously.
+        // The simple fix is to wrap $tenant->delete() in try-catch logic specifically for the DB permission error.
+
+        try {
+            $tenant->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (str_contains($e->getMessage(), 'Access denied') && str_contains($e->getMessage(), 'DROP DATABASE')) {
+                // Force delete the record if DB deletion failed due to permissions
+                // We can temporary disable events to delete the record
+                $tenant->unsetEventDispatcher();
+                $tenant->delete();
+                $dbDeletionStatus = 'failed_permission';
+            } else {
+                throw $e;
+            }
+        }
+
+        if ($dbDeletionStatus === 'failed' || $dbDeletionStatus === 'failed_permission') {
+            return redirect()->route('superadmin.tenants.index')
+                ->with('success', 'Data Sekolah dihapus. WARNING: Database harus dihapus MANUAL via cPanel karena keterbatasan izin hosting.');
+        }
+
+        return redirect()->route('superadmin.tenants.index')->with('success', 'Sekolah dan Database berhasil dihapus!');
     }
 
     /**
