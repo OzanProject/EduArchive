@@ -16,6 +16,7 @@ class StudentTemplateExport implements FromCollection, WithHeadings, WithStyles,
     return collect([
       [
         'Budi Santoso',
+        'L', // Gender
         '0054321', // NISN
         '3501012005050001', // NIK
         'VII-A',
@@ -31,6 +32,7 @@ class StudentTemplateExport implements FromCollection, WithHeadings, WithStyles,
   {
     return [
       'nama_lengkap',
+      'jenis_kelamin', // L/P
       'nisn',
       'nik',
       'kelas',

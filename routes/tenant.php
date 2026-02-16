@@ -42,6 +42,9 @@ Route::group([
         return view('tenant.welcome');
     })->name('tenant.home'); // added name for easier redirection
 
+    Route::get('/profil', [\App\Http\Controllers\Tenant\PublicProfileController::class, 'index'])->name('tenant.profile');
+    Route::get('/profil/detail/{type}', [\App\Http\Controllers\Tenant\PublicProfileController::class, 'getDetail'])->name('tenant.profile.detail');
+
     // Tenant Dashboard (Redirect to specific dashboard based on role)
     Route::get('/dashboard', function () {
         $user = auth()->user();
@@ -90,6 +93,7 @@ Route::group([
         Route::get('reports', [\App\Http\Controllers\Backend\ReportController::class, 'index'])->name('reports.index');
 
         // Settings
+        Route::get('settings/profile', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'editProfile'])->name('settings.profile');
         Route::get('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'index'])->name('settings.index');
         Route::post('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'update'])->name('settings.update');
     });

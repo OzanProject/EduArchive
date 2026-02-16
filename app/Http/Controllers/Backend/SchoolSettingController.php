@@ -38,11 +38,22 @@ class SchoolSettingController extends Controller
     return view('backend.adminlembaga.settings.index', compact('settings', 'tenant', 'supportPhone'));
   }
 
+  public function editProfile()
+  {
+    $settings = AppSetting::all()->pluck('value', 'key');
+    // Merge defaults
+    if (!isset($settings['school_name']) && tenant('nama_sekolah')) {
+      $settings['school_name'] = tenant('nama_sekolah');
+    }
+    $tenant = tenant();
+    return view('backend.adminlembaga.settings.profile', compact('settings', 'tenant'));
+  }
+
   public function update(Request $request)
   {
     // Logs removed for production
 
-    $data = $request->except(['_token', '_method', 'school_logo', 'logo_kabupaten', 'school_signature', 'school_stamp']);
+    $data = $request->except(['_token', '_method', 'school_logo', 'logo_kabupaten', 'school_signature', 'school_stamp', 'school_headmaster_photo']);
 
     // Clear the global array cache for this tenant
     Cache::forget('app_settings_' . (tenant('id') ?? 'global'));
@@ -112,6 +123,28 @@ class SchoolSettingController extends Controller
 
       AppSetting::updateOrCreate(
         ['key' => 'school_stamp'],
+        ['value' => $url, 'type' => 'image']
+      );
+    }
+
+    // Handle File Uploads (Headmaster Photo)
+    if ($request->hasFile('school_headmaster_photo')) {
+      $path = $request->file('school_headmaster_photo')->store('settings', 'public');
+      $url = tenant_asset($path);
+
+      AppSetting::updateOrCreate(
+        ['key' => 'school_headmaster_photo'],
+        ['value' => $url, 'type' => 'image']
+      );
+    }
+
+    // Handle File Uploads (Hero Image)
+    if ($request->hasFile('school_hero_image')) {
+      $path = $request->file('school_hero_image')->store('settings', 'public');
+      $url = tenant_asset($path);
+
+      AppSetting::updateOrCreate(
+        ['key' => 'school_hero_image'],
         ['value' => $url, 'type' => 'image']
       );
     }

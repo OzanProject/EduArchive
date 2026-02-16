@@ -30,7 +30,7 @@ class SchoolAdminController extends Controller
             $usage = \App\Models\StorageUsage::create(['used_space' => $totalBytes, 'last_calculated' => now()]);
         }
         $data['storage_usage'] = $usage->used_space;
-        $data['storage_limit'] = tenant('storage_limit') ?? 1073741824; // Default 1GB if not set on tenant
+        $data['storage_limit'] = tenant('storage_limit');
 
         // Fetch Recent Activity (Audit Logs) for this Tenant
         $recent_logs = \App\Models\AuditLog::where('tenant_id', tenant('id'))

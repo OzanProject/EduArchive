@@ -19,7 +19,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Lupa Password - {{ $appName }}</title>
     <link rel="icon" type="image/x-icon"
-        href="{{ \App\Models\AppSetting::getSetting('app_favicon') ? asset(\App\Models\AppSetting::getSetting('app_favicon')) : asset('favicon.ico') }}">
+        href="{{ !empty($central_branding['app_favicon']) ? asset($central_branding['app_favicon']) : asset('favicon.ico') }}">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet" />

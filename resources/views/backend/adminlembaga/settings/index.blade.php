@@ -24,6 +24,7 @@
                 Dokumen & Kop Surat
               </a>
             </li>
+
             <li class="nav-item">
               <a class="nav-link" id="account-tab" data-toggle="pill" href="#account" role="tab">
                 Info Akun
@@ -188,6 +189,8 @@
               </form>
             </div>
 
+
+
             {{-- ================= ACCOUNT INFO TAB ================= --}}
             <div class="tab-pane fade" id="account">
               <div class="row">
@@ -301,13 +304,13 @@
           reader.onload = function (e) {
 
             const html = `
-                                    <div class="position-relative d-inline-block">
-                                      <img src="${e.target.result}"
-                                           class="border p-2 bg-light rounded shadow-sm"
-                                           style="max-height:100px; object-fit:contain;">
-                                      <small class="d-block text-muted mt-1">${file.name}</small>
-                                    </div>
-                                  `;
+                                                            <div class="position-relative d-inline-block">
+                                                              <img src="${e.target.result}"
+                                                                   class="border p-2 bg-light rounded shadow-sm"
+                                                                   style="max-height:100px; object-fit:contain;">
+                                                              <small class="d-block text-muted mt-1">${file.name}</small>
+                                                            </div>
+                                                          `;
 
             $('#' + containerId).html(html);
           };
@@ -329,6 +332,36 @@
 
         $('#school_stamp').on('change', function () {
           previewImage(this, 'preview-container-school_stamp');
+        });
+
+        // Activate tab based on hash
+        function activateTabFromHash() {
+          var hash = window.location.hash;
+          if (hash) {
+            var tabLink = $('.nav-link[href="' + hash + '"]');
+            if (tabLink.length) {
+              tabLink.tab('show');
+              // Scroll to top of tabs or page to ensure visibility
+              $('html, body').scrollTop(0);
+            }
+          }
+        }
+
+        // Run on load
+        activateTabFromHash();
+
+        // Run on hash change (when clicking sidebar links while already on page)
+        $(window).on('hashchange', function () {
+          activateTabFromHash();
+        });
+
+        // Change hash on tab click (Update URL when user manually clicks tabs)
+        $('.nav-link').on('shown.bs.tab', function (e) {
+          if (history.pushState) {
+            history.pushState(null, null, e.target.hash);
+          } else {
+            window.location.hash = e.target.hash;
+          }
         });
 
       });

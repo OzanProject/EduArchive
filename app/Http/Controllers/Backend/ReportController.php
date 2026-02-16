@@ -17,15 +17,15 @@ class ReportController extends Controller
         $stats = [
             'students' => [
                 'total' => Student::count(),
-                'active' => Student::where('status_kelulusan', 'Aktif')->count(),
-                'graduated' => Student::where('status_kelulusan', 'Lulus')->count(),
-                'others' => Student::whereNotIn('status_kelulusan', ['Aktif', 'Lulus'])->count(),
+                'active' => Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->count(),
+                'graduated' => Student::whereIn('status_kelulusan', ['Lulus', 'lulus'])->count(),
+                'others' => Student::whereNotIn('status_kelulusan', ['Aktif', 'aktif', 'Lulus', 'lulus'])->count(),
             ],
             'teachers' => [
                 'total' => Teacher::count(),
-                'pns' => Teacher::where('status_kepegawaian', 'PNS')->count(),
-                'pppk' => Teacher::where('status_kepegawaian', 'PPPK')->count(),
-                'honorer' => Teacher::where('status_kepegawaian', 'Honorer')->count(),
+                'pns' => Teacher::whereIn('status_kepegawaian', ['PNS', 'pns'])->count(),
+                'pppk' => Teacher::whereIn('status_kepegawaian', ['PPPK', 'pppk'])->count(),
+                'honorer' => Teacher::whereIn('status_kepegawaian', ['Honorer', 'honorer'])->count(),
             ],
             'classrooms' => Classroom::count(),
             'documents' => Document::count(),

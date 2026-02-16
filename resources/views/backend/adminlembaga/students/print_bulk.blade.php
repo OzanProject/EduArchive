@@ -242,6 +242,11 @@
           <td>{{ $student->nisn ? $student->nisn : '-' }} / {{ $student->nik ? $student->nik : '-' }}</td>
         </tr>
         <tr>
+          <td>Jenis Kelamin</td>
+          <td>:</td>
+          <td>{{ $student->gender == 'L' ? 'Laki-laki' : ($student->gender == 'P' ? 'Perempuan' : '-') }}</td>
+        </tr>
+        <tr>
           <td>Tempat, Tanggal Lahir</td>
           <td>:</td>
           <td>{{ $student->birth_place ?? '-' }},

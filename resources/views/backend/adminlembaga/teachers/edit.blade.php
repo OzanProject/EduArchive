@@ -145,7 +145,12 @@
               </div>
               @if($teacher->foto)
                 <div class="mt-2">
-                  <img src="{{ asset('storage/' . $teacher->foto) }}" alt="Foto" width="100">
+                  <img id="preview-foto" src="{{ tenant_asset($teacher->foto) }}" alt="Foto" width="100"
+                    class="img-thumbnail">
+                </div>
+              @else
+                <div class="mt-2">
+                  <img id="preview-foto" src="" alt="Preview Foto" width="100" class="img-thumbnail" style="display: none;">
                 </div>
               @endif
               <small class="text-muted">Format: JPG, JPEG, PNG. Max: 2MB.</small>
@@ -161,3 +166,20 @@
     </div>
   </div>
 @endsection
+
+@push('scripts')
+  <script>
+    $(document).ready(function () {
+      $('#foto').on('change', function () {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass("selected").html(fileName);
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#preview-foto').attr('src', e.target.result).show();
+        }
+        reader.readAsDataURL(this.files[0]);
+      });
+    });
+  </script>
+@endpush

@@ -47,8 +47,20 @@ class TeacherController extends Controller
     {
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'nip' => 'nullable|string|unique:teachers,nip',
-            'nuptk' => 'nullable|string|unique:teachers,nuptk',
+            'nip' => [
+                'nullable',
+                'string',
+                \Illuminate\Validation\Rule::unique('teachers')->where(function ($query) {
+                    return $query->where('tenant_id', tenant('id'));
+                }),
+            ],
+            'nuptk' => [
+                'nullable',
+                'string',
+                \Illuminate\Validation\Rule::unique('teachers')->where(function ($query) {
+                    return $query->where('tenant_id', tenant('id'));
+                }),
+            ],
             'jenis_kelamin' => 'required|in:L,P',
             'email' => 'nullable|email',
             'status_kepegawaian' => 'required',
@@ -85,8 +97,20 @@ class TeacherController extends Controller
 
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'nip' => 'nullable|string|unique:teachers,nip,' . $id,
-            'nuptk' => 'nullable|string|unique:teachers,nuptk,' . $id,
+            'nip' => [
+                'nullable',
+                'string',
+                \Illuminate\Validation\Rule::unique('teachers')->ignore($id)->where(function ($query) {
+                    return $query->where('tenant_id', tenant('id'));
+                }),
+            ],
+            'nuptk' => [
+                'nullable',
+                'string',
+                \Illuminate\Validation\Rule::unique('teachers')->ignore($id)->where(function ($query) {
+                    return $query->where('tenant_id', tenant('id'));
+                }),
+            ],
             'jenis_kelamin' => 'required|in:L,P',
             'email' => 'nullable|email',
             'status_kepegawaian' => 'required',

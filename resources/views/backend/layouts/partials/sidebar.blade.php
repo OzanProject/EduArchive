@@ -9,7 +9,7 @@
     @if(auth()->user()->role === 'admin_sekolah' || auth()->user()->role === 'operator')
       {{-- Tenant Logo --}}
       <img
-        src="{{ tenant('logo') ? tenant_asset(tenant('logo')) : (!empty($dinas_logo) ? $dinas_logo : asset('adminlte3/dist/img/AdminLTELogo.png')) }}"
+        src="{{ tenant('logo') ? tenant_asset(tenant('logo')) : (!empty($central_branding['app_logo']) ? asset($central_branding['app_logo']) : asset('adminlte3/dist/img/AdminLTELogo.png')) }}"
         alt="School Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-bold" style="white-space: normal; line-height: 1.2; font-size: 0.9rem;">
         {{ $app_settings['school_name'] ?? tenant('nama_sekolah') }}
@@ -17,7 +17,7 @@
     @else
       {{-- Central App Logo --}}
       <img
-        src="{{ !empty($app_settings['app_logo']) ? $app_settings['app_logo'] : asset('adminlte3/dist/img/AdminLTELogo.png') }}"
+        src="{{ !empty($app_settings['app_logo']) ? asset($app_settings['app_logo']) : asset('adminlte3/dist/img/AdminLTELogo.png') }}"
         alt="App Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-bold" style="white-space: normal; line-height: 1.2;">
         {{ $app_settings['app_name'] ?? 'EduArchive' }}
@@ -316,13 +316,42 @@
             </a>
           </li>
 
-          {{-- Settings --}}
-          <li class="nav-item">
-            <a href="{{ route('adminlembaga.settings.index') }}"
-              class="nav-link {{ request()->routeIs('adminlembaga.settings.*') ? 'active' : '' }}">
+          {{-- Settings Group --}}
+          <li class="nav-item has-treeview {{ request()->routeIs('adminlembaga.settings.*') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->routeIs('adminlembaga.settings.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-cogs"></i>
-              <p>Pengaturan Sekolah</p>
+              <p>
+                Pengaturan Sekolah
+                <i class="right fas fa-angle-left"></i>
+              </p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.profile') }}"
+                  class="nav-link {{ request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon text-info"></i>
+                  <p>Profil Publik</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.index') }}#general" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Konfigurasi Umum</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.index') }}#doc" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Dokumen & Kop Surat</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.index') }}#account" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Info Akun</p>
+                </a>
+              </li>
+            </ul>
           </li>
         @endif
 

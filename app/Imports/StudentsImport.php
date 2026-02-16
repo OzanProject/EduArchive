@@ -44,6 +44,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
 
     return new Student([
       'nama' => $row['nama_lengkap'],
+      'gender' => $this->parseGender($row['jenis_kelamin'] ?? null), // Parse Gender
       'nisn' => $row['nisn'] ?? null,
       'nik' => $row['nik'] ?? null,
       'classroom_id' => $classroom ? $classroom->id : null,
@@ -57,10 +58,23 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
     ]);
   }
 
+  private function parseGender($value)
+  {
+    if (!$value)
+      return null;
+    $val = strtoupper(trim($value));
+    if (in_array($val, ['L', 'LAKI-LAKI', 'LAKI LAKI', 'PRIA']))
+      return 'L';
+    if (in_array($val, ['P', 'PEREMPUAN', 'WOMAN', 'WANITA']))
+      return 'P';
+    return null;
+  }
+
   public function rules(): array
   {
     return [
       'nama_lengkap' => 'required',
+      'jenis_kelamin' => 'required', // Gender is required
       'nisn' => 'nullable|unique:students,nisn',
       'nik' => 'nullable|unique:students,nik',
     ];

@@ -60,6 +60,8 @@ class MonitoringController extends Controller
         $query->where('status_kelulusan', 'aktif');
       }
 
+      $query->whereNotNull('nisn')->where('nisn', '!=', '');
+
       return $query->latest()->get();
     });
 

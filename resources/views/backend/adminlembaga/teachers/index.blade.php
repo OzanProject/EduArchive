@@ -43,7 +43,7 @@
                   <td>{{ $loop->iteration + ($teachers->currentPage() - 1) * $teachers->perPage() }}</td>
                   <td>
                     @if($teacher->foto)
-                      <img src="{{ asset('storage/' . $teacher->foto) }}" alt="Foto" class="img-circle"
+                      <img src="{{ tenant_asset($teacher->foto) }}" alt="Foto" class="img-circle"
                         style="width: 30px; height: 30px; object-fit: cover;">
                     @else
                       <img src="{{ asset('adminlte3/dist/img/user2-160x160.jpg') }}" alt="Default" class="img-circle"

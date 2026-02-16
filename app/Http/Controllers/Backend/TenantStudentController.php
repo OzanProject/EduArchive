@@ -46,6 +46,7 @@ class TenantStudentController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
+            'gender' => 'required|in:L,P', // Added gender validation
             'classroom_id' => 'nullable|exists:classrooms,id',
             'nik' => 'nullable|string|unique:students,nik',
             'foto_profil' => 'nullable|image|max:2048',
@@ -90,6 +91,7 @@ class TenantStudentController extends Controller
 
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
+            'gender' => 'required|in:L,P', // Added gender validation
             'classroom_id' => 'nullable|exists:classrooms,id',
             'nik' => 'nullable|string|unique:students,nik,' . $id,
             'foto_profil' => 'nullable|image|max:2048',

@@ -35,14 +35,12 @@ class RoleController extends Controller
   {
     $request->validate([
       'name' => 'required|unique:roles,name',
-      'permission' => 'required|array',
+      'permission' => 'nullable|array',
     ]);
 
     $role = Role::create(['name' => $request->input('name')]);
-    // Sync permissions (using names or ids)
-    // Spatie expects syncPermissions using names usually, but IDs work too if passed correctly
-    // Let's assume input 'permission' is array of IDs.
-    $permissions = Permission::whereIn('id', $request->input('permission'))->get();
+
+    $permissions = $request->input('permission') ? Permission::whereIn('id', $request->input('permission'))->get() : [];
     $role->syncPermissions($permissions);
 
     return redirect()->route('superadmin.roles.index')
@@ -54,7 +52,7 @@ class RoleController extends Controller
    */
   public function show(string $id)
   {
-    $role = Role::find($id);
+    $role = Role::findOrFail($id);
     $rolePermissions = Permission::join("role_has_permissions", "role_has_permissions.permission_id", "=", "permissions.id")
       ->where("role_has_permissions.role_id", $id)
       ->get();
@@ -67,7 +65,7 @@ class RoleController extends Controller
    */
   public function edit(string $id)
   {
-    $role = Role::find($id);
+    $role = Role::findOrFail($id);
     $permissions = Permission::get();
     $rolePermissions = \DB::table("role_has_permissions")->where("role_has_permissions.role_id", $id)
       ->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')
@@ -82,15 +80,16 @@ class RoleController extends Controller
   public function update(Request $request, string $id)
   {
     $request->validate([
-      'name' => 'required',
-      'permission' => 'required|array',
+      'name' => 'required|unique:roles,name,' . $id,
+      'permission' => 'nullable|array',
     ]);
 
-    $role = Role::find($id);
+    /** @var Role $role */
+    $role = Role::findOrFail($id);
     $role->name = $request->input('name');
     $role->save();
 
-    $permissions = Permission::whereIn('id', $request->input('permission'))->get();
+    $permissions = $request->input('permission') ? Permission::whereIn('id', $request->input('permission'))->get() : [];
     $role->syncPermissions($permissions);
 
     return redirect()->route('superadmin.roles.index')
@@ -102,11 +101,15 @@ class RoleController extends Controller
    */
   public function destroy(string $id)
   {
-    if ($id == 1) { // Prevent deleting Super Admin role
+    /** @var Role $role */
+    $role = Role::findOrFail($id);
+
+    if ($role->name == 'superadmin') { // Prevent deleting Super Admin role
       return redirect()->route('superadmin.roles.index')->with('error', 'Tidak bisa menghapus Role Utama.');
     }
 
-    Role::find($id)->delete();
+    $role->delete();
+
     return redirect()->route('superadmin.roles.index')
       ->with('success', 'Role berhasil dihapus');
   }

@@ -43,6 +43,7 @@
                 <th>No</th>
                 <th>Foto</th>
                 <th>Nama Lengkap</th>
+                <th>L/P</th>
                 <th>Kelas</th>
                 <th>NIK / NISN</th>
                 <th>Status</th>
@@ -69,6 +70,7 @@
                     @endif
                   </td>
                   <td>{{ $student->nama }}</td>
+                  <td>{{ $student->gender ?? '-' }}</td>
                   <td>{{ $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-') }}</td>
                   <td>{{ $student->nik ?? '-' }}</td>
                   <td>

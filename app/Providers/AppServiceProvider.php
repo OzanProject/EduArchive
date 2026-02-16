@@ -59,19 +59,19 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('app_settings', []);
             }
 
-            // Always fetch Central/Dinas Logo for Favicon
-            $dinas_logo = \Illuminate\Support\Facades\Cache::remember('dinas_app_logo', 3600, function () {
+            // Always fetch Central/Dinas Logo & Favicon
+            $central_branding = \Illuminate\Support\Facades\Cache::remember('central_branding', 3600, function () {
                 try {
-                    // Force connection to central database (usually 'mysql') to get Dinas settings
+                    // Force connection to central database (usually 'mysql')
                     return \Illuminate\Support\Facades\DB::connection('mysql')
                         ->table('app_settings')
-                        ->where('key', 'app_logo')
-                        ->value('value');
+                        ->whereIn('key', ['app_logo', 'app_favicon'])
+                        ->pluck('value', 'key');
                 } catch (\Exception $e) {
-                    return null;
+                    return [];
                 }
             });
-            $view->with('dinas_logo', $dinas_logo);
+            $view->with('central_branding', $central_branding);
         });
 
         // View Composer for Navbar (Dynamic Stats)

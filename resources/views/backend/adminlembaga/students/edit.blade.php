@@ -56,6 +56,17 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
+                  <label>Jenis Kelamin <span class="text-danger">*</span></label>
+                  <select name="gender" class="form-control @error('gender') is-invalid @enderror" required>
+                    <option value="">-- Pilih Gender --</option>
+                    <option value="L" {{ old('gender', $student->gender) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                    <option value="P" {{ old('gender', $student->gender) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                  </select>
+                  @error('gender') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
                   <label>Tempat Lahir</label>
                   <input type="text" name="birth_place" class="form-control"
                     value="{{ old('birth_place', $student->birth_place) }}">

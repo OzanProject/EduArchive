@@ -14,6 +14,10 @@ class Teacher extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+
     public function classrooms()
     {
         return $this->hasMany(Classroom::class, 'wali_kelas_id');

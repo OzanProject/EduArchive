@@ -264,4 +264,30 @@ class TenantController extends Controller
 
         return response()->file($filePath);
     }
+    /**
+     * Handle bulk actions for tenants.
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tenants,id',
+            'action' => 'required|in:activate,suspend,delete',
+        ]);
+
+        $ids = $request->ids;
+        $action = $request->action;
+        $count = count($ids);
+
+        if ($action === 'delete') {
+            Tenant::whereIn('id', $ids)->delete();
+            return redirect()->back()->with('success', "$count sekolah berhasil dihapus permanen.");
+        }
+
+        $status = $action === 'activate' ? 1 : 0;
+        Tenant::whereIn('id', $ids)->update(['status_aktif' => $status]);
+
+        $statusText = $action === 'activate' ? 'diaktifkan' : 'disuspend';
+        return redirect()->back()->with('success', "$count sekolah berhasil $statusText.");
+    }
 }
