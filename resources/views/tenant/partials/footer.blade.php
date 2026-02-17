@@ -34,11 +34,20 @@
       </div>
 
       <div class="col-lg-2 col-6 footer-links">
-        <h6>Layanan</h6>
+        <h6>Statistik Akademik</h6>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="#">Info PPDB</a></li>
-          <li class="mb-2"><a href="#">Agenda Sekolah</a></li>
-          <li class="mb-2"><a href="#">Galeri Kegiatan</a></li>
+          <li class="mb-2 text-secondary">
+            <i class="fas fa-users mr-2"></i> {{ \App\Models\Student::count() }} Siswa
+          </li>
+          <li class="mb-2 text-secondary">
+            <i class="fas fa-chalkboard-teacher mr-2"></i> {{ \App\Models\Teacher::count() }} Guru
+          </li>
+          <li class="mb-2 text-secondary">
+            <i class="fas fa-school mr-2"></i> {{ \App\Models\Classroom::count() }} Rombel
+          </li>
+          <li class="mb-2 text-secondary">
+            <i class="fas fa-id-card mr-2"></i> NPSN: {{ tenant('npsn') ?? '-' }}
+          </li>
         </ul>
       </div>
 

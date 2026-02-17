@@ -40,22 +40,6 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label>NIK / NISN</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                    </div>
-                    <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
-                      value="{{ old('nik', $student->nik) }}" placeholder="Nomor Induk / NISN">
-                  </div>
-                  @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
                   <label>Jenis Kelamin <span class="text-danger">*</span></label>
                   <select name="gender" class="form-control @error('gender') is-invalid @enderror" required>
                     <option value="">-- Pilih Gender --</option>
@@ -65,6 +49,38 @@
                   @error('gender') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>NISN</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                    </div>
+                    <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror"
+                      value="{{ old('nisn', $student->nisn) }}" placeholder="Nomor Induk Siswa Nasional">
+                  </div>
+                  @error('nisn') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>NIK</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                    </div>
+                    <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
+                      value="{{ old('nik', $student->nik) }}" placeholder="Nomor Induk Kependudukan">
+                  </div>
+                  @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label>Tempat Lahir</label>

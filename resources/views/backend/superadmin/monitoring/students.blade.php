@@ -79,7 +79,7 @@
                   <td>{{ $student->nama }}</td>
                   <td>{{ $student->kelas }}</td>
                   <td>
-                    <a href="{{ route('superadmin.monitoring.student', ['tenant_id' => $tenant->id, 'nisn' => $student->nisn]) }}"
+                    <a href="{{ route('superadmin.monitoring.student', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}"
                       class="btn btn-info btn-sm" title="Detail Siswa & Dokumen">
                       <i class="fas fa-search"></i> Detail
                     </a>

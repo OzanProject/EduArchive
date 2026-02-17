@@ -80,8 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
-            Route::get('/{tenant_id}/student/{nisn}', [MonitoringController::class, 'showStudent'])->name('student');
-            Route::post('/{tenant_id}/student/{nisn}/document/{document_id}', [MonitoringController::class, 'logAccess'])->name('access_document');
+            Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
+            Route::get('/{tenant_id}/student/{id}/document/{document_id}/view', [MonitoringController::class, 'viewDocument'])->name('view_document');
+            Route::post('/{tenant_id}/student/{id}/document/{document_id}', [MonitoringController::class, 'logAccess'])->name('access_document');
         });
 
         // Broadcast Logs
@@ -111,6 +112,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // School Level Management
         Route::resource('school-levels', \App\Http\Controllers\Backend\SchoolLevelController::class);
+
+        // Reports
+        Route::resource('reports', \App\Http\Controllers\Backend\SuperAdminReportController::class)->only(['index', 'show']);
     });
 });
 

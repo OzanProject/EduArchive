@@ -114,6 +114,13 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="{{ route('superadmin.reports.index') }}"
+              class="nav-link {{ Request::routeIs('superadmin.reports.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>Laporan Sekolah</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{ route('superadmin.document-types.index') }}"
               class="nav-link {{ request()->routeIs('superadmin.document-types.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-file-alt"></i>

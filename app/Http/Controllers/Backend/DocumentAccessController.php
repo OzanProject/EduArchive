@@ -13,7 +13,7 @@ class DocumentAccessController extends Controller
     {
         $request->validate([
             'tenant_id' => 'required',
-            'student_nisn' => 'required',
+            'student_id' => 'required',
             'document_id' => 'required',
             'reason' => 'required|string|min:5',
         ]);
@@ -34,7 +34,8 @@ class DocumentAccessController extends Controller
             'target_id' => $request->document_id,
             'ip_address' => $request->ip(),
             'details' => json_encode([
-                'student_nisn' => $request->student_nisn,
+                'student_id' => $request->student_id,
+                'student_nisn' => $request->student_nisn ?? '-',
                 'document_name' => $document->jenis_dokumen,
                 'reason' => $request->reason,
                 'user_agent' => $request->userAgent()
@@ -48,9 +49,9 @@ class DocumentAccessController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Akses diberikan. Mengarahkan ke dokumen...',
-            'url' => route('superadmin.monitoring.access_document', [
+            'url' => route('superadmin.monitoring.view_document', [
                 'tenant_id' => $request->tenant_id,
-                'nisn' => $request->student_nisn,
+                'id' => $request->student_id,
                 'document_id' => $request->document_id
             ]) // Re-using the existing route for the actual view, but now it's "authorized" via front-end flow
             // Ideally, the view route should ALSO check if a log exists recently, but for this prototype, we rely on the flow.

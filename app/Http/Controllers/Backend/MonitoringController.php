@@ -60,7 +60,7 @@ class MonitoringController extends Controller
         $query->where('status_kelulusan', 'aktif');
       }
 
-      $query->whereNotNull('nisn')->where('nisn', '!=', '');
+      // $query->whereNotNull('nisn')->where('nisn', '!=', ''); // Commented out to allow students without NISN
 
       return $query->latest()->get();
     });
@@ -77,34 +77,48 @@ class MonitoringController extends Controller
     return view('backend.superadmin.monitoring.students', compact('tenant', 'students', 'graduation_years'));
   }
 
-  public function showStudent($tenant_id, $nisn)
+  public function showStudent($tenant_id, $id)
   {
     $tenant = Tenant::findOrFail($tenant_id);
 
     // Fetch student detail inside tenant context
-    $student = $tenant->run(function () use ($nisn) {
-      return \App\Models\Student::where('nisn', $nisn)->with('documents')->firstOrFail();
+    $student = $tenant->run(function () use ($id) {
+      return \App\Models\Student::with('documents')->findOrFail($id);
     });
 
-    // Calculate Competeness
-    $required_docs = ['Ijazah', 'Transkrip Nilai', 'Kartu Keluarga', 'Akte Kelahiran']; // Example required list
+    // Calculate Completeness based on DocumentType
+    $required_types = \App\Models\DocumentType::where('is_required', true)->where('is_active', true)->pluck('name');
     $uploaded_types = $student->documents->pluck('jenis_dokumen')->toArray();
+
+    // Normalize logic: check if required type exists in uploaded types
     $filled_count = 0;
-    foreach ($required_docs as $req) {
-      // Simple fuzzy check or strict check. Let's do strict for now or based on existing types
-      // For demonstration, we count how many documents are uploaded vs a fixed number (e.g., 5)
-      // Or better: Count verified documents
+    $missing_docs = [];
+
+    foreach ($required_types as $type) {
+      // Case-insensitive check or direct match? Let's assume direct match first, or fuzzy if needed.
+      // But usually 'jenis_dokumen' should match 'DocumentType name'.
+      if (in_array($type, $uploaded_types)) {
+        $filled_count++;
+      } else {
+        $missing_docs[] = $type;
+      }
     }
-    // Simplification: 80% if Ijazah exists, etc.
-    // Let's just count total uploaded vs target (say 5)
-    $completeness = min(100, round(($student->documents->count() / 5) * 100));
+
+    $total_required = $required_types->count();
+    $completeness = $total_required > 0 ? min(100, round(($filled_count / $total_required) * 100)) : 100;
 
     // Fetch Activity Logs for this student
     $logs = \App\Models\AuditLog::where('tenant_id', $tenant_id)
-      ->where('details', 'like', '%"student_nisn":"' . $nisn . '"%') // Simple JSON search
+      ->where('details', 'like', '%"student_id":"' . $id . '"%') // Fix: Quote the ID if stored as string in JSON, or handle int.
+      // Better Query:
+      ->where(function ($q) use ($id, $student) {
+        $q->where('details', 'like', '%"student_id":"' . $id . '"%')
+          ->orWhere('details', 'like', '%"student_id":' . $id . '%') // Handle both number/string json
+          ->orWhere('details', 'like', '%"student_nisn":"' . ($student->nisn ?? 'UNKNOWN') . '"%');
+      })
       ->with('user')
       ->latest()
-      ->limit(5)
+      ->limit(10) // Increase limit
       ->get();
 
     // Map logs to expected format for view (if needed, or update view)
@@ -113,14 +127,15 @@ class MonitoringController extends Controller
       return (object) [
         'user' => $log->user,
         'document_name' => $details['document_name'] ?? 'Unknown Document',
-        'created_at' => $log->created_at
+        'created_at' => $log->created_at,
+        'action' => $log->action // Pass action
       ];
     });
 
-    return view('backend.superadmin.monitoring.student_detail', compact('tenant', 'student', 'completeness'), ['logs' => $formatted_logs]);
+    return view('backend.superadmin.monitoring.student_detail', compact('tenant', 'student', 'completeness', 'missing_docs'), ['logs' => $formatted_logs]);
   }
 
-  public function logAccess(Request $request, $tenant_id, $nisn, $document_id)
+  public function logAccess(Request $request, $tenant_id, $id, $document_id)
   {
     $tenant = \App\Models\Tenant::findOrFail($tenant_id);
 
@@ -138,7 +153,8 @@ class MonitoringController extends Controller
       'target_id' => $document_id,
       'ip_address' => $request->ip(),
       'details' => json_encode([
-        'student_nisn' => $nisn,
+        'student_id' => $id,
+        'student_nisn' => $request->input('student_nisn', '-'),
         'document_name' => $document->jenis_dokumen . ' (' . $document->file_path . ')',
         'user_agent' => $request->userAgent()
       ]),
@@ -146,6 +162,23 @@ class MonitoringController extends Controller
 
     // 3. Return File (Simulasi atau Real)
     // Return mock PDF preview
+    return $this->returnMockFile($document);
+  }
+
+  public function viewDocument($tenant_id, $id, $document_id)
+  {
+    $tenant = \App\Models\Tenant::findOrFail($tenant_id);
+    $document = $tenant->run(function () use ($document_id) {
+      return \App\Models\Document::findOrFail($document_id);
+    });
+
+    // Optional: Log 'Viewed' event if strict tracking is needed
+
+    return $this->returnMockFile($document);
+  }
+
+  private function returnMockFile($document)
+  {
     return response("
         <html>
         <head><title>Document Preview</title></head>
@@ -154,7 +187,7 @@ class MonitoringController extends Controller
             <p><strong>Jenis Dokumen:</strong> {$document->jenis_dokumen}</p>
             <p><strong>File Path:</strong> {$document->file_path}</p>
             <hr>
-            <p style='color:green;'>AKSES TERCATAT DI AUDIT LOG</p>
+            <p style='color:green;'>DOKUMEN DIAKSES</p>
             <p><em>(Dalam aplikasi production, ini akan meredirect ke file PDF asli atau force download)</em></p>
             <button onclick='window.close()'>Tutup</button>
         </body>

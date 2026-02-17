@@ -85,6 +85,8 @@ Route::group([
         Route::post('students/import', [\App\Http\Controllers\Backend\TenantStudentController::class, 'import'])->name('students.import');
         Route::post('students/bulk-delete', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkDelete'])->name('students.bulkDestroy');
         Route::get('students/bulk-print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPrint'])->name('students.bulkPrint');
+        Route::post('students/bulk-promote', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromote'])->name('students.bulkPromote');
+        Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
         Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class)->except(['edit', 'update']);
@@ -105,6 +107,8 @@ Route::group([
         Route::post('students/import', [\App\Http\Controllers\Backend\TenantStudentController::class, 'import'])->name('students.import');
         Route::post('students/bulk-delete', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkDelete'])->name('students.bulkDestroy');
         Route::get('students/bulk-print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPrint'])->name('students.bulkPrint');
+        Route::post('students/bulk-promote', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromote'])->name('students.bulkPromote');
+        Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
 

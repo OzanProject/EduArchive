@@ -237,9 +237,14 @@
           <td><strong>{{ $student->nama }}</strong></td>
         </tr>
         <tr>
-          <td>NISN / NIK</td>
+          <td>NISN</td>
           <td>:</td>
-          <td>{{ $student->nisn ? $student->nisn : '-' }} / {{ $student->nik ? $student->nik : '-' }}</td>
+          <td>{{ $student->nisn ? $student->nisn : '-' }}</td>
+        </tr>
+        <tr>
+          <td>NIK</td>
+          <td>:</td>
+          <td>{{ $student->nik ? $student->nik : '-' }}</td>
         </tr>
         <tr>
           <td>Jenis Kelamin</td>

@@ -157,28 +157,31 @@
 
         .signature-container {
             position: relative;
-            height: 90px;
+            height: 100px;
+            /* Increased height */
             width: 220px;
-            /* Kembali ke fixed width agar stempel menimpa ttd */
             margin: 5px auto;
+            text-align: center;
+            /* Ensure contents are centered */
         }
 
         .signature-img {
             height: 80px;
+            width: auto; /* Maintain aspect ratio */
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 2;
+            z-index: 10;
         }
 
         .stamp-img {
-            height: 75px;
+            height: 85px; /* Slightly larger */
+            width: auto;
             position: absolute;
             bottom: 5px;
-            left: 0;
-            /* Tempelkan ke kiri container kecil ini */
-            z-index: 1;
+            left: 10px; /* Moved slightly right */
+            z-index: 5;
             opacity: 0.8;
             transform: rotate(-5deg);
         }
@@ -202,6 +205,7 @@
 
 <body onload="window.print()">
     <div class="container">
+        <!-- Debug: Stamp={{ $stamp }} Signature={{ $signature }} -->
         <!-- Kop Surat -->
         <div class="kop-surat">
             <table class="kop-table">
@@ -246,9 +250,14 @@
                 <td><strong>{{ $student->nama }}</strong></td>
             </tr>
             <tr>
-                <td>NISN / NIK</td>
+                <td>NISN</td>
                 <td>:</td>
-                <td>{{ $student->nisn ? $student->nisn : '-' }} / {{ $student->nik ? $student->nik : '-' }}</td>
+                <td>{{ $student->nisn ? $student->nisn : '-' }}</td>
+            </tr>
+            <tr>
+                <td>NIK</td>
+                <td>:</td>
+                <td>{{ $student->nik ? $student->nik : '-' }}</td>
             </tr>
             <tr>
                 <td>Jenis Kelamin</td>

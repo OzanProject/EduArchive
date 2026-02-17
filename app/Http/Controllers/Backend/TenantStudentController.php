@@ -48,7 +48,8 @@ class TenantStudentController extends Controller
             'nama' => 'required|string|max:255',
             'gender' => 'required|in:L,P', // Added gender validation
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string|unique:students,nik',
+            'nik' => 'nullable|string',
+            'nisn' => 'nullable|string',
             'foto_profil' => 'nullable|image|max:2048',
         ]);
 
@@ -93,9 +94,9 @@ class TenantStudentController extends Controller
             'nama' => 'required|string|max:255',
             'gender' => 'required|in:L,P', // Added gender validation
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string|unique:students,nik,' . $id,
+            'nik' => 'nullable|string',
+            'nisn' => 'nullable|string',
             'foto_profil' => 'nullable|image|max:2048',
-            'status_kelulusan' => 'required',
         ]);
 
         if ($request->hasFile('foto_profil')) {
@@ -204,5 +205,42 @@ class TenantStudentController extends Controller
         }
 
         return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\StudentTemplateExport, 'template_siswa_aktif.xlsx');
+    }
+
+    public function bulkPromote(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:students,id',
+            'target_classroom_id' => 'required|exists:classrooms,id',
+        ]);
+
+        $targetClassroom = \App\Models\Classroom::findOrFail($request->target_classroom_id);
+
+        \App\Models\Student::whereIn('id', $request->ids)->update([
+            'classroom_id' => $targetClassroom->id,
+            'kelas' => $targetClassroom->nama_kelas, // Sync legacy field
+        ]);
+
+        return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil dinaikkan ke kelas ' . $targetClassroom->nama_kelas]);
+    }
+
+    public function bulkGraduate(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:students,id',
+            'graduation_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
+        ]);
+
+        \App\Models\Student::whereIn('id', $request->ids)->update([
+            'status_kelulusan' => 'Lulus',
+            'tahun_lulus' => $request->graduation_year,
+            // Optional: Detach from classroom or keep as history
+            // 'classroom_id' => null, 
+        ]);
+
+        return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil diluluskan.']);
+
     }
 }

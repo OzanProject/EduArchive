@@ -37,8 +37,8 @@
             <label class="text-xs text-uppercase text-muted font-weight-bold mb-1">NIK (Nomor Induk Kependudukan)</label>
             <div class="d-flex justify-content-between align-items-center">
               <code class="text-dark font-weight-bold" style="font-size: 1.1em;">
-                                 {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
-                             </code>
+                                       {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
+                                   </code>
               <i class="fas fa-shield-alt text-muted" title="Data secured"></i>
             </div>
           </div>
@@ -70,8 +70,9 @@
             </div>
           </div>
           <hr class="my-3">
-          <a href="#" class="btn btn-outline-primary btn-block btn-sm">
-            <i class="fas fa-external-link-alt mr-1"></i> Open School Dashboard
+          <a href="{{ route('superadmin.monitoring.school', $tenant->id) }}"
+            class="btn btn-outline-primary btn-block btn-sm">
+            <i class="fas fa-external-link-alt mr-1"></i> Lihat Sekolah
           </a>
         </div>
       </div>
@@ -86,14 +87,25 @@
           <div class="row align-items-center">
             <div class="col-md-8">
               <h5 class="font-weight-bold mb-1">Kelengkapan Dokumen</h5>
-              <p class="text-muted text-sm mb-2">Progress digitalisasi arsip siswa ini.</p>
+              <p class="text-muted text-sm mb-2">Progress digitalisasi arsip siswa ini berdasarkan dokumen wajib.</p>
               <div class="progress" style="height: 10px; border-radius: 5px;">
-                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $completeness }}%;"
-                  aria-valuenow="{{ $completeness }}" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar {{ $completeness == 100 ? 'bg-success' : 'bg-warning' }}" role="progressbar"
+                  style="width: {{ $completeness }}%;" aria-valuenow="{{ $completeness }}" aria-valuemin="0"
+                  aria-valuemax="100"></div>
               </div>
+              @if(!empty($missing_docs))
+                <div class="mt-2 text-xs text-danger">
+                  <i class="fas fa-exclamation-circle mr-1"></i> Belum diunggah:
+                  @foreach($missing_docs as $missing)
+                    <span class="badge badge-light border">{{ $missing }}</span>
+                  @endforeach
+                </div>
+              @endif
             </div>
             <div class="col-md-4 text-right">
-              <h2 class="font-weight-bold text-success mb-0">{{ $completeness }}%</h2>
+              <h2 class="font-weight-bold {{ $completeness == 100 ? 'text-success' : 'text-warning' }} mb-0">
+                {{ $completeness }}%
+              </h2>
               <small class="text-muted">Completed</small>
             </div>
           </div>
@@ -115,7 +127,8 @@
           @else
             <div class="list-group list-group-flush">
               @foreach($student->documents as $doc)
-                <div class="list-group-item px-0 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between">
+                <div
+                  class="list-group-item px-0 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between">
                   <div class="d-flex align-items-center col-12 col-md-auto p-0 mb-2 mb-md-0">
                     <div class="mr-3 text-center" style="width: 40px;">
                       @if($doc->is_verified)
@@ -168,7 +181,11 @@
                 <div class="media-body">
                   <p class="mb-0 text-sm">
                     <span class="font-weight-bold">{{ $log->user->name ?? 'System' }}</span>
-                    mengakses dokumen
+                    @if(isset($log->action) && $log->action == 'DOCUMENT_ACCESS')
+                      mengakses dokumen
+                    @else
+                      melakukan aktivitas
+                    @endif
                     <span class="font-weight-bold text-dark">{{ $log->document_name }}</span>
                   </p>
                   <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
@@ -205,6 +222,7 @@
           </p>
           <form id="requestAccessForm">
             <input type="hidden" name="tenant_id" value="{{ $tenant->id }}">
+            <input type="hidden" name="student_id" value="{{ $student->id }}">
             <input type="hidden" name="student_nisn" value="{{ $student->nisn }}">
             <input type="hidden" id="modalDocId" name="document_id">
 

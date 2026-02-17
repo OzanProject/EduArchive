@@ -24,6 +24,14 @@
             <button class="btn btn-info btn-sm d-none ml-1" id="btn-bulk-print" onclick="bulkPrint()">
               <i class="fas fa-print"></i> Cetak Masal
             </button>
+            <button class="btn btn-warning btn-sm d-none ml-1" id="btn-bulk-promote" data-toggle="modal"
+              data-target="#promoteModal">
+              <i class="fas fa-level-up-alt"></i> Naik Kelas
+            </button>
+            <button class="btn btn-secondary btn-sm d-none ml-1" id="btn-bulk-graduate" data-toggle="modal"
+              data-target="#graduateModal">
+              <i class="fas fa-user-graduate"></i> Luluskan
+            </button>
             <a href="{{ route($prefix . 'students.create') }}" class="btn btn-primary btn-sm ml-2">
               <i class="fas fa-plus"></i> Tambah Baru
             </a>
@@ -44,8 +52,13 @@
                 <th>Foto</th>
                 <th>Nama Lengkap</th>
                 <th>L/P</th>
-                <th>Kelas</th>
-                <th>NIK / NISN</th>
+                @if($status == 'Lulus')
+                  <th>Tahun Lulus</th>
+                @else
+                  <th>Kelas</th>
+                @endif
+                <th>NISN</th>
+                <th>NIK</th>
                 <th>Status</th>
                 <th>Aksi</th>
               </tr>
@@ -71,7 +84,12 @@
                   </td>
                   <td>{{ $student->nama }}</td>
                   <td>{{ $student->gender ?? '-' }}</td>
-                  <td>{{ $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-') }}</td>
+                  @if($status == 'Lulus')
+                    <td>{{ $student->tahun_lulus ?? '-' }}</td>
+                  @else
+                    <td>{{ $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-') }}</td>
+                  @endif
+                  <td>{{ $student->nisn ?? '-' }}</td>
                   <td>{{ $student->nik ?? '-' }}</td>
                   <td>
                     <span class="badge badge-{{ $student->status_kelulusan == 'Aktif' ? 'success' : 'secondary' }}">
@@ -119,7 +137,7 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="7" class="text-center">Belum ada data siswa.</td>
+                  <td colspan="10" class="text-center">Belum ada data siswa.</td>
                 </tr>
               @endforelse
             </tbody>
@@ -135,6 +153,72 @@
   </div>
 
   @include('backend.adminlembaga.students.import_modal')
+
+  <!-- Modal Promote -->
+  <div class="modal fade" id="promoteModal" tabindex="-1" role="dialog" aria-labelledby="promoteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="promote-form" action="{{ route($prefix . 'students.bulkPromote') }}" method="POST">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="promoteModalLabel">Naik Kelas Masal</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Pilih kelas tujuan untuk siswa yang dipilih:</p>
+            <div class="form-group">
+              <label>Kelas Tujuan</label>
+              <select name="target_classroom_id" class="form-control select2" style="width: 100%;" required>
+                <option value="">-- Pilih Kelas --</option>
+                @foreach(\App\Models\Classroom::where('is_active', true)->orderBy('nama_kelas')->get() as $classroom)
+                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            <div id="promote-ids"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="submitPromote()">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Graduate -->
+  <div class="modal fade" id="graduateModal" tabindex="-1" role="dialog" aria-labelledby="graduateModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="graduate-form" action="{{ route($prefix . 'students.bulkGraduate') }}" method="POST">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="graduateModalLabel">Luluskan Siswa Masal</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Masukkan tahun lulus untuk siswa yang dipilih:</p>
+            <div class="form-group">
+              <label>Tahun Lulus</label>
+              <input type="number" name="graduation_year" class="form-control" value="{{ date('Y') }}" required>
+            </div>
+            <div id="graduate-ids"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="submitGraduate()">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   @push('scripts')
     <script>
@@ -156,9 +240,13 @@
         if ($('.checkItem:checked').length > 0) {
           $('#btn-bulk-delete').removeClass('d-none');
           $('#btn-bulk-print').removeClass('d-none');
+          $('#btn-bulk-promote').removeClass('d-none');
+          $('#btn-bulk-graduate').removeClass('d-none');
         } else {
           $('#btn-bulk-delete').addClass('d-none');
           $('#btn-bulk-print').addClass('d-none');
+          $('#btn-bulk-promote').addClass('d-none');
+          $('#btn-bulk-graduate').addClass('d-none');
         }
       }
 
@@ -193,6 +281,72 @@
 
         var url = '{{ route("adminlembaga.students.bulkPrint") }}' + '?ids=' + ids.join(',');
         window.open(url, '_blank');
+      }
+
+      function submitPromote() {
+        var ids = [];
+        $('.checkItem:checked').each(function () {
+          ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        var container = $('#promote-ids');
+        container.empty();
+        $.each(ids, function (index, value) {
+          container.append('<input type="hidden" name="ids[]" value="' + value + '">');
+        });
+
+        // AJAX submission to handle JSON response
+        $.ajax({
+          url: $('#promote-form').attr('action'),
+          method: 'POST',
+          data: $('#promote-form').serialize(),
+          success: function (response) {
+            if (response.success) {
+              alert(response.message);
+              location.reload();
+            } else {
+              alert('Terjadi kesalahan.');
+            }
+          },
+          error: function (xhr) {
+            alert('Error: ' + xhr.responseText);
+          }
+        });
+      }
+
+      function submitGraduate() {
+        var ids = [];
+        $('.checkItem:checked').each(function () {
+          ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        var container = $('#graduate-ids');
+        container.empty();
+        $.each(ids, function (index, value) {
+          container.append('<input type="hidden" name="ids[]" value="' + value + '">');
+        });
+
+        // AJAX submission
+        $.ajax({
+          url: $('#graduate-form').attr('action'),
+          method: 'POST',
+          data: $('#graduate-form').serialize(),
+          success: function (response) {
+            if (response.success) {
+              alert(response.message);
+              location.reload();
+            } else {
+              alert('Terjadi kesalahan.');
+            }
+          },
+          error: function (xhr) {
+            alert('Error: ' + xhr.responseText);
+          }
+        });
       }
     </script>
   @endpush

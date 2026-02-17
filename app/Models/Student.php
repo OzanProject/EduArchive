@@ -21,6 +21,7 @@ class Student extends Model
     'foto_profil',
     'tahun_lulus',
     // Enterprise Fields
+    'nisn',
     'nik',
     'birth_place',
     'birth_date',
