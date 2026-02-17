@@ -37,8 +37,8 @@
             <label class="text-xs text-uppercase text-muted font-weight-bold mb-1">NIK (Nomor Induk Kependudukan)</label>
             <div class="d-flex justify-content-between align-items-center">
               <code class="text-dark font-weight-bold" style="font-size: 1.1em;">
-                                                   {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
-                                               </code>
+                                                     {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
+                                                 </code>
               <i class="fas fa-shield-alt text-muted" title="Data secured"></i>
             </div>
           </div>
@@ -227,12 +227,21 @@
                 <div class="media-body">
                   <p class="mb-0 text-sm">
                     <span class="font-weight-bold">{{ $log->user->name ?? 'System' }}</span>
-                    @if(isset($log->action) && $log->action == 'DOCUMENT_ACCESS')
-                      mengakses dokumen
-                    @else
-                      melakukan aktivitas
+                    @if(isset($log->action))
+                      @if($log->action == 'VIEW')
+                        mengakses dokumen
+                      @elseif($log->action == 'APPROVE')
+                        menyetujui dokumen
+                      @elseif($log->action == 'REJECT')
+                        <span class="text-danger">menolak</span> dokumen
+                      @else
+                        melakukan aktivitas
+                      @endif
                     @endif
                     <span class="font-weight-bold text-dark">{{ $log->document_name }}</span>
+                    @if(isset($log->action) && $log->action == 'REJECT' && isset($log->details['notes']))
+                      <div class="text-xs text-muted mt-1 italic">"{{ $log->details['notes'] }}"</div>
+                    @endif
                   </p>
                   <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
                 </div>

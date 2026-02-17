@@ -25,8 +25,9 @@
                 <th>Sekolah (Tenant ID)</th>
                 <th>NISN Siswa</th>
                 <th>Dokumen</th>
+                <th>Jenis Aktivitas</th>
                 <th>IP Address</th>
-                <th>Aksi</th>
+                <th>Hapus</th>
               </tr>
             </thead>
             <tbody>
@@ -40,6 +41,17 @@
                   <td><span class="badge badge-info">{{ $log->tenant_id }}</span></td>
                   <td>{{ $details['student_nisn'] ?? '-' }}</td>
                   <td>{{ $details['document_name'] ?? '-' }}</td>
+                  <td>
+                    @if($log->action == 'VIEW')
+                      <span class="badge badge-primary">LIHAT</span>
+                    @elseif($log->action == 'APPROVE')
+                      <span class="badge badge-success">SETUJU</span>
+                    @elseif($log->action == 'REJECT')
+                      <span class="badge badge-danger">TOLAK</span>
+                    @else
+                      <span class="badge badge-secondary">{{ $log->action }}</span>
+                    @endif
+                  </td>
                   <td>{{ $log->ip_address }}</td>
                   <td>
                     <form action="{{ route('superadmin.monitoring.audit_logs.destroy', $log->id) }}" method="POST"
