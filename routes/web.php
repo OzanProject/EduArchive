@@ -47,6 +47,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', function () {
+        if (auth()->user()->role === 'superadmin') {
+            return redirect()->route('superadmin.dashboard');
+        }
         return view('dashboard');
     })->name('dashboard');
 
