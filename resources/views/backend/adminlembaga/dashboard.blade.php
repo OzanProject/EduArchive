@@ -152,7 +152,7 @@
                     @endphp
                     <tr>
                       <td>{{ $log->created_at->diffForHumans() }}</td>
-                      <td>{{ $log->user->name }}</td>
+                      <td>{{ $log->user->name ?? 'System' }}</td>
                       <td><span class="badge badge-info">{{ $log->action }}</span></td>
                       <td>
                         @if(isset($details['document_name']))

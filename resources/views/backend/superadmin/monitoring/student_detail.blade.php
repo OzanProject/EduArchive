@@ -37,8 +37,8 @@
             <label class="text-xs text-uppercase text-muted font-weight-bold mb-1">NIK (Nomor Induk Kependudukan)</label>
             <div class="d-flex justify-content-between align-items-center">
               <code class="text-dark font-weight-bold" style="font-size: 1.1em;">
-                                                     {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
-                                                 </code>
+                                                           {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
+                                                       </code>
               <i class="fas fa-shield-alt text-muted" title="Data secured"></i>
             </div>
           </div>
@@ -113,99 +113,144 @@
       </div>
 
       <!-- DOCUMENT LIST (Modern) -->
+      <!-- DOCUMENT LIST (Modern - Pagination Safe) -->
       <div class="card card-modern mb-4">
         <div class="card-header d-flex justify-content-between align-items-center border-bottom-0 pb-0">
           <h5 class="font-weight-bold mb-0">Arsip Dokumen</h5>
-          <span class="badge badge-secondary">{{ $student->documents->count() }} File</span>
+          <span class="badge badge-secondary">{{ $documents->total() }} File</span>
         </div>
+
         <div class="card-body pt-2">
-          @if($student->documents->isEmpty())
+
+          @if($documents->isEmpty())
             <div class="text-center py-5 text-muted">
               <i class="fas fa-folder-open fa-3x mb-3 text-light"></i>
               <p>Belum ada dokumen yang diunggah.</p>
             </div>
           @else
+
             <div class="list-group list-group-flush">
-              @foreach($student->documents as $doc)
+
+              @foreach($documents as $doc)
                 <div
                   class="list-group-item px-0 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between">
+
+                  <!-- LEFT INFO -->
                   <div class="d-flex align-items-center col-12 col-md-auto p-0 mb-2 mb-md-0">
+
                     <div class="mr-3 text-center" style="width: 40px;">
-                      @if($doc->is_verified)
-                        <i class="fas fa-file-pdf text-danger fa-2x"></i>
+                      @if($doc->validation_status === 'approved')
+                        <i class="fas fa-file-pdf text-success fa-2x"></i>
                       @else
                         <i class="fas fa-file text-muted fa-2x"></i>
                       @endif
                     </div>
-                    <div>
-                      <h6 class="mb-1 font-weight-bold text-dark">{{ $doc->jenis_dokumen }}</h6>
-                      <div class="small">
-                        {{-- Validation Status Badge --}}
-                        @if($doc->validation_status === 'approved')
-                          <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Disetujui</span>
-                        @elseif($doc->validation_status === 'rejected')
-                          <span class="badge badge-danger"><i class="fas fa-times-circle mr-1"></i> Ditolak</span>
-                        @else
-                          <span class="badge badge-warning"><i class="fas fa-clock mr-1"></i> Menunggu Validasi</span>
-                        @endif
-                        <span class="text-muted mx-1">&bull;</span>
-                        <span class="text-muted">{{ $doc->created_at->format('d M Y') }}</span>
 
-                        {{-- Show validator info if validated --}}
+                    <div>
+                      <h6 class="mb-1 font-weight-bold text-dark">
+                        {{ $doc->document_type ?? $doc->jenis_dokumen }}
+                      </h6>
+
+                      <div class="small">
+
+                        {{-- STATUS BADGE --}}
+                        @if($doc->validation_status === 'approved')
+                          <span class="badge badge-success">
+                            <i class="fas fa-check-circle mr-1"></i> Disetujui
+                          </span>
+                        @elseif($doc->validation_status === 'rejected')
+                          <span class="badge badge-danger">
+                            <i class="fas fa-times-circle mr-1"></i> Ditolak
+                          </span>
+                        @else
+                          <span class="badge badge-warning">
+                            <i class="fas fa-clock mr-1"></i> Menunggu Validasi
+                          </span>
+                        @endif
+
+                        <span class="text-muted mx-1">&bull;</span>
+                        <span class="text-muted">
+                          {{ optional($doc->created_at)->format('d M Y') }}
+                        </span>
+
+                        {{-- VALIDATOR INFO --}}
                         @if($doc->validated_at)
                           <div class="text-xs text-muted mt-1">
                             <i class="fas fa-user-shield"></i>
-                            {{ $doc->validator->name ?? 'Super Admin' }} - {{ $doc->validated_at->format('d M Y H:i') }}
+                            {{ optional($doc->validator)->name ?? 'Super Admin' }}
+                            -
+                            {{ optional($doc->validated_at)->format('d M Y H:i') }}
                           </div>
                         @endif
 
-                        {{-- Show rejection note --}}
+                        {{-- REJECTION NOTE --}}
                         @if($doc->validation_status === 'rejected' && $doc->validation_notes)
                           <div class="alert alert-danger alert-sm mt-2 p-2">
-                            <small><strong>Alasan Penolakan:</strong> {{ $doc->validation_notes }}</small>
+                            <small>
+                              <strong>Alasan Penolakan:</strong>
+                              {{ $doc->validation_notes }}
+                            </small>
                           </div>
                         @endif
+
                       </div>
                     </div>
                   </div>
+
+                  <!-- ACTION BUTTONS -->
                   <div class="col-12 col-md-auto mt-2 mt-md-0">
                     <div class="btn-group" role="group">
-                      {{-- Direct view link for Super Admin - no request needed --}}
+
                       <a href="{{ route('superadmin.monitoring.view_document', [$tenant->id, $student->id, $doc->id]) }}"
                         target="_blank" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-eye mr-1"></i> Lihat Dokumen
+                        <i class="fas fa-eye mr-1"></i> Lihat
                       </a>
 
-                      {{-- Validation Buttons --}}
-                      @if($doc->validation_status === 'pending')
+                      {{-- VALIDATION BUTTONS --}}
+                      @if(!$doc->validation_status || $doc->validation_status === 'pending')
+
                         <form
                           action="{{ route('superadmin.monitoring.document.approve', [$tenant->id, $student->id, $doc->id]) }}"
                           method="POST" class="d-inline">
                           @csrf
                           <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui dokumen ini?')">
-                            <i class="fas fa-check"></i> Setujui
+                            <i class="fas fa-check"></i>
                           </button>
                         </form>
+
                         <button type="button" class="btn btn-sm btn-danger btn-reject-doc" data-doc-id="{{ $doc->id }}"
-                          data-doc-name="{{ $doc->jenis_dokumen }}">
-                          <i class="fas fa-times"></i> Tolak
+                          data-doc-name="{{ $doc->document_type ?? $doc->jenis_dokumen }}">
+                          <i class="fas fa-times"></i>
                         </button>
+
                       @elseif($doc->validation_status === 'rejected')
+
                         <form
                           action="{{ route('superadmin.monitoring.document.approve', [$tenant->id, $student->id, $doc->id]) }}"
                           method="POST" class="d-inline">
                           @csrf
                           <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui dokumen ini?')">
-                            <i class="fas fa-redo"></i> Setujui
+                            <i class="fas fa-redo"></i>
                           </button>
                         </form>
+
                       @endif
+
                     </div>
                   </div>
+
                 </div>
               @endforeach
+
             </div>
+
+            {{-- PAGINATION --}}
+            <div class="mt-4 d-flex justify-content-end">
+              {{ $documents->withQueryString()->links('pagination::bootstrap-4') }}
+            </div>
+
           @endif
+
         </div>
       </div>
 

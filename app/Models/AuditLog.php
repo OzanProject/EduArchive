@@ -21,6 +21,6 @@ class AuditLog extends Model
 
   public function user()
   {
-    return $this->belongsTo(User::class); // Global User
+    return $this->belongsTo(User::class)->withoutGlobalScopes(); // Can be Super Admin or Tenant User
   }
 }
