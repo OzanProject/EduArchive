@@ -47,6 +47,7 @@
                 <th>Jenis Dokumen</th>
                 <th>Nama File</th>
                 <th>Ukuran</th>
+                <th>Status Validasi</th>
                 <th>Diupload Oleh</th>
                 <th>Aksi</th>
               </tr>
@@ -71,6 +72,33 @@
                     </a>
                   </td>
                   <td>{{ number_format($document->file_size / 1024, 2) }} KB</td>
+                  <td>
+                    {{-- Validation Status Badge --}}
+                    @if($document->validation_status === 'approved')
+                      <span class="badge badge-success">
+                        <i class="fas fa-check-circle"></i> Disetujui
+                      </span>
+                      @if($document->validated_at)
+                        <br><small class="text-muted">{{ $document->validated_at->format('d/m/Y H:i') }}</small>
+                      @endif
+                    @elseif($document->validation_status === 'rejected')
+                      <span class="badge badge-danger">
+                        <i class="fas fa-times-circle"></i> Ditolak
+                      </span>
+                      @if($document->validation_notes)
+                        <br><small class="text-danger"><strong>Alasan:</strong>
+                          {{ Str::limit($document->validation_notes, 50) }}</small>
+                      @endif
+                      @if($document->validated_at)
+                        <br><small class="text-muted">{{ $document->validated_at->format('d/m/Y H:i') }}</small>
+                      @endif
+                    @else
+                      <span class="badge badge-warning">
+                        <i class="fas fa-clock"></i> Menunggu Validasi
+                      </span>
+                      <br><small class="text-muted">Belum divalidasi Super Admin</small>
+                    @endif
+                  </td>
                   <td>{{ $document->uploader ? $document->uploader->name : '-' }}</td>
                   <td>
                     <form action="{{ route($prefix . 'documents.destroy', $document->id) }}" method="POST"
@@ -86,7 +114,7 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="7" class="text-center">Belum ada dokumen diupload.</td>
+                  <td colspan="8" class="text-center">Belum ada dokumen diupload.</td>
                 </tr>
               @endforelse
             </tbody>

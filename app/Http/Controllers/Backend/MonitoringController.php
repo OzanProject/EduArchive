@@ -86,18 +86,20 @@ class MonitoringController extends Controller
       return \App\Models\Student::with('documents')->findOrFail($id);
     });
 
-    // Calculate Completeness based on DocumentType
+    // Calculate Completeness based on DocumentType and validation status
     $required_types = \App\Models\DocumentType::where('is_required', true)->where('is_active', true)->pluck('name');
-    $uploaded_types = $student->documents->pluck('jenis_dokumen')->toArray();
 
-    // Normalize logic: check if required type exists in uploaded types
+    // Only count APPROVED documents
+    $approved_docs = $student->documents->where('validation_status', 'approved');
+    $approved_types = $approved_docs->pluck('document_type')->toArray(); // Fixed: use document_type field
+
+
+    // Calculate filled count and missing docs
     $filled_count = 0;
     $missing_docs = [];
 
     foreach ($required_types as $type) {
-      // Case-insensitive check or direct match? Let's assume direct match first, or fuzzy if needed.
-      // But usually 'jenis_dokumen' should match 'DocumentType name'.
-      if (in_array($type, $uploaded_types)) {
+      if (in_array($type, $approved_types)) {
         $filled_count++;
       } else {
         $missing_docs[] = $type;
@@ -109,26 +111,24 @@ class MonitoringController extends Controller
 
     // Fetch Activity Logs for this student
     $logs = \App\Models\AuditLog::where('tenant_id', $tenant_id)
-      ->where('details', 'like', '%"student_id":"' . $id . '"%') // Fix: Quote the ID if stored as string in JSON, or handle int.
-      // Better Query:
-      ->where(function ($q) use ($id, $student) {
+      ->where(function ($q) use ($id) {
         $q->where('details', 'like', '%"student_id":"' . $id . '"%')
-          ->orWhere('details', 'like', '%"student_id":' . $id . '%') // Handle both number/string json
-          ->orWhere('details', 'like', '%"student_nisn":"' . ($student->nisn ?? 'UNKNOWN') . '"%');
+          ->orWhere('details', 'like', '%"student_id":' . $id . '%');
       })
       ->with('user')
       ->latest()
-      ->limit(10) // Increase limit
+      ->limit(10)
       ->get();
 
-    // Map logs to expected format for view (if needed, or update view)
+    // Map logs to expected format for view
     $formatted_logs = $logs->map(function ($log) {
       $details = json_decode($log->details, true);
       return (object) [
         'user' => $log->user,
         'document_name' => $details['document_name'] ?? 'Unknown Document',
         'created_at' => $log->created_at,
-        'action' => $log->action // Pass action
+        'action' => $log->action,
+        'details' => $details
       ];
     });
 
@@ -160,40 +160,56 @@ class MonitoringController extends Controller
       ]),
     ]);
 
-    // 3. Return File (Simulasi atau Real)
-    // Return mock PDF preview
-    return $this->returnMockFile($document);
+    // 3. Redirect to view document
+    return redirect()->route('superadmin.monitoring.view_document', [
+      'tenant_id' => $tenant_id,
+      'id' => $id,
+      'document_id' => $document_id
+    ]);
   }
 
+
+  /**
+   * View/Download document - uses Storage facade
+   */
   public function viewDocument($tenant_id, $id, $document_id)
   {
-    $tenant = \App\Models\Tenant::findOrFail($tenant_id);
-    $document = $tenant->run(function () use ($document_id) {
-      return \App\Models\Document::findOrFail($document_id);
-    });
+    try {
+      $tenant = \App\Models\Tenant::findOrFail($tenant_id);
 
-    // Optional: Log 'Viewed' event if strict tracking is needed
+      // Execute EVERYTHING inside tenant context to ensure Storage::disk('public') 
+      // resolves to the correct tenant storage path.
+      return $tenant->run(function () use ($document_id, $tenant_id, $id) {
+        $document = \App\Models\Document::findOrFail($document_id);
 
-    return $this->returnMockFile($document);
+        // Storage disk is now tenant-aware because we're inside tenant->run()
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+
+        if (!$disk->exists($document->file_path)) {
+          // Debug info if still not found
+          $diskRoot = $disk->path('');
+          \Log::error("File not found in tenant storage. Root: {$diskRoot}, Path: {$document->file_path}");
+          abort(404, 'File not found in tenant storage: ' . $document->file_path);
+        }
+
+        // Return file response through tenant-aware Storage
+        $response = $disk->response($document->file_path);
+
+        // Log access after successful response generation
+        $this->logAction($tenant_id, $id, 'VIEW', \App\Models\Document::class, $document_id, [
+          'document_name' => $document->document_type . ' (' . basename($document->file_path) . ')',
+          'document_type' => $document->document_type
+        ]);
+
+        return $response;
+      });
+
+    } catch (\Exception $e) {
+      \Log::error("ViewDocument error: " . $e->getMessage());
+      abort(500, "Error: " . $e->getMessage());
+    }
   }
 
-  private function returnMockFile($document)
-  {
-    return response("
-        <html>
-        <head><title>Document Preview</title></head>
-        <body style='text-align:center; padding-top:50px; font-family:sans-serif;'>
-            <h1>Mock Document Preview</h1>
-            <p><strong>Jenis Dokumen:</strong> {$document->jenis_dokumen}</p>
-            <p><strong>File Path:</strong> {$document->file_path}</p>
-            <hr>
-            <p style='color:green;'>DOKUMEN DIAKSES</p>
-            <p><em>(Dalam aplikasi production, ini akan meredirect ke file PDF asli atau force download)</em></p>
-            <button onclick='window.close()'>Tutup</button>
-        </body>
-        </html>
-    ");
-  }
 
   public function printRecap(Request $request, $id)
   {
@@ -231,5 +247,110 @@ class MonitoringController extends Controller
     $log->delete();
 
     return redirect()->back()->with('success', 'Log audit berhasil dihapus.');
+  }
+
+  /**
+   * Approve a student document
+   */
+  public function approveDocument($tenant_id, $student_id, $document_id)
+  {
+    try {
+      $tenant = Tenant::findOrFail($tenant_id);
+
+      $tenant->run(function () use ($document_id, $tenant_id, $student_id) {
+        $document = \App\Models\Document::findOrFail($document_id);
+        $document->update([
+          'validation_status' => 'approved',
+          'validated_by' => auth()->id(),
+          'validated_at' => now(), // Correctly uses Asia/Jakarta now
+          'validation_notes' => null,
+        ]);
+
+        // Log Approval - Wrap in secondary try-catch to not break main action if log fails
+        try {
+          $this->logAction($tenant_id, $student_id, 'APPROVE', \App\Models\Document::class, $document_id, [
+            'document_name' => $document->document_type,
+            'status' => 'approved'
+          ]);
+        } catch (\Exception $logEx) {
+          \Log::error("Failed to log approval: " . $logEx->getMessage());
+        }
+      });
+
+      return redirect()->back()->with('success', 'Dokumen berhasil disetujui.');
+    } catch (\Exception $e) {
+      \Log::error("Error in approveDocument: " . $e->getMessage());
+      return redirect()->back()->with('error', 'Terjadi kesalahan saat menyetujui dokumen: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Reject a student document
+   */
+  public function rejectDocument(Request $request, $tenant_id, $student_id, $document_id)
+  {
+    try {
+      $request->validate([
+        'validation_notes' => 'required|string|max:500',
+      ]);
+
+      $tenant = Tenant::findOrFail($tenant_id);
+
+      $tenant->run(function () use ($document_id, $request, $tenant_id, $student_id) {
+        $document = \App\Models\Document::findOrFail($document_id);
+        $document->update([
+          'validation_status' => 'rejected',
+          'validated_by' => auth()->id(),
+          'validated_at' => now(), // Correctly uses Asia/Jakarta now
+          'validation_notes' => $request->validation_notes,
+        ]);
+
+        // Log Rejection - Wrap in secondary try-catch
+        try {
+          $this->logAction($tenant_id, $student_id, 'REJECT', \App\Models\Document::class, $document_id, [
+            'document_name' => $document->document_type,
+            'status' => 'rejected',
+            'notes' => $request->validation_notes
+          ]);
+        } catch (\Exception $logEx) {
+          \Log::error("Failed to log rejection: " . $logEx->getMessage());
+        }
+      });
+
+      return redirect()->back()->with('success', 'Dokumen ditolak dengan catatan.');
+    } catch (\Exception $e) {
+      \Log::error("Error in rejectDocument: " . $e->getMessage());
+      return redirect()->back()->with('error', 'Terjadi kesalahan saat menolak dokumen: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Private helper to log monitoring actions
+   */
+  private function logAction($tenant_id, $student_id, $action, $target_type, $target_id, $details = [])
+  {
+    // Ensure we have student context for the details (needed for activity log display)
+    $tenant = \App\Models\Tenant::find($tenant_id);
+    if (!$tenant)
+      return;
+
+    $student = $tenant->run(function () use ($student_id) {
+      return \App\Models\Student::find($student_id);
+    });
+
+    \App\Models\AuditLog::create([
+      'user_id' => auth()->id(),
+      'tenant_id' => $tenant_id,
+      'action' => $action,
+      'target_type' => $target_type,
+      'target_id' => $target_id,
+      'ip_address' => request()->ip(),
+      'details' => json_encode(array_merge($details, [
+        'student_id' => $student_id,
+        'student_nisn' => $student->nisn ?? '-',
+        'student_nama' => $student->nama ?? 'Unknown',
+        'user_agent' => request()->userAgent()
+      ])),
+    ]);
   }
 }

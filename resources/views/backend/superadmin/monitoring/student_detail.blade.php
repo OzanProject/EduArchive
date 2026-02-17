@@ -37,8 +37,8 @@
             <label class="text-xs text-uppercase text-muted font-weight-bold mb-1">NIK (Nomor Induk Kependudukan)</label>
             <div class="d-flex justify-content-between align-items-center">
               <code class="text-dark font-weight-bold" style="font-size: 1.1em;">
-                                       {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
-                                   </code>
+                                                   {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
+                                               </code>
               <i class="fas fa-shield-alt text-muted" title="Data secured"></i>
             </div>
           </div>
@@ -140,21 +140,67 @@
                     <div>
                       <h6 class="mb-1 font-weight-bold text-dark">{{ $doc->jenis_dokumen }}</h6>
                       <div class="small">
-                        @if($doc->is_verified)
-                          <span class="text-success"><i class="fas fa-check-circle mr-1"></i> Verified</span>
+                        {{-- Validation Status Badge --}}
+                        @if($doc->validation_status === 'approved')
+                          <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Disetujui</span>
+                        @elseif($doc->validation_status === 'rejected')
+                          <span class="badge badge-danger"><i class="fas fa-times-circle mr-1"></i> Ditolak</span>
                         @else
-                          <span class="text-warning"><i class="fas fa-clock mr-1"></i> Pending Review</span>
+                          <span class="badge badge-warning"><i class="fas fa-clock mr-1"></i> Menunggu Validasi</span>
                         @endif
                         <span class="text-muted mx-1">&bull;</span>
                         <span class="text-muted">{{ $doc->created_at->format('d M Y') }}</span>
+
+                        {{-- Show validator info if validated --}}
+                        @if($doc->validated_at)
+                          <div class="text-xs text-muted mt-1">
+                            <i class="fas fa-user-shield"></i>
+                            {{ $doc->validator->name ?? 'Super Admin' }} - {{ $doc->validated_at->format('d M Y H:i') }}
+                          </div>
+                        @endif
+
+                        {{-- Show rejection note --}}
+                        @if($doc->validation_status === 'rejected' && $doc->validation_notes)
+                          <div class="alert alert-danger alert-sm mt-2 p-2">
+                            <small><strong>Alasan Penolakan:</strong> {{ $doc->validation_notes }}</small>
+                          </div>
+                        @endif
                       </div>
                     </div>
                   </div>
                   <div class="col-12 col-md-auto mt-2 mt-md-0">
-                    <button type="button" class="btn btn-sm btn-outline-primary btn-block btn-md-inline btn-request-access"
-                      data-doc-id="{{ $doc->id }}" data-doc-name="{{ $doc->jenis_dokumen }}">
-                      <i class="fas fa-lock mr-1"></i> Request Access
-                    </button>
+                    <div class="btn-group" role="group">
+                      {{-- Direct view link for Super Admin - no request needed --}}
+                      <a href="{{ route('superadmin.monitoring.view_document', [$tenant->id, $student->id, $doc->id]) }}"
+                        target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye mr-1"></i> Lihat Dokumen
+                      </a>
+
+                      {{-- Validation Buttons --}}
+                      @if($doc->validation_status === 'pending')
+                        <form
+                          action="{{ route('superadmin.monitoring.document.approve', [$tenant->id, $student->id, $doc->id]) }}"
+                          method="POST" class="d-inline">
+                          @csrf
+                          <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui dokumen ini?')">
+                            <i class="fas fa-check"></i> Setujui
+                          </button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-danger btn-reject-doc" data-doc-id="{{ $doc->id }}"
+                          data-doc-name="{{ $doc->jenis_dokumen }}">
+                          <i class="fas fa-times"></i> Tolak
+                        </button>
+                      @elseif($doc->validation_status === 'rejected')
+                        <form
+                          action="{{ route('superadmin.monitoring.document.approve', [$tenant->id, $student->id, $doc->id]) }}"
+                          method="POST" class="d-inline">
+                          @csrf
+                          <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui dokumen ini?')">
+                            <i class="fas fa-redo"></i> Setujui
+                          </button>
+                        </form>
+                      @endif
+                    </div>
                   </div>
                 </div>
               @endforeach
@@ -243,6 +289,43 @@
     </div>
   </div>
 
+  {{-- REJECT DOCUMENT MODAL --}}
+  <div class="modal fade" id="rejectDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem;">
+        <div class="modal-header border-bottom-0 pb-0 bg-danger text-white" style="border-radius: 1rem 1rem 0 0;">
+          <h5 class="modal-title font-weight-bold"><i class="fas fa-exclamation-triangle mr-2"></i> Tolak Dokumen</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pt-3">
+          <div class="alert alert-light border shadow-sm rounded mb-3">
+            <small class="text-muted d-block">Dokumen:</small>
+            <strong id="rejectDocName" class="text-dark">-</strong>
+          </div>
+          <form id="rejectDocForm" method="POST">
+            @csrf
+            <div class="form-group">
+              <label class="font-weight-bold text-xs uppercase">Alasan Penolakan <span
+                  class="text-danger">*</span></label>
+              <textarea class="form-control border-danger" name="validation_notes" rows="4"
+                placeholder="Jelaskan mengapa dokumen ini ditolak (max 500 karakter)..." required
+                maxlength="500"></textarea>
+              <small class="text-muted">Alasan ini akan dilihat oleh Admin Sekolah</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn btn-link text-muted" data-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-danger px-4 shadow-sm" id="btnConfirmReject">
+            <i class="fas fa-ban mr-1"></i> Tolak Dokumen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 @endsection
 
 @push('scripts')
@@ -288,6 +371,27 @@
             alert('Error: ' + xhr.responseText);
           }
         });
+      });
+      // Handle Document Rejection
+      $('.btn-reject-doc').on('click', function () {
+        let docId = $(this).data('doc-id');
+        let docName = $(this).data('doc-name');
+
+        $('#rejectDocName').text(docName);
+        $('#rejectDocForm').attr('action', '/superadmin/monitoring/{{ $tenant->id }}/student/{{ $student->id }}/document/' + docId + '/reject');
+        $('#rejectDocModal').modal('show');
+      });
+
+      $('#btnConfirmReject').on('click', function () {
+        let form = $('#rejectDocForm');
+        let notes = form.find('textarea').val();
+
+        if (notes.trim().length < 10) {
+          alert('Alasan penolakan minimal 10 karakter.');
+          return;
+        }
+
+        form.submit();
       });
     });
   </script>

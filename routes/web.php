@@ -87,6 +87,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
             Route::get('/{tenant_id}/student/{id}/document/{document_id}/view', [MonitoringController::class, 'viewDocument'])->name('view_document');
             Route::post('/{tenant_id}/student/{id}/document/{document_id}', [MonitoringController::class, 'logAccess'])->name('access_document');
+            
+            // Document Validation
+            Route::post('/{tenant_id}/student/{student_id}/document/{document_id}/approve', [MonitoringController::class, 'approveDocument'])->name('document.approve');
+            Route::post('/{tenant_id}/student/{student_id}/document/{document_id}/reject', [MonitoringController::class, 'rejectDocument'])->name('document.reject');
         });
 
         // Broadcast Logs

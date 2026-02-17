@@ -21,11 +21,22 @@ class Document extends Model
     'uploaded_by',
     'keterangan',
     'verified_at',
+    'validation_status',
+    'validation_notes',
+    'validated_by',
+    'validated_at',
   ];
 
   protected $casts = [
     'verified_at' => 'datetime',
+    'validated_at' => 'datetime',
   ];
+
+  // Accessor for backward compatibility
+  public function getJenisDokumenAttribute()
+  {
+    return $this->document_type;
+  }
 
   public function student()
   {
@@ -35,5 +46,27 @@ class Document extends Model
   public function uploader()
   {
     return $this->belongsTo(User::class, 'uploaded_by');
+  }
+
+  public function validator()
+  {
+    // Validator is from central database (Super Admin)
+    return $this->belongsTo(\App\Models\User::class, 'validated_by')->withoutGlobalScopes();
+  }
+
+  // Scopes
+  public function scopePending($query)
+  {
+    return $query->where('validation_status', 'pending');
+  }
+
+  public function scopeApproved($query)
+  {
+    return $query->where('validation_status', 'approved');
+  }
+
+  public function scopeRejected($query)
+  {
+    return $query->where('validation_status', 'rejected');
   }
 }
