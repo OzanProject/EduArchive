@@ -282,7 +282,7 @@
           {{-- Data Siswa Aktif --}}
           <li class="nav-item">
             <a href="{{ route('adminlembaga.students.index', ['status' => 'Aktif']) }}"
-              class="nav-link {{ Request::routeIs('adminlembaga.students.*') && request('status') != 'Lulus' ? 'active' : '' }}">
+              class="nav-link {{ Request::routeIs('adminlembaga.students.*') && (strtolower(request('status')) != 'lulus' && (!isset($student) || strtolower($student->status_kelulusan) != 'lulus')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-user-graduate"></i>
               <p>Data Siswa Aktif</p>
             </a>
@@ -291,7 +291,7 @@
           {{-- Data Siswa Lulusan --}}
           <li class="nav-item">
             <a href="{{ route('adminlembaga.students.index', ['status' => 'Lulus']) }}"
-              class="nav-link {{ Request::routeIs('adminlembaga.students.*') && request('status') == 'Lulus' ? 'active' : '' }}">
+              class="nav-link {{ Request::routeIs('adminlembaga.students.*') && (strtolower(request('status')) == 'lulus' || (isset($student) && strtolower($student->status_kelulusan) == 'lulus')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-user-check"></i>
               <p>Data Siswa Lulusan</p>
             </a>
@@ -320,6 +320,15 @@
               class="nav-link {{ request()->routeIs('adminlembaga.reports.index') ? 'active' : '' }}">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>Laporan & Statistik</p>
+            </a>
+          </li>
+
+          {{-- Panduan --}}
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.guide') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.guide') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-book-reader"></i>
+              <p>Panduan Website</p>
             </a>
           </li>
 
@@ -394,6 +403,15 @@
               class="nav-link {{ Request::routeIs('operator.school-documents.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-file-archive"></i>
               <p>Arsip Dokumen</p>
+            </a>
+          </li>
+
+          {{-- Panduan --}}
+          <li class="nav-item">
+            <a href="{{ route('operator.guide') }}"
+              class="nav-link {{ Request::routeIs('operator.guide') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-book-reader"></i>
+              <p>Panduan Website</p>
             </a>
           </li>
         @endif

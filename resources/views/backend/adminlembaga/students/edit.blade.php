@@ -3,12 +3,14 @@
 @endphp
 @extends('backend.layouts.app')
 
-@section('title', 'Edit Siswa')
-@section('page_title', 'Edit Data Siswa')
+@section('title', 'Edit Siswa (' . $student->status_kelulusan . ')')
+@section('page_title', 'Edit Data Siswa (' . $student->status_kelulusan . ')')
 
 @section('breadcrumb')
   <li class="breadcrumb-item"><a href="{{ route($prefix . 'dashboard') }}">Dashboard</a></li>
-  <li class="breadcrumb-item"><a href="{{ route($prefix . 'students.index') }}">Data Siswa</a></li>
+  <li class="breadcrumb-item"><a href="{{ route($prefix . 'students.index', ['status' => $student->status_kelulusan]) }}">
+      Data Siswa ({{ $student->status_kelulusan }})
+    </a></li>
   <li class="breadcrumb-item active">Edit Data</li>
 @endsection
 
@@ -52,7 +54,7 @@
             </div>
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label>NISN</label>
                   <div class="input-group">
@@ -60,12 +62,12 @@
                       <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                     </div>
                     <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror"
-                      value="{{ old('nisn', $student->nisn) }}" placeholder="Nomor Induk Siswa Nasional">
+                      value="{{ old('nisn', $student->nisn) }}" placeholder="NISN">
                   </div>
                   @error('nisn') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label>NIK</label>
                   <div class="input-group">
@@ -73,9 +75,23 @@
                       <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                     </div>
                     <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
-                      value="{{ old('nik', $student->nik) }}" placeholder="Nomor Induk Kependudukan">
+                      value="{{ old('nik', $student->nik) }}" placeholder="NIK">
                   </div>
                   @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>No. Seri Ijazah</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-certificate"></i></span>
+                    </div>
+                    <input type="text" name="no_seri_ijazah"
+                      class="form-control @error('no_seri_ijazah') is-invalid @enderror"
+                      value="{{ old('no_seri_ijazah', $student->no_seri_ijazah) }}" placeholder="Nomor Seri Ijazah">
+                  </div>
+                  @error('no_seri_ijazah') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
             </div>
@@ -105,9 +121,9 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label>Kelas</label>
+                  <label>Kelas {{ $student->status_kelulusan == 'Lulus' ? '(Riwayat)' : '' }}</label>
                   <select name="classroom_id" class="form-control select2 @error('classroom_id') is-invalid @enderror"
-                    style="width: 100%;">
+                    style="width: 100%;" {{ $student->status_kelulusan == 'Lulus' ? 'disabled' : '' }}>
                     <option value="">-- Pilih Kelas --</option>
                     @foreach($classrooms as $classroom)
                       <option value="{{ $classroom->id }}" {{ old('classroom_id', $student->classroom_id) == $classroom->id ? 'selected' : '' }}>
@@ -115,14 +131,24 @@
                       </option>
                     @endforeach
                   </select>
+                  @if($student->status_kelulusan == 'Lulus')
+                    <input type="hidden" name="classroom_id" value="{{ $student->classroom_id }}">
+                    <small class="text-muted">Kelas tidak dapat diubah untuk siswa lulusan.</small>
+                  @endif
                   @error('classroom_id') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label>Tahun Masuk</label>
-                  <input type="number" name="year_in" class="form-control"
-                    value="{{ old('year_in', $student->year_in) }}">
+                  @if($student->status_kelulusan == 'Lulus')
+                    <label>Tahun Lulus</label>
+                    <input type="number" name="tahun_lulus" class="form-control"
+                      value="{{ old('tahun_lulus', $student->tahun_lulus) }}">
+                  @else
+                    <label>Tahun Masuk</label>
+                    <input type="number" name="year_in" class="form-control"
+                      value="{{ old('year_in', $student->year_in) }}">
+                  @endif
                 </div>
               </div>
             </div>

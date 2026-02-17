@@ -167,7 +167,8 @@
 
         .signature-img {
             height: 80px;
-            width: auto; /* Maintain aspect ratio */
+            width: auto;
+            /* Maintain aspect ratio */
             position: absolute;
             bottom: 0;
             left: 50%;
@@ -176,11 +177,13 @@
         }
 
         .stamp-img {
-            height: 85px; /* Slightly larger */
+            height: 85px;
+            /* Slightly larger */
             width: auto;
             position: absolute;
             bottom: 5px;
-            left: 10px; /* Moved slightly right */
+            left: 10px;
+            /* Moved slightly right */
             z-index: 5;
             opacity: 0.8;
             transform: rotate(-5deg);
@@ -259,6 +262,13 @@
                 <td>:</td>
                 <td>{{ $student->nik ? $student->nik : '-' }}</td>
             </tr>
+            @if($student->no_seri_ijazah)
+                <tr>
+                    <td>No. Seri Ijazah</td>
+                    <td>:</td>
+                    <td>{{ $student->no_seri_ijazah }}</td>
+                </tr>
+            @endif
             <tr>
                 <td>Jenis Kelamin</td>
                 <td>:</td>

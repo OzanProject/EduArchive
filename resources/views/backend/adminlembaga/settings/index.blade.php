@@ -193,59 +193,137 @@
 
             {{-- ================= ACCOUNT INFO TAB ================= --}}
             <div class="tab-pane fade" id="account">
+              <div class="callout callout-warning">
+                <i class="fas fa-info-circle"></i> Informasi ini bersifat <strong>read-only</strong>. Hubungi
+                Super Admin untuk perubahan data sensitif.
+              </div>
+
               <div class="row">
                 <div class="col-md-8">
-                  <div class="callout callout-warning">
-                    <i class="fas fa-info-circle"></i> Informasi ini bersifat <strong>read-only</strong>. Hubungi
-                    Super Admin untuk perubahan data sensitif.
+                  <div class="card card-primary card-outline">
+                    <div class="card-header">
+                      <h3 class="card-title"><i class="fas fa-school"></i> Informasi Sekolah</h3>
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-bordered table-striped">
+                        <tbody>
+                          <tr>
+                            <th style="width: 35%;">ID Sekolah (Tenant ID)</th>
+                            <td><code class="bg-light p-1">{{ $tenant->id }}</code></td>
+                          </tr>
+                          <tr>
+                            <th>Nama Sekolah</th>
+                            <td><strong>{{ $tenant->nama_sekolah }}</strong></td>
+                          </tr>
+                          <tr>
+                            <th>NPSN</th>
+                            <td><span class="badge badge-info">{{ $tenant->npsn ?? '-' }}</span></td>
+                          </tr>
+                          <tr>
+                            <th>Jenjang Pendidikan</th>
+                            <td>{{ $tenant->jenjang }}</td>
+                          </tr>
+                          <tr>
+                            <th>Alamat</th>
+                            <td>{{ $tenant->alamat ?? '-' }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  <table class="table table-bordered table-striped">
-                    <tbody>
-                      <tr>
-                        <th style="width: 30%;">ID Sekolah (Tenant ID)</th>
-                        <td><code>{{ $tenant->id }}</code></td>
-                      </tr>
-                      <tr>
-                        <th>Domain Akses</th>
-                        <td>
-                          @foreach($tenant->domains as $domain)
-                            <a href="http://{{ $domain->domain }}" target="_blank">{{ $domain->domain }}</a><br>
-                          @endforeach
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Status Akun</th>
-                        <td>
-                          @if($tenant->status_aktif)
-                            <span class="badge badge-success">AKTIF</span>
-                          @else
-                            <span class="badge badge-danger">NON-AKTIF</span>
-                          @endif
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Paket Langganan</th>
-                        <td>
-                          <span class="badge badge-info">{{ $tenant->subscription_plan ?? 'Free / Basic' }}</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Batas Penyimpanan</th>
-                        <td>
-                          {{ $tenant->storage_limit ? number_format($tenant->storage_limit / 1024, 2) . ' GB' : 'Unlimited' }}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Tanggal Bergabung</th>
-                        <td>{{ $tenant->created_at->translatedFormat('d F Y') }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+
+                  <div class="card card-success card-outline">
+                    <div class="card-header">
+                      <h3 class="card-title"><i class="fas fa-globe"></i> Domain Akses</h3>
+                    </div>
+                    <div class="card-body">
+                      <p class="text-muted mb-2">
+                        <i class="fas fa-info-circle"></i> URL berikut dapat digunakan untuk mengakses sistem sekolah
+                        Anda:
+                      </p>
+                      @php
+                        $appUrl = config('app.url');
+                        $tenantUrl = $appUrl . '/' . $tenant->id;
+                      @endphp
+                      <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ $tenantUrl }}" id="domainUrl" readonly>
+                        <div class="input-group-append">
+                          <button class="btn btn-primary" type="button" onclick="copyDomain()">
+                            <i class="fas fa-copy"></i> Salin
+                          </button>
+                          <a href="{{ $tenantUrl }}" target="_blank" class="btn btn-success">
+                            <i class="fas fa-external-link-alt"></i> Buka
+                          </a>
+                        </div>
+                      </div>
+                      <small class="text-muted">
+                        <i class="fas fa-lock"></i> Pastikan hanya membagikan URL ini kepada pengguna yang berwenang.
+                      </small>
+                    </div>
+                  </div>
+
+                  <div class="card card-info card-outline">
+                    <div class="card-header">
+                      <h3 class="card-title"><i class="fas fa-server"></i> Status & Paket</h3>
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-bordered">
+                        <tbody>
+                          <tr>
+                            <th style="width: 35%;">Status Akun</th>
+                            <td>
+                              @if($tenant->status_aktif)
+                                <span class="badge badge-success"><i class="fas fa-check-circle"></i> AKTIF</span>
+                              @else
+                                <span class="badge badge-danger"><i class="fas fa-times-circle"></i> NON-AKTIF</span>
+                              @endif
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Paket Langganan</th>
+                            <td>
+                              <span class="badge badge-primary">{{ $tenant->subscription_plan ?? 'Free / Basic' }}</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Batas Penyimpanan</th>
+                            <td>
+                              @if($tenant->storage_limit)
+                                <div class="progress progress-sm">
+                                  @php
+                                    $usedStorage = $tenant->getUsedStorage();
+                                    $percentage = ($usedStorage / $tenant->storage_limit) * 100;
+                                  @endphp
+                                  <div class="progress-bar bg-{{ $percentage > 80 ? 'danger' : 'success' }}"
+                                    style="width: {{ min(100, $percentage) }}%"></div>
+                                </div>
+                                <small class="text-muted">
+                                  {{ number_format($usedStorage / 1024 / 1024, 2) }} MB /
+                                  {{ number_format($tenant->storage_limit / 1024 / 1024, 2) }} MB digunakan
+                                </small>
+                              @else
+                                <span class="badge badge-success"><i class="fas fa-infinity"></i> Unlimited</span>
+                              @endif
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Tanggal Bergabung</th>
+                            <td>
+                              <i class="fas fa-calendar-alt text-muted"></i>
+                              {{ $tenant->created_at->translatedFormat('d F Y') }}
+                              <small class="text-muted">({{ $tenant->created_at->diffForHumans() }})</small>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
+
                 <div class="col-md-4">
                   <div class="card card-outline card-warning">
                     <div class="card-header">
-                      <h3 class="card-title">Bantuan</h3>
+                      <h3 class="card-title"><i class="fas fa-life-ring"></i> Bantuan</h3>
                     </div>
                     <div class="card-body">
                       <p>Jika Anda mengalami kendala teknis atau ingin melakukan upgrade paket layanan, silakan hubungi
@@ -260,6 +338,16 @@
                           <small>Kontak support belum dikonfigurasi oleh Super Admin.</small>
                         </div>
                       @endif
+
+                      <hr>
+
+                      <h6 class="mt-3"><i class="fas fa-question-circle"></i> Layanan Support</h6>
+                      <ul class="list-unstyled text-sm">
+                        <li><i class="fas fa-check text-success"></i> Reset Password</li>
+                        <li><i class="fas fa-check text-success"></i> Upgrade Paket</li>
+                        <li><i class="fas fa-check text-success"></i> Bantuan Teknis</li>
+                        <li><i class="fas fa-check text-success"></i> Konsultasi Sistem</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -304,13 +392,13 @@
           reader.onload = function (e) {
 
             const html = `
-                                                            <div class="position-relative d-inline-block">
-                                                              <img src="${e.target.result}"
-                                                                   class="border p-2 bg-light rounded shadow-sm"
-                                                                   style="max-height:100px; object-fit:contain;">
-                                                              <small class="d-block text-muted mt-1">${file.name}</small>
-                                                            </div>
-                                                          `;
+                                                                <div class="position-relative d-inline-block">
+                                                                  <img src="${e.target.result}"
+                                                                       class="border p-2 bg-light rounded shadow-sm"
+                                                                       style="max-height:100px; object-fit:contain;">
+                                                                  <small class="d-block text-muted mt-1">${file.name}</small>
+                                                                </div>
+                                                              `;
 
             $('#' + containerId).html(html);
           };
@@ -365,7 +453,29 @@
         });
 
       });
+
+      // Copy domain URL to clipboard
+      function copyDomain() {
+        const input = document.getElementById('domainUrl');
+        input.select();
+        input.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand('copy');
+
+        // Show feedback
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-success');
+
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-primary');
+        }, 2000);
+      }
     </script>
   @endpush
+
 
 @endsection

@@ -51,7 +51,7 @@
             </div>
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label>NISN</label>
                   <div class="input-group">
@@ -59,12 +59,12 @@
                       <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                     </div>
                     <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror"
-                      value="{{ old('nisn') }}" placeholder="Nomor Induk Siswa Nasional">
+                      value="{{ old('nisn') }}" placeholder="NISN">
                   </div>
                   @error('nisn') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label>NIK</label>
                   <div class="input-group">
@@ -72,9 +72,23 @@
                       <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                     </div>
                     <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
-                      value="{{ old('nik') }}" placeholder="Nomor Induk Kependudukan">
+                      value="{{ old('nik') }}" placeholder="NIK">
                   </div>
                   @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>No. Seri Ijazah (Opsional)</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-certificate"></i></span>
+                    </div>
+                    <input type="text" name="no_seri_ijazah"
+                      class="form-control @error('no_seri_ijazah') is-invalid @enderror"
+                      value="{{ old('no_seri_ijazah') }}" placeholder="Nomor Seri Ijazah">
+                  </div>
+                  @error('no_seri_ijazah') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
             </div>

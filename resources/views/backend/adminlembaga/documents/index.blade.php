@@ -24,8 +24,21 @@
             </a>
           </div>
         </div>
-        <!-- /.card-header -->
-        <div class="card-body table-responsive p-0">
+        <div class="card-body">
+          <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+              <a class="nav-link {{ $status == 'Aktif' ? 'active' : '' }}"
+                href="{{ route($prefix . 'documents.index', ['status' => 'Aktif']) }}">
+                <i class="fas fa-user-graduate"></i> Siswa Aktif
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ $status == 'Lulus' ? 'active' : '' }}"
+                href="{{ route($prefix . 'documents.index', ['status' => 'Lulus']) }}">
+                <i class="fas fa-graduation-cap"></i> Siswa Lulusan
+              </a>
+            </li>
+          </ul>
           <table class="table table-hover text-nowrap">
             <thead>
               <tr>

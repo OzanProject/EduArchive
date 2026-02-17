@@ -73,6 +73,16 @@ class SchoolSettingController extends Controller
       if ($key === 'school_name') {
         tenant()->update(['nama_sekolah' => $value]);
       }
+
+      // Sync NPSN to Tenant Record
+      if ($key === 'school_npsn') {
+        try {
+          tenant()->update(['npsn' => $value]);
+        } catch (\Exception $e) {
+          // Ignore duplicate entry error if any, or handle gracefully
+          // For now, we assume admin knows what they are doing
+        }
+      }
     }
 
     // Handle File Uploads (School Logo)

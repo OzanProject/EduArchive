@@ -98,6 +98,9 @@ Route::group([
         Route::get('settings/profile', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'editProfile'])->name('settings.profile');
         Route::get('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'index'])->name('settings.index');
         Route::post('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'update'])->name('settings.update');
+
+        // Guide
+        Route::get('guide', [\App\Http\Controllers\Backend\GuideController::class, 'index'])->name('guide');
     });
 
     // Operator Routes
@@ -114,6 +117,9 @@ Route::group([
 
         Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class)->except(['edit', 'update']);
         Route::resource('school-documents', \App\Http\Controllers\Backend\SchoolDocumentController::class)->except(['show', 'edit', 'update']);
+
+        // Guide
+        Route::get('guide', [\App\Http\Controllers\Backend\GuideController::class, 'index'])->name('guide');
     });
 });
 

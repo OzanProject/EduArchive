@@ -34,6 +34,12 @@
                 </div>
 
                 <div class="form-group">
+                  <label for="app_version">Versi Aplikasi</label>
+                  <input type="text" name="app_version" class="form-control" id="app_version"
+                    value="{{ $settings['app_version'] ?? '1.0.0 (Beta)' }}" placeholder="1.0.0 (Beta)">
+                </div>
+
+                <div class="form-group">
                   <label for="app_description">Deskripsi Singkat (Meta Description)</label>
                   <textarea name="app_description" class="form-control" rows="3"
                     placeholder="Deskripsi aplikasi...">{{ $settings['app_description'] ?? '' }}</textarea>

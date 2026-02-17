@@ -14,13 +14,20 @@ class DocumentController extends Controller
     {
         $query = \App\Models\Document::with(['student', 'uploader'])->latest();
 
+        $status = $request->get('status', 'Aktif');
+
+        // Filter based on Student Status
+        $query->whereHas('student', function ($q) use ($status) {
+            $q->where('status_kelulusan', $status);
+        });
+
         if ($request->has('student_id')) {
             $query->where('student_id', $request->student_id);
         }
 
         $documents = $query->paginate(10);
 
-        return view('backend.adminlembaga.documents.index', compact('documents'));
+        return view('backend.adminlembaga.documents.index', compact('documents', 'status'));
     }
 
     /**

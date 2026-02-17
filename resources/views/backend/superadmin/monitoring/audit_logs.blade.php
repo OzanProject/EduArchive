@@ -26,6 +26,7 @@
                 <th>NISN Siswa</th>
                 <th>Dokumen</th>
                 <th>IP Address</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -40,10 +41,20 @@
                   <td>{{ $details['student_nisn'] ?? '-' }}</td>
                   <td>{{ $details['document_name'] ?? '-' }}</td>
                   <td>{{ $log->ip_address }}</td>
+                  <td>
+                    <form action="{{ route('superadmin.monitoring.audit_logs.destroy', $log->id) }}" method="POST"
+                      class="d-inline" onsubmit="return confirm('Yakin ingin menghapus log ini?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="6" class="text-center">Belum ada aktivitas akses dokumen.</td>
+                  <td colspan="7" class="text-center">Belum ada aktivitas akses dokumen.</td>
                 </tr>
               @endforelse
             </tbody>

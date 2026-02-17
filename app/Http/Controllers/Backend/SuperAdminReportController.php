@@ -19,6 +19,15 @@ class SuperAdminReportController extends Controller
       return redirect()->route('superadmin.reports.show', $request->tenant_id);
     }
 
+    if ($request->has('npsn') && $request->npsn) {
+      $npsn = trim($request->npsn);
+      $tenant = Tenant::where('npsn', $npsn)->first();
+      if ($tenant) {
+        return redirect()->route('superadmin.reports.show', $tenant->id);
+      }
+      return redirect()->back()->with('error', 'Sekolah dengan NPSN ' . $npsn . ' tidak ditemukan.');
+    }
+
     $tenants = Tenant::all();
     return view('backend.superadmin.reports.index', compact('tenants'));
   }

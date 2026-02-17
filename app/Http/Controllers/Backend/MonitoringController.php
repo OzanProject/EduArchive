@@ -224,4 +224,12 @@ class MonitoringController extends Controller
     $logs = \App\Models\AuditLog::with('user')->latest()->paginate(20);
     return view('backend.superadmin.monitoring.audit_logs', compact('logs'));
   }
+
+  public function destroyAuditLog($id)
+  {
+    $log = \App\Models\AuditLog::findOrFail($id);
+    $log->delete();
+
+    return redirect()->back()->with('success', 'Log audit berhasil dihapus.');
+  }
 }

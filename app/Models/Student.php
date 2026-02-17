@@ -29,6 +29,7 @@ class Student extends Model
     'parent_name',
     'year_in',
     'year_out',
+    'no_seri_ijazah',
   ];
 
   protected $casts = [

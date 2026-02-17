@@ -54,6 +54,7 @@
                 <th>L/P</th>
                 @if($status == 'Lulus')
                   <th>Tahun Lulus</th>
+                  <th>No Ijazah</th>
                 @else
                   <th>Kelas</th>
                 @endif
@@ -86,6 +87,7 @@
                   <td>{{ $student->gender ?? '-' }}</td>
                   @if($status == 'Lulus')
                     <td>{{ $student->tahun_lulus ?? '-' }}</td>
+                          <td><span class="badge badge-info">{{ $student->no_seri_ijazah ?? '-' }}</span></td>
                   @else
                     <td>{{ $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-') }}</td>
                   @endif

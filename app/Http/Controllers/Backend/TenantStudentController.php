@@ -96,7 +96,10 @@ class TenantStudentController extends Controller
             'classroom_id' => 'nullable|exists:classrooms,id',
             'nik' => 'nullable|string',
             'nisn' => 'nullable|string',
+            'no_seri_ijazah' => 'nullable|string',
+            'status_kelulusan' => 'nullable|in:Aktif,Lulus,Pindah,DO',
             'foto_profil' => 'nullable|image|max:2048',
+            'tahun_lulus' => 'nullable|integer|min:2000|max:' . (date('Y') + 1),
         ]);
 
         if ($request->hasFile('foto_profil')) {
@@ -112,6 +115,10 @@ class TenantStudentController extends Controller
         $validated['address'] = $request->address;
         $validated['parent_name'] = $request->parent_name;
         $validated['year_in'] = $request->year_in;
+
+        if ($request->filled('tahun_lulus')) {
+            $validated['tahun_lulus'] = $request->tahun_lulus;
+        }
 
         if ($request->classroom_id) {
             $classroom = \App\Models\Classroom::find($request->classroom_id);

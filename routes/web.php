@@ -79,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [MonitoringController::class, 'index'])->name('index');
             Route::get('/{id}/print', [MonitoringController::class, 'printRecap'])->name('print_recap');
             Route::get('/audit-logs', [MonitoringController::class, 'auditLogs'])->name('audit_logs');
+            Route::delete('/audit-logs/{id}', [MonitoringController::class, 'destroyAuditLog'])->name('audit_logs.destroy');
             Route::post('/document-access/request', [DocumentAccessController::class, 'requestAccess'])->name('document_access.request');
 
             // Specific Monitoring

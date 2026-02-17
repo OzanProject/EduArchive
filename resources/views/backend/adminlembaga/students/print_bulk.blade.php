@@ -246,6 +246,13 @@
           <td>:</td>
           <td>{{ $student->nik ? $student->nik : '-' }}</td>
         </tr>
+        @if($student->no_seri_ijazah)
+          <tr>
+            <td>No. Seri Ijazah</td>
+            <td>:</td>
+            <td>{{ $student->no_seri_ijazah }}</td>
+          </tr>
+        @endif
         <tr>
           <td>Jenis Kelamin</td>
           <td>:</td>
