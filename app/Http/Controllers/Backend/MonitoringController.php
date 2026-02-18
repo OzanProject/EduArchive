@@ -16,29 +16,17 @@ class MonitoringController extends Controller
 {
   public function index(Request $request)
   {
-    $query = Student::query();
+    $category = $request->get('category', 'students'); // students or graduates
+    $query = Tenant::query();
 
-    if ($request->filled('search')) {
-      $search = trim($request->search);
-
-      $query->where(function ($q) use ($search) {
-        $q->where('nama', 'like', "%{$search}%")
-          ->orWhere('nis', 'like', "%{$search}%");
-      });
+    if ($request->has('table_search') && $request->table_search != '') {
+      $search = $request->table_search;
+      $query->where('npsn', 'like', "%{$search}%")
+        ->orWhere('nama_sekolah', 'like', "%{$search}%");
     }
 
-    $allowedSort = ['nama', 'nis', 'created_at'];
-    $sort = in_array($request->sort, $allowedSort) ? $request->sort : 'created_at';
-    $direction = $request->direction === 'asc' ? 'asc' : 'desc';
-
-    $query->orderBy($sort, $direction);
-
-    $perPage = (int) $request->per_page;
-    $perPage = $perPage > 0 && $perPage <= 100 ? $perPage : 10;
-
-    $students = $query->paginate($perPage)->withQueryString();
-
-    return view('backend.superadmin.monitoring.students', compact('students'));
+    $tenants = $query->paginate(10);
+    return view('backend.superadmin.monitoring.index', compact('tenants', 'category'));
   }
 
   public function showSchool(Request $request, $id)
