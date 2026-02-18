@@ -282,7 +282,7 @@ class MonitoringController extends Controller
     $year = $request->get('year');
 
     $data = $tenant->run(function () use ($status, $year) {
-      $query = \App\Models\Student::with('documents');
+      $query = Student::with('documents');
 
       if ($status == 'lulus') {
         $query->where('status_kelulusan', 'lulus');
@@ -301,13 +301,13 @@ class MonitoringController extends Controller
 
   public function auditLogs()
   {
-    $logs = \App\Models\AuditLog::with(['user', 'tenant'])->latest()->paginate(20);
+    $logs = AuditLog::with(['user', 'tenant'])->latest()->paginate(20);
     return view('backend.superadmin.monitoring.audit_logs', compact('logs'));
   }
 
   public function destroyAuditLog($id)
   {
-    $log = \App\Models\AuditLog::findOrFail($id);
+    $log = AuditLog::findOrFail($id);
     $log->delete();
 
     return redirect()->back()->with('success', 'Log audit berhasil dihapus.');
