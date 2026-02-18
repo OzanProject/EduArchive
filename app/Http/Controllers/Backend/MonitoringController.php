@@ -313,6 +313,18 @@ class MonitoringController extends Controller
     return redirect()->back()->with('success', 'Log audit berhasil dihapus.');
   }
 
+  public function bulkDestroyAuditLog(Request $request)
+  {
+    $ids = $request->input('ids');
+    if (empty($ids)) {
+      return redirect()->back()->with('error', 'Pilih log yang ingin dihapus.');
+    }
+
+    AuditLog::whereIn('id', $ids)->delete();
+
+    return redirect()->back()->with('success', 'Log audit yang dipilih berhasil dihapus.');
+  }
+
   private function logAction($tenant_id, $student_id, $action, $target_type, $target_id, $details = [])
   {
     AuditLog::create([
