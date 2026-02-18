@@ -38,7 +38,9 @@
                 <tr>
                   <td>{{ $log->created_at->format('d M Y H:i:s') }}</td>
                   <td>{{ $log->user->name ?? 'System' }}</td>
-                  <td><span class="badge badge-info">{{ $log->tenant_id }}</span></td>
+                  <td>
+                    <span class="badge badge-info">{{ $log->tenant->nama_sekolah ?? $log->tenant_id }}</span>
+                  </td>
                   <td>{{ $details['student_nisn'] ?? '-' }}</td>
                   <td>{{ $details['document_name'] ?? '-' }}</td>
                   <td>

@@ -275,6 +275,44 @@ class MonitoringController extends Controller
     }
   }
 
+  public function printRecap(Request $request, $id)
+  {
+    $tenant = Tenant::findOrFail($id);
+    $status = $request->get('status', 'aktif');
+    $year = $request->get('year');
+
+    $data = $tenant->run(function () use ($status, $year) {
+      $query = \App\Models\Student::with('documents');
+
+      if ($status == 'lulus') {
+        $query->where('status_kelulusan', 'lulus');
+        if ($year) {
+          $query->where('tahun_lulus', $year);
+        }
+      } else {
+        $query->where('status_kelulusan', 'aktif');
+      }
+
+      return $query->oldest('nama')->get();
+    });
+
+    return view('backend.superadmin.monitoring.print_recap', compact('tenant', 'data', 'status', 'year'));
+  }
+
+  public function auditLogs()
+  {
+    $logs = \App\Models\AuditLog::with(['user', 'tenant'])->latest()->paginate(20);
+    return view('backend.superadmin.monitoring.audit_logs', compact('logs'));
+  }
+
+  public function destroyAuditLog($id)
+  {
+    $log = \App\Models\AuditLog::findOrFail($id);
+    $log->delete();
+
+    return redirect()->back()->with('success', 'Log audit berhasil dihapus.');
+  }
+
   private function logAction($tenant_id, $student_id, $action, $target_type, $target_id, $details = [])
   {
     AuditLog::create([
