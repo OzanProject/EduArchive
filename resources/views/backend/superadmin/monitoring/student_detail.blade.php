@@ -37,8 +37,8 @@
             <label class="text-xs text-uppercase text-muted font-weight-bold mb-1">NIK (Nomor Induk Kependudukan)</label>
             <div class="d-flex justify-content-between align-items-center">
               <code class="text-dark font-weight-bold" style="font-size: 1.1em;">
-                                                           {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
-                                                       </code>
+                                                             {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
+                                                         </code>
               <i class="fas fa-shield-alt text-muted" title="Data secured"></i>
             </div>
           </div>
@@ -213,13 +213,16 @@
                           action="{{ route('superadmin.monitoring.document.approve', [$tenant->id, $student->id, $doc->id]) }}"
                           method="POST" class="d-inline">
                           @csrf
+                          <input type="hidden" name="student_nisn" value="{{ $student->nisn }}">
+                          <input type="hidden" name="student_nama" value="{{ $student->nama }}">
                           <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui dokumen ini?')">
                             <i class="fas fa-check"></i>
                           </button>
                         </form>
 
                         <button type="button" class="btn btn-sm btn-danger btn-reject-doc" data-doc-id="{{ $doc->id }}"
-                          data-doc-name="{{ $doc->document_type ?? $doc->jenis_dokumen }}">
+                          data-doc-name="{{ $doc->document_type ?? $doc->jenis_dokumen }}"
+                          data-student-nisn="{{ $student->nisn }}" data-student-nama="{{ $student->nama }}">
                           <i class="fas fa-times"></i>
                         </button>
 
@@ -229,6 +232,8 @@
                           action="{{ route('superadmin.monitoring.document.approve', [$tenant->id, $student->id, $doc->id]) }}"
                           method="POST" class="d-inline">
                           @csrf
+                          <input type="hidden" name="student_nisn" value="{{ $student->nisn }}">
+                          <input type="hidden" name="student_nama" value="{{ $student->nama }}">
                           <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui dokumen ini?')">
                             <i class="fas fa-redo"></i>
                           </button>
@@ -360,6 +365,8 @@
           </div>
           <form id="rejectDocForm" method="POST">
             @csrf
+            <input type="hidden" name="student_nisn" id="rejectStudentNisn">
+            <input type="hidden" name="student_nama" id="rejectStudentNama">
             <div class="form-group">
               <label class="font-weight-bold text-xs uppercase">Alasan Penolakan <span
                   class="text-danger">*</span></label>
@@ -430,8 +437,12 @@
       $('.btn-reject-doc').on('click', function () {
         let docId = $(this).data('doc-id');
         let docName = $(this).data('doc-name');
+        let studentNisn = $(this).data('student-nisn');
+        let studentNama = $(this).data('student-nama');
 
         $('#rejectDocName').text(docName);
+        $('#rejectStudentNisn').val(studentNisn);
+        $('#rejectStudentNama').val(studentNama);
         $('#rejectDocForm').attr('action', '/superadmin/monitoring/{{ $tenant->id }}/student/{{ $student->id }}/document/' + docId + '/reject');
         $('#rejectDocModal').modal('show');
       });

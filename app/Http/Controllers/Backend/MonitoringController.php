@@ -128,7 +128,10 @@ class MonitoringController extends Controller
     // AUDIT LOG
     // ===============================
     $logs = AuditLog::where('tenant_id', $tenant_id)
-      ->where('details', 'like', '%"student_id":' . $id . '%')
+      ->where(function ($q) use ($id) {
+        $q->where('details', 'like', '%"student_id":"' . $id . '"%')
+          ->orWhere('details', 'like', '%"student_id":' . $id . '%');
+      })
       ->with('user')
       ->latest()
       ->limit(10)
@@ -283,6 +286,8 @@ class MonitoringController extends Controller
       'ip_address' => request()->ip(),
       'details' => json_encode(array_merge($details, [
         'student_id' => $student_id,
+        'student_nisn' => request()->input('student_nisn', '-'),
+        'student_nama' => request()->input('student_nama', 'Unknown'),
         'user_agent' => request()->userAgent()
       ])),
     ]);
