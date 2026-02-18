@@ -38,7 +38,7 @@ class MonitoringController extends Controller
 
     $students = $query->paginate($perPage)->withQueryString();
 
-    return view('students_detail.index', compact('students'));
+    return view('backend.superadmin.monitoring.students', compact('students'));
   }
 
   public function showSchool(Request $request, $id)
