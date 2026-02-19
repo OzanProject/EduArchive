@@ -56,10 +56,24 @@ class SuperAdminReportController extends Controller
       ],
       'classrooms' => Classroom::count(),
       'classroom_stats' => Classroom::withCount([
-        'students' => function ($query) {
-          $query->whereIn('status_kelulusan', ['Aktif', 'aktif']);
+        'students as total' => function ($q) {
+          $q->whereIn('status_kelulusan', ['Aktif', 'aktif']);
+        },
+        'students as male' => function ($q) {
+          $q->whereIn('status_kelulusan', ['Aktif', 'aktif'])->where('gender', 'L');
+        },
+        'students as female' => function ($q) {
+          $q->whereIn('status_kelulusan', ['Aktif', 'aktif'])->where('gender', 'P');
         }
-      ])->get()->pluck('students_count', 'nama_kelas')->toArray(),
+      ])->get()->mapWithKeys(function ($item) {
+        return [
+          $item->nama_kelas => [
+            'total' => $item->total,
+            'male' => $item->male,
+            'female' => $item->female,
+          ]
+        ];
+      })->toArray(),
       'teachers' => [
         'total' => Teacher::count(),
         'pns' => Teacher::whereIn('status_kepegawaian', ['PNS', 'pns'])->count(),
@@ -149,10 +163,24 @@ class SuperAdminReportController extends Controller
       ],
       'classrooms' => Classroom::count(),
       'classroom_stats' => Classroom::withCount([
-        'students' => function ($q) {
+        'students as total' => function ($q) {
           $q->whereIn('status_kelulusan', ['Aktif', 'aktif']);
+        },
+        'students as male' => function ($q) {
+          $q->whereIn('status_kelulusan', ['Aktif', 'aktif'])->where('gender', 'L');
+        },
+        'students as female' => function ($q) {
+          $q->whereIn('status_kelulusan', ['Aktif', 'aktif'])->where('gender', 'P');
         }
-      ])->get()->pluck('students_count', 'nama_kelas')->toArray(),
+      ])->get()->mapWithKeys(function ($item) {
+        return [
+          $item->nama_kelas => [
+            'total' => $item->total,
+            'male' => $item->male,
+            'female' => $item->female,
+          ]
+        ];
+      })->toArray(),
       'teachers' => [
         'total' => Teacher::count(),
         'pns' => Teacher::whereIn('status_kepegawaian', ['PNS', 'pns'])->count(),

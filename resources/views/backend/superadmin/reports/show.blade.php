@@ -384,11 +384,18 @@
           type: 'bar',
           data: {
             labels: {!! json_encode(array_keys($stats['classroom_stats'])) !!},
-            datasets: [{
-              label: 'Siswa Aktif',
-              data: {!! json_encode(array_values($stats['classroom_stats'])) !!},
-              backgroundColor: '#6c757d',
-            }]
+            datasets: [
+              {
+                label: 'Laki-laki',
+                data: {!! json_encode(array_map(fn($v) => $v['male'], array_values($stats['classroom_stats']))) !!},
+                backgroundColor: '#007bff',
+              },
+              {
+                label: 'Perempuan',
+                data: {!! json_encode(array_map(fn($v) => $v['female'], array_values($stats['classroom_stats']))) !!},
+                backgroundColor: '#dc3545',
+              }
+            ]
           },
           options: {
             maintainAspectRatio: false,

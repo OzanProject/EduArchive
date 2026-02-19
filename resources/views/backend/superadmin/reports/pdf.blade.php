@@ -170,7 +170,33 @@
     </tr>
   </table>
 
-  <div class="section-title">3. Statistik Arsip & Dokumen</div>
+  <div class="section-title">3. Distribusi Siswa Per Kelas</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Nama Kelas</th>
+        <th style="text-align: center;">Laki-laki (L)</th>
+        <th style="text-align: center;">Perempuan (P)</th>
+        <th style="text-align: center;">Total Siswa</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse($stats['classroom_stats'] as $className => $cStats)
+        <tr>
+          <td>{{ $className }}</td>
+          <td style="text-align: center;">{{ $cStats['male'] }}</td>
+          <td style="text-align: center;">{{ $cStats['female'] }}</td>
+          <td style="text-align: center; font-weight: bold;">{{ $cStats['total'] }}</td>
+        </tr>
+      @empty
+        <tr>
+          <td colspan="4" style="text-align: center;">Tidak ada data kelas.</td>
+        </tr>
+      @endforelse
+    </tbody>
+  </table>
+
+  <div class="section-title">4. Statistik Arsip & Dokumen</div>
   <table>
     <tr>
       <th>Kategori Dokumen</th>
@@ -186,7 +212,7 @@
     </tr>
   </table>
 
-  <div class="section-title">4. Monitoring Kegiatan Pembelajaran</div>
+  <div class="section-title">5. Monitoring Kegiatan Pembelajaran</div>
   <table>
     <tr>
       <th>Status Kegiatan</th>
@@ -210,7 +236,31 @@
     </tr>
   </table>
 
-  <div class="section-title">6. Detail Usia Siswa Aktif</div>
+  <div class="section-title">6. Usulan Sarpras (Infrastruktur)</div>
+  <table>
+    <tr>
+      <th>Jenis Usulan</th>
+      <th>Jumlah</th>
+    </tr>
+    <tr>
+      <td>Total Usulan Diajukan</td>
+      <td>{{ $stats['infrastructure']['total'] }}</td>
+    </tr>
+    <tr>
+      <td>- Ruang Kelas Baru (RKB)</td>
+      <td>{{ $stats['infrastructure']['rkb'] }}</td>
+    </tr>
+    <tr>
+      <td>- Rehabilitasi (REHAB)</td>
+      <td>{{ $stats['infrastructure']['rehab'] }}</td>
+    </tr>
+    <tr>
+      <td>- Lain-lain</td>
+      <td>{{ $stats['infrastructure']['other'] }}</td>
+    </tr>
+  </table>
+
+  <div class="section-title">7. Detail Usia Siswa Aktif</div>
   <table>
     <thead>
       <tr>
