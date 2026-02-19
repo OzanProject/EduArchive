@@ -51,8 +51,8 @@ class SuperAdminReportController extends Controller
         'others' => Student::whereNotIn('status_kelulusan', ['Aktif', 'aktif', 'Lulus', 'lulus'])->count(),
       ],
       'gender' => [
-        'L' => Student::where('gender', 'Laki-laki')->count(),
-        'P' => Student::where('gender', 'Perempuan')->count(),
+        'L' => Student::where('gender', 'L')->count(),
+        'P' => Student::where('gender', 'P')->count(),
       ],
       'classrooms' => Classroom::count(),
       'classroom_stats' => Classroom::withCount([
@@ -85,9 +85,10 @@ class SuperAdminReportController extends Controller
     // Age Statistics for Active Students
     $activeStudents = Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->get();
     $ageStats = [
-      '< 12' => 0,
-      '12-15' => 0,
-      '15-18' => 0,
+      '< 7' => 0,
+      '7-12' => 0,
+      '13-15' => 0,
+      '16-18' => 0,
       '> 18' => 0,
       'Kosong' => 0,
     ];
@@ -100,12 +101,14 @@ class SuperAdminReportController extends Controller
 
       $age = \Carbon\Carbon::parse($student->birth_date)->age;
 
-      if ($age < 12) {
-        $ageStats['< 12']++;
+      if ($age < 7) {
+        $ageStats['< 7']++;
+      } elseif ($age <= 12) {
+        $ageStats['7-12']++;
       } elseif ($age <= 15) {
-        $ageStats['12-15']++;
+        $ageStats['13-15']++;
       } elseif ($age <= 18) {
-        $ageStats['15-18']++;
+        $ageStats['16-18']++;
       } else {
         $ageStats['> 18']++;
       }
@@ -131,12 +134,15 @@ class SuperAdminReportController extends Controller
         'others' => Student::whereNotIn('status_kelulusan', ['Aktif', 'aktif', 'Lulus', 'lulus'])->count(),
       ],
       'gender' => [
-        'L' => Student::where('gender', 'Laki-laki')->count(),
-        'P' => Student::where('gender', 'Perempuan')->count(),
+        'L' => Student::where('gender', 'L')->count(),
+        'P' => Student::where('gender', 'P')->count(),
       ],
       'classrooms' => Classroom::count(),
-      'classroom_stats' => Classroom::withCount(['students' => function ($q) {
-        $q->whereIn('status_kelulusan', ['Aktif', 'aktif']); }])->get()->pluck('students_count', 'nama_kelas')->toArray(),
+      'classroom_stats' => Classroom::withCount([
+        'students' => function ($q) {
+          $q->whereIn('status_kelulusan', ['Aktif', 'aktif']);
+        }
+      ])->get()->pluck('students_count', 'nama_kelas')->toArray(),
       'teachers' => [
         'total' => Teacher::count(),
         'pns' => Teacher::whereIn('status_kepegawaian', ['PNS', 'pns'])->count(),
@@ -160,19 +166,21 @@ class SuperAdminReportController extends Controller
     ];
 
     $activeStudents = Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->get();
-    $ageStats = ['< 12' => 0, '12-15' => 0, '15-18' => 0, '> 18' => 0, 'Kosong' => 0];
+    $ageStats = ['< 7' => 0, '7-12' => 0, '13-15' => 0, '16-18' => 0, '> 18' => 0, 'Kosong' => 0];
     foreach ($activeStudents as $student) {
       if (!$student->birth_date) {
         $ageStats['Kosong']++;
         continue;
       }
       $age = \Carbon\Carbon::parse($student->birth_date)->age;
-      if ($age < 12) {
-        $ageStats['< 12']++;
+      if ($age < 7) {
+        $ageStats['< 7']++;
+      } elseif ($age <= 12) {
+        $ageStats['7-12']++;
       } elseif ($age <= 15) {
-        $ageStats['12-15']++;
+        $ageStats['13-15']++;
       } elseif ($age <= 18) {
-        $ageStats['15-18']++;
+        $ageStats['16-18']++;
       } else {
         $ageStats['> 18']++;
       }

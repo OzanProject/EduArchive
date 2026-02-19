@@ -49,8 +49,8 @@ class TenantStudentController extends Controller
             'gender' => 'required|in:L,P', // Added gender validation
             'no_hp' => 'nullable|string|max:20', // Added no_hp validation
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string',
-            'nisn' => 'nullable|string',
+            'nik' => 'nullable|string|unique:students,nik',
+            'nisn' => 'nullable|string|unique:students,nisn',
             'foto_profil' => 'nullable|image|max:2048',
         ]);
 
@@ -96,8 +96,8 @@ class TenantStudentController extends Controller
             'gender' => 'required|in:L,P', // Added gender validation
             'no_hp' => 'nullable|string|max:20', // Added no_hp validation
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string',
-            'nisn' => 'nullable|string',
+            'nik' => 'nullable|string|unique:students,nik,' . $id,
+            'nisn' => 'nullable|string|unique:students,nisn,' . $id,
             'no_seri_ijazah' => 'nullable|string',
             'status_kelulusan' => 'nullable|in:Aktif,Lulus,Pindah,DO',
             'foto_profil' => 'nullable|image|max:2048',
