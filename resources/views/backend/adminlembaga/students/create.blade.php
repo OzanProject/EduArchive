@@ -51,7 +51,7 @@
             </div>
 
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="form-group">
                   <label>NISN</label>
                   <div class="input-group">
@@ -64,7 +64,7 @@
                   @error('nisn') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="form-group">
                   <label>NIK</label>
                   <div class="input-group">
@@ -77,7 +77,20 @@
                   @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>No. HP</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                    </div>
+                    <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror"
+                      value="{{ old('no_hp') }}" placeholder="08xxx">
+                  </div>
+                  @error('no_hp') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-3">
                 <div class="form-group">
                   <label>No. Seri Ijazah (Opsional)</label>
                   <div class="input-group">

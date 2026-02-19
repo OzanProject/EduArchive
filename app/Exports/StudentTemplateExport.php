@@ -40,6 +40,7 @@ class StudentTemplateExport implements FromCollection, WithHeadings, WithStyles,
       'tempat_lahir',
       'alamat',
       'nama_orang_tua',
+      'no_hp',
     ];
   }
 

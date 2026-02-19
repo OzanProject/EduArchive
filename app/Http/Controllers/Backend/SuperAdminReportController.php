@@ -10,6 +10,9 @@ use App\Models\Teacher;
 use App\Models\Classroom;
 use App\Models\Document;
 use App\Models\SchoolDocument;
+use App\Models\LearningActivity;
+use App\Models\InfrastructureRequest;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SuperAdminReportController extends Controller
 {
@@ -47,24 +50,140 @@ class SuperAdminReportController extends Controller
         'graduated' => Student::whereIn('status_kelulusan', ['Lulus', 'lulus'])->count(),
         'others' => Student::whereNotIn('status_kelulusan', ['Aktif', 'aktif', 'Lulus', 'lulus'])->count(),
       ],
+      'gender' => [
+        'L' => Student::where('gender', 'Laki-laki')->count(),
+        'P' => Student::where('gender', 'Perempuan')->count(),
+      ],
+      'classrooms' => Classroom::count(),
+      'classroom_stats' => Classroom::withCount([
+        'students' => function ($query) {
+          $query->whereIn('status_kelulusan', ['Aktif', 'aktif']);
+        }
+      ])->get()->pluck('students_count', 'nama_kelas')->toArray(),
       'teachers' => [
         'total' => Teacher::count(),
         'pns' => Teacher::whereIn('status_kepegawaian', ['PNS', 'pns'])->count(),
         'pppk' => Teacher::whereIn('status_kepegawaian', ['PPPK', 'pppk'])->count(),
         'honorer' => Teacher::whereIn('status_kepegawaian', ['Honorer', 'honorer'])->count(),
       ],
-      'classrooms' => Classroom::count(),
       'documents' => Document::count(),
       'school_documents' => SchoolDocument::count(),
+      'learning_activities' => [
+        'total' => LearningActivity::count(),
+        'pending' => LearningActivity::where('status', 'pending')->count(),
+        'approved' => LearningActivity::where('status', 'approved')->count(),
+        'rejected' => LearningActivity::where('status', 'rejected')->count(),
+      ],
+      'infrastructure' => [
+        'total' => InfrastructureRequest::count(),
+        'rkb' => InfrastructureRequest::where('type', 'RKB')->count(),
+        'rehab' => InfrastructureRequest::where('type', 'REHAB')->count(),
+        'other' => InfrastructureRequest::whereNotIn('type', ['RKB', 'REHAB'])->count(),
+      ],
     ];
 
-    // We don't necessarily need to end tenancy if we are just returning a view, 
-    // but it's safer if there are other operations. 
-    // However, for single-db, the scope persists. 
-    // Let's keep it initialized so the view can potentially access other tenant-scoped things if needed.
-    // Or we can end it. Ideally, Super Admin view shouldn't depend on tenant context globally.
+    // Age Statistics for Active Students
+    $activeStudents = Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->get();
+    $ageStats = [
+      '< 12' => 0,
+      '12-15' => 0,
+      '15-18' => 0,
+      '> 18' => 0,
+      'Kosong' => 0,
+    ];
+
+    foreach ($activeStudents as $student) {
+      if (!$student->birth_date) {
+        $ageStats['Kosong']++;
+        continue;
+      }
+
+      $age = \Carbon\Carbon::parse($student->birth_date)->age;
+
+      if ($age < 12) {
+        $ageStats['< 12']++;
+      } elseif ($age <= 15) {
+        $ageStats['12-15']++;
+      } elseif ($age <= 18) {
+        $ageStats['15-18']++;
+      } else {
+        $ageStats['> 18']++;
+      }
+    }
+    $stats['age_stats'] = $ageStats;
+
     tenancy()->end();
 
     return view('backend.superadmin.reports.show', compact('tenant', 'stats'));
+  }
+
+  public function pdfExport($tenantId)
+  {
+    $tenant = Tenant::findOrFail($tenantId);
+    tenancy()->initialize($tenant);
+
+    // Reuse statistics logic (abstracted would be better, but doing it here for simplicity now)
+    $stats = [
+      'students' => [
+        'total' => Student::count(),
+        'active' => Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->count(),
+        'graduated' => Student::whereIn('status_kelulusan', ['Lulus', 'lulus'])->count(),
+        'others' => Student::whereNotIn('status_kelulusan', ['Aktif', 'aktif', 'Lulus', 'lulus'])->count(),
+      ],
+      'gender' => [
+        'L' => Student::where('gender', 'Laki-laki')->count(),
+        'P' => Student::where('gender', 'Perempuan')->count(),
+      ],
+      'classrooms' => Classroom::count(),
+      'classroom_stats' => Classroom::withCount(['students' => function ($q) {
+        $q->whereIn('status_kelulusan', ['Aktif', 'aktif']); }])->get()->pluck('students_count', 'nama_kelas')->toArray(),
+      'teachers' => [
+        'total' => Teacher::count(),
+        'pns' => Teacher::whereIn('status_kepegawaian', ['PNS', 'pns'])->count(),
+        'pppk' => Teacher::whereIn('status_kepegawaian', ['PPPK', 'pppk'])->count(),
+        'honorer' => Teacher::whereIn('status_kepegawaian', ['Honorer', 'honorer'])->count(),
+      ],
+      'documents' => Document::count(),
+      'school_documents' => SchoolDocument::count(),
+      'learning_activities' => [
+        'total' => LearningActivity::count(),
+        'pending' => LearningActivity::where('status', 'pending')->count(),
+        'approved' => LearningActivity::where('status', 'approved')->count(),
+        'rejected' => LearningActivity::where('status', 'rejected')->count(),
+      ],
+      'infrastructure' => [
+        'total' => InfrastructureRequest::count(),
+        'rkb' => InfrastructureRequest::where('type', 'RKB')->count(),
+        'rehab' => InfrastructureRequest::where('type', 'REHAB')->count(),
+        'other' => InfrastructureRequest::whereNotIn('type', ['RKB', 'REHAB'])->count(),
+      ],
+    ];
+
+    $activeStudents = Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->get();
+    $ageStats = ['< 12' => 0, '12-15' => 0, '15-18' => 0, '> 18' => 0, 'Kosong' => 0];
+    foreach ($activeStudents as $student) {
+      if (!$student->birth_date) {
+        $ageStats['Kosong']++;
+        continue;
+      }
+      $age = \Carbon\Carbon::parse($student->birth_date)->age;
+      if ($age < 12) {
+        $ageStats['< 12']++;
+      } elseif ($age <= 15) {
+        $ageStats['12-15']++;
+      } elseif ($age <= 18) {
+        $ageStats['15-18']++;
+      } else {
+        $ageStats['> 18']++;
+      }
+    }
+    $stats['age_stats'] = $ageStats;
+
+    tenancy()->end();
+
+    $pdf = Pdf::loadView('backend.superadmin.reports.pdf', compact('tenant', 'stats'))
+      ->setPaper('a4', 'portrait');
+
+    return $pdf->download('Laporan_' . $tenant->npsn . '_' . date('Ymd_His') . '.pdf');
   }
 }

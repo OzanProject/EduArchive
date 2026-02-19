@@ -37,8 +37,8 @@
             <label class="text-xs text-uppercase text-muted font-weight-bold mb-1">NIK (Nomor Induk Kependudukan)</label>
             <div class="d-flex justify-content-between align-items-center">
               <code class="text-dark font-weight-bold" style="font-size: 1.1em;">
-                                                             {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
-                                                         </code>
+                                                               {{ substr($student->nik ?? '3201123456789000', 0, 4) }}********{{ substr($student->nik ?? '3201123456789000', -4) }}
+                                                           </code>
               <i class="fas fa-shield-alt text-muted" title="Data secured"></i>
             </div>
           </div>
@@ -51,6 +51,12 @@
             <div class="col-6 mb-2">
               <small class="text-muted d-block">Orang Tua</small>
               <span class="font-weight-bold">{{ $student->parent_name ?? '-' }}</span>
+            </div>
+            <div class="col-12 mb-2">
+              <small class="text-muted d-block">No. HP / WhatsApp</small>
+              <span class="font-weight-bold text-primary">
+                <i class="fab fa-whatsapp mr-1"></i> {{ $student->no_hp ?? '-' }}
+              </span>
             </div>
           </div>
         </div>

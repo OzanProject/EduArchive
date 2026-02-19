@@ -94,6 +94,20 @@
                   <p>Data Lulusan</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.monitoring.infrastructure.index') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.monitoring.infrastructure.*') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Usulan Sarpras</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.monitoring.learning-activities.index') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.monitoring.learning-activities.*') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Monitoring Kegiatan</p>
+                </a>
+              </li>
             </ul>
           </li>
 
@@ -303,6 +317,22 @@
               class="nav-link {{ request()->routeIs('adminlembaga.school-documents.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-file-archive"></i>
               <p>Arsip Dokumen Lembaga</p>
+            </a>
+          </li>
+
+          <li class="nav-header">SARANA PRASARANA</li>
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.infrastructure.index') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.infrastructure.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-tools"></i>
+              <p>RKB & REHAB</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.learning-activities.index') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.learning-activities.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-calendar-alt"></i>
+              <p>Kegiatan Belajar</p>
             </a>
           </li>
 

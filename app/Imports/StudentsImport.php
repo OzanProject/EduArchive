@@ -53,6 +53,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
       'birth_date' => $birthDate,
       'parent_name' => $row['nama_orang_tua'] ?? null,
       'address' => $row['alamat'] ?? null,
+      'no_hp' => $row['no_hp'] ?? $row['nomor_hp'] ?? null,
       'status_kelulusan' => $this->status,
       'tahun_lulus' => $row['tahun_lulus'] ?? null,
     ]);

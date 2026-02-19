@@ -83,6 +83,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/audit-logs/{id}', [MonitoringController::class, 'destroyAuditLog'])->name('audit_logs.destroy');
             Route::post('/document-access/request', [DocumentAccessController::class, 'requestAccess'])->name('document_access.request');
 
+            // Infrastructure Monitoring
+            Route::get('/infrastructure', [\App\Http\Controllers\Backend\SuperAdminInfrastructureController::class, 'index'])->name('infrastructure.index');
+            Route::get('/infrastructure/{id}', [\App\Http\Controllers\Backend\SuperAdminInfrastructureController::class, 'show'])->name('infrastructure.show');
+            Route::patch('/infrastructure/{id}/status', [\App\Http\Controllers\Backend\SuperAdminInfrastructureController::class, 'updateStatus'])->name('infrastructure.status');
+
+            // Learning Activity Monitoring
+            Route::get('/learning-activities', [\App\Http\Controllers\Backend\SuperAdminLearningActivityController::class, 'index'])->name('learning-activities.index');
+            Route::get('/learning-activities/{id}', [\App\Http\Controllers\Backend\SuperAdminLearningActivityController::class, 'show'])->name('learning-activities.show');
+            Route::patch('/learning-activities/{id}/status', [\App\Http\Controllers\Backend\SuperAdminLearningActivityController::class, 'updateStatus'])->name('learning-activities.status');
+
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
@@ -123,6 +133,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('school-levels', \App\Http\Controllers\Backend\SchoolLevelController::class);
 
         // Reports
+        Route::get('reports/{report}/pdf', [\App\Http\Controllers\Backend\SuperAdminReportController::class, 'pdfExport'])->name('reports.pdf');
         Route::resource('reports', \App\Http\Controllers\Backend\SuperAdminReportController::class)->only(['index', 'show']);
     });
 });

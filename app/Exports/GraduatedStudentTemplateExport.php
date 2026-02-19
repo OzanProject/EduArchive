@@ -38,6 +38,7 @@ class GraduatedStudentTemplateExport implements FromCollection, WithHeadings, Wi
       'tempat_lahir',
       'alamat',
       'nama_orang_tua',
+      'no_hp',
       'tahun_lulus',
     ];
   }

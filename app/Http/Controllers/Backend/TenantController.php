@@ -253,16 +253,20 @@ class TenantController extends Controller
 
         // Initialize tenancy to get the correct storage path
         tenancy()->initialize($tenant);
-
         $filePath = storage_path('app/public/' . $path);
+        tenancy()->end();
 
-        tenancy()->end(); // End tenancy to return to central context
-
-        if (!file_exists($filePath)) {
-            abort(404);
+        if (file_exists($filePath)) {
+            return response()->file($filePath);
         }
 
-        return response()->file($filePath);
+        // Fallback to central storage just in case (e.g. if files were moved or uploaded centrally)
+        $centralPath = storage_path('app/public/' . $path);
+        if (file_exists($centralPath)) {
+            return response()->file($centralPath);
+        }
+
+        abort(404);
     }
     /**
      * Handle bulk actions for tenants.

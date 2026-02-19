@@ -76,9 +76,10 @@
       <tr>
         <th width="5%">No</th>
         <th width="15%">NISN</th>
-        <th width="30%">Nama Siswa</th>
+        <th width="25%">Nama Siswa</th>
+        <th width="15%">No. HP</th>
         <th width="15%">{{ $status == 'lulus' ? 'Tahun Lulus' : 'Kelas' }}</th>
-        <th width="35%">Status Dokumen</th>
+        <th width="25%">Status Dokumen</th>
       </tr>
     </thead>
     <tbody>
@@ -87,6 +88,7 @@
           <td style="text-align: center;">{{ $loop->iteration }}</td>
           <td>{{ $student->nisn }}</td>
           <td>{{ $student->nama }}</td>
+          <td>{{ $student->no_hp ?? '-' }}</td>
           <td>{{ $status == 'lulus' ? $student->tahun_lulus : $student->kelas }}</td>
           <td>
             @if($student->documents->count() > 0)

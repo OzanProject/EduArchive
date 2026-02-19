@@ -15,6 +15,7 @@ class Student extends Model
   protected $fillable = [
     'nama',
     'gender', // Added gender
+    'no_hp', // Added phone number
     'classroom_id',
     'kelas', // Legacy field, might be removed later or kept for sync
     'status_kelulusan',

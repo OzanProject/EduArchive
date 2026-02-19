@@ -20,10 +20,11 @@ class AssetController extends Controller
     }
 
     try {
-      $disk = Storage::disk('public');
+      // In tenant context, storage_path() matches the tenant storage folder
+      $filePath = storage_path('app/public/' . $path);
 
-      if ($disk->exists($path)) {
-        return $disk->response($path);
+      if (file_exists($filePath)) {
+        return response()->file($filePath);
       }
 
       abort(404);

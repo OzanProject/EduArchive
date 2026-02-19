@@ -60,6 +60,7 @@
                 @endif
                 <th>NISN</th>
                 <th>NIK</th>
+                <th>No. HP</th>
                 <th>Status</th>
                 <th>Aksi</th>
               </tr>
@@ -87,12 +88,13 @@
                   <td>{{ $student->gender ?? '-' }}</td>
                   @if($status == 'Lulus')
                     <td>{{ $student->tahun_lulus ?? '-' }}</td>
-                          <td><span class="badge badge-info">{{ $student->no_seri_ijazah ?? '-' }}</span></td>
+                    <td><span class="badge badge-info">{{ $student->no_seri_ijazah ?? '-' }}</span></td>
                   @else
                     <td>{{ $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-') }}</td>
                   @endif
                   <td>{{ $student->nisn ?? '-' }}</td>
                   <td>{{ $student->nik ?? '-' }}</td>
+                  <td>{{ $student->no_hp ?? '-' }}</td>
                   <td>
                     <span class="badge badge-{{ $student->status_kelulusan == 'Aktif' ? 'success' : 'secondary' }}">
                       {{ $student->status_kelulusan }}

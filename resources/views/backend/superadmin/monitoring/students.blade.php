@@ -67,6 +67,7 @@
                 <th>No</th>
                 <th>NISN</th>
                 <th>Nama Siswa</th>
+                <th>No. HP</th>
                 <th>Kelas</th>
                 <th>Aksi</th>
               </tr>
@@ -77,6 +78,7 @@
                   <td>{{ $loop->iteration }}</td>
                   <td>{{ $student->nisn }}</td>
                   <td>{{ $student->nama }}</td>
+                  <td>{{ $student->no_hp ?? '-' }}</td>
                   <td>{{ $student->kelas }}</td>
                   <td>
                     <a href="{{ route('superadmin.monitoring.student', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}"

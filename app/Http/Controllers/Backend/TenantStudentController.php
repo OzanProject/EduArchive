@@ -47,6 +47,7 @@ class TenantStudentController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'gender' => 'required|in:L,P', // Added gender validation
+            'no_hp' => 'nullable|string|max:20', // Added no_hp validation
             'classroom_id' => 'nullable|exists:classrooms,id',
             'nik' => 'nullable|string',
             'nisn' => 'nullable|string',
@@ -93,6 +94,7 @@ class TenantStudentController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'gender' => 'required|in:L,P', // Added gender validation
+            'no_hp' => 'nullable|string|max:20', // Added no_hp validation
             'classroom_id' => 'nullable|exists:classrooms,id',
             'nik' => 'nullable|string',
             'nisn' => 'nullable|string',

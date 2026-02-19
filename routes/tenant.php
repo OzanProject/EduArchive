@@ -89,6 +89,8 @@ Route::group([
         Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
+        Route::resource('infrastructure', \App\Http\Controllers\Backend\InfrastructureController::class);
+        Route::resource('learning-activities', \App\Http\Controllers\Backend\LearningActivityController::class);
         Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class)->except(['edit', 'update']);
         Route::resource('school-documents', \App\Http\Controllers\Backend\SchoolDocumentController::class)->except(['show', 'edit', 'update']);
         Route::resource('users', \App\Http\Controllers\Backend\TenantUserController::class); // Manage Operators
