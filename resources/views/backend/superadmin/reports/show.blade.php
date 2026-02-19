@@ -148,207 +148,258 @@
         </div>
       </div>
     </div>
-  <div class="row mt-4">
-    <!-- Learning Activities Stats -->
-    <div class="col-md-6">
-      <div class="card card-info card-outline h-100">
-        <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-calendar-check mr-1"></i> Monitoring Kegiatan Pembelajaran</h3>
-        </div>
-        <div class="card-body">
-          <div class="row text-center mb-3">
-            <div class="col-6">
-              <h3 class="font-weight-bold">{{ $stats['learning_activities']['total'] }}</h3>
-              <p class="text-muted small">Total Kegiatan</p>
+    <div class="row mt-4">
+      <!-- Learning Activities Stats -->
+      <div class="col-md-6">
+        <div class="card card-info card-outline h-100">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-calendar-check mr-1"></i> Monitoring Kegiatan Pembelajaran</h3>
+          </div>
+          <div class="card-body">
+            <div class="row text-center mb-3">
+              <div class="col-6">
+                <h3 class="font-weight-bold">{{ $stats['learning_activities']['total'] }}</h3>
+                <p class="text-muted small">Total Kegiatan</p>
+              </div>
+              <div class="col-6">
+                <h3 class="font-weight-bold text-success">{{ $stats['learning_activities']['approved'] }}</h3>
+                <p class="text-muted small">Disetujui</p>
+              </div>
             </div>
-            <div class="col-6">
-              <h3 class="font-weight-bold text-success">{{ $stats['learning_activities']['approved'] }}</h3>
-              <p class="text-muted small">Disetujui</p>
+            <div class="row text-center">
+              <div class="col-6">
+                <h3 class="font-weight-bold text-warning">{{ $stats['learning_activities']['pending'] }}</h3>
+                <p class="text-muted small">Pending</p>
+              </div>
+              <div class="col-6">
+                <h3 class="font-weight-bold text-danger">{{ $stats['learning_activities']['rejected'] }}</h3>
+                <p class="text-muted small">Ditolak</p>
+              </div>
             </div>
           </div>
-          <div class="row text-center">
-            <div class="col-6">
-              <h3 class="font-weight-bold text-warning">{{ $stats['learning_activities']['pending'] }}</h3>
-              <p class="text-muted small">Pending</p>
+        </div>
+      </div>
+
+      <!-- Infrastructure Stats -->
+      <div class="col-md-6">
+        <div class="card card-purple card-outline h-100">
+          <div class="card-header">
+            <h3 class="card-title text-purple"><i class="fas fa-tools mr-1"></i> Usulan Sarpras (Infrastruktur)</h3>
+          </div>
+          <div class="card-body">
+            <div class="row text-center mb-3">
+              <div class="col-6">
+                <h3 class="font-weight-bold">{{ $stats['infrastructure']['total'] }}</h3>
+                <p class="text-muted small">Total Usulan</p>
+              </div>
+              <div class="col-6">
+                <h3 class="font-weight-bold text-primary">{{ $stats['infrastructure']['rkb'] }}</h3>
+                <p class="text-muted small">RKB</p>
+              </div>
             </div>
-            <div class="col-6">
-              <h3 class="font-weight-bold text-danger">{{ $stats['learning_activities']['rejected'] }}</h3>
-              <p class="text-muted small">Ditolak</p>
+            <div class="row text-center">
+              <div class="col-6">
+                <h3 class="font-weight-bold text-info">{{ $stats['infrastructure']['rehab'] }}</h3>
+                <p class="text-muted small">REHAB</p>
+              </div>
+              <div class="col-6">
+                <h3 class="font-weight-bold text-secondary">{{ $stats['infrastructure']['other'] }}</h3>
+                <p class="text-muted small">Lain-lain</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Infrastructure Stats -->
-    <div class="col-md-6">
-      <div class="card card-purple card-outline h-100">
-        <div class="card-header">
-          <h3 class="card-title text-purple"><i class="fas fa-tools mr-1"></i> Usulan Sarpras (Infrastruktur)</h3>
-        </div>
-        <div class="card-body">
-          <div class="row text-center mb-3">
-            <div class="col-6">
-              <h3 class="font-weight-bold">{{ $stats['infrastructure']['total'] }}</h3>
-              <p class="text-muted small">Total Usulan</p>
-            </div>
-            <div class="col-6">
-              <h3 class="font-weight-bold text-primary">{{ $stats['infrastructure']['rkb'] }}</h3>
-              <p class="text-muted small">RKB</p>
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card card-outline card-info">
+          <div class="card-header">
+            <h3 class="card-title">Detail Usia Siswa</h3>
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
             </div>
           </div>
-          <div class="row text-center">
-            <div class="col-6">
-              <h3 class="font-weight-bold text-info">{{ $stats['infrastructure']['rehab'] }}</h3>
-              <p class="text-muted small">REHAB</p>
-            </div>
-            <div class="col-6">
-              <h3 class="font-weight-bold text-secondary">{{ $stats['infrastructure']['other'] }}</h3>
-              <p class="text-muted small">Lain-lain</p>
-            </div>
+          <div class="card-body table-responsive p-0" style="max-height: 400px;">
+            <table class="table table-head-fixed text-nowrap table-striped">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama Siswa</th>
+                  <th>Kelas</th>
+                  <th>L/P</th>
+                  <th>Tgl Lahir</th>
+                  <th>Usia</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($stats['student_details'] as $index => $item)
+                  <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $item['nama'] }}</td>
+                    <td>{{ $item['kelas'] }}</td>
+                    <td>{{ $item['gender'] }}</td>
+                    <td>{{ $item['birth_date'] }}</td>
+                    <td>
+                      @if($item['age'] !== null)
+                        <span class="badge badge-info">{{ $item['age'] }} Tahun</span>
+                      @else
+                        <span class="badge badge-secondary">Tidak Ada Data</span>
+                      @endif
+                    </td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="6" class="text-center">Tidak ada data siswa aktif.</td>
+                  </tr>
+                @endforelse
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
-  </div>
 @endsection
 
-@push('styles')
-  <style>
-    @media print {
+  @push('styles')
+    <style>
+      @media print {
 
-      /* Hide everything by default */
-      body * {
-        visibility: hidden;
-      }
-
-      /* Unhide the content wrapper and its children */
-      .content-wrapper,
-      .content-wrapper * {
-        visibility: visible;
-      }
-
-      /* Reset position to top-left */
-      .content-wrapper {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background-color: white !important;
-      }
-
-      /* Hide sidebar, footer, navbar, buttons explicitly */
-      .main-sidebar,
-      .main-header,
-      .main-footer,
-      .no-print,
-      .card-header .card-tools,
-      .btn,
-      .breadcrumb {
-        display: none !important;
-      }
-
-      /* Ensure cards look good */
-      .card {
-        box-shadow: none !important;
-        border: 1px solid #ddd !important;
-        break-inside: avoid;
-      }
-
-      /* Ensure charts are responsive */
-      canvas {
-        max-width: 100% !important;
-      }
-
-      /* Layout adjustments */
-      .row {
-        display: flex;
-        flex-wrap: wrap;
-      }
-
-      .col-md-4 {
-        width: 33.333333%;
-        flex: 0 0 33.333333%;
-      }
-    }
-  </style>
-@endpush
-
-@push('scripts')
-  <script src="{{ asset('adminlte3/plugins/chart.js/Chart.min.js') }}"></script>
-  <script>
-    $(function () {
-      // 1. Student Status Chart
-      new Chart($('#studentChart').get(0).getContext('2d'), {
-        type: 'doughnut',
-        data: {
-          labels: ['Aktif', 'Lulusan', 'Lainnya'],
-          datasets: [{
-            data: [{{ $stats['students']['active'] }}, {{ $stats['students']['graduated'] }}, {{ $stats['students']['others'] }}],
-            backgroundColor: ['#28a745', '#17a2b8', '#ffc107'],
-          }]
-        },
-        options: { maintainAspectRatio: false, responsive: true }
-      });
-
-      // 2. Gender Chart
-      new Chart($('#genderChart').get(0).getContext('2d'), {
-        type: 'pie',
-        data: {
-          labels: ['Laki-laki', 'Perempuan'],
-          datasets: [{
-            data: [{{ $stats['gender']['L'] }}, {{ $stats['gender']['P'] }}],
-            backgroundColor: ['#007bff', '#dc3545'],
-          }]
-        },
-        options: { maintainAspectRatio: false, responsive: true }
-      });
-
-      // 3. Age Chart
-      new Chart($('#ageChart').get(0).getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: {!! json_encode(array_keys($stats['age_stats'])) !!},
-          datasets: [{
-            label: 'Jumlah Siswa',
-            data: {!! json_encode(array_values($stats['age_stats'])) !!},
-            backgroundColor: '#28a745',
-          }]
-        },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          scales: {
-            yAxes: [{
-              ticks: { beginAtZero: true, stepSize: 1 }
-            }]
-          }
+        /* Hide everything by default */
+        body * {
+          visibility: hidden;
         }
-      });
 
-      // 4. Class Distribution Chart
-      new Chart($('#classChart').get(0).getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: {!! json_encode(array_keys($stats['classroom_stats'])) !!},
-          datasets: [{
-            label: 'Siswa Aktif',
-            data: {!! json_encode(array_values($stats['classroom_stats'])) !!},
-            backgroundColor: '#6c757d',
-          }]
-        },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          scales: {
-            yAxes: [{
-              ticks: { beginAtZero: true, stepSize: 1 }
-            }]
-          }
+        /* Unhide the content wrapper and its children */
+        .content-wrapper,
+        .content-wrapper * {
+          visibility: visible;
         }
-      });
-    })
-  </script>
-@endpush
+
+        /* Reset position to top-left */
+        .content-wrapper {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          background-color: white !important;
+        }
+
+        /* Hide sidebar, footer, navbar, buttons explicitly */
+        .main-sidebar,
+        .main-header,
+        .main-footer,
+        .no-print,
+        .card-header .card-tools,
+        .btn,
+        .breadcrumb {
+          display: none !important;
+        }
+
+        /* Ensure cards look good */
+        .card {
+          box-shadow: none !important;
+          border: 1px solid #ddd !important;
+          break-inside: avoid;
+        }
+
+        /* Ensure charts are responsive */
+        canvas {
+          max-width: 100% !important;
+        }
+
+        /* Layout adjustments */
+        .row {
+          display: flex;
+          flex-wrap: wrap;
+        }
+
+        .col-md-4 {
+          width: 33.333333%;
+          flex: 0 0 33.333333%;
+        }
+      }
+    </style>
+  @endpush
+
+  @push('scripts')
+    <script src="{{ asset('adminlte3/plugins/chart.js/Chart.min.js') }}"></script>
+    <script>
+      $(function () {
+        // 1. Student Status Chart
+        new Chart($('#studentChart').get(0).getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Aktif', 'Lulusan', 'Lainnya'],
+            datasets: [{
+              data: [{{ $stats['students']['active'] }}, {{ $stats['students']['graduated'] }}, {{ $stats['students']['others'] }}],
+              backgroundColor: ['#28a745', '#17a2b8', '#ffc107'],
+            }]
+          },
+          options: { maintainAspectRatio: false, responsive: true }
+        });
+
+        // 2. Gender Chart
+        new Chart($('#genderChart').get(0).getContext('2d'), {
+          type: 'pie',
+          data: {
+            labels: ['Laki-laki', 'Perempuan'],
+            datasets: [{
+              data: [{{ $stats['gender']['L'] }}, {{ $stats['gender']['P'] }}],
+              backgroundColor: ['#007bff', '#dc3545'],
+            }]
+          },
+          options: { maintainAspectRatio: false, responsive: true }
+        });
+
+        // 3. Age Chart
+        new Chart($('#ageChart').get(0).getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: {!! json_encode(array_keys($stats['age_stats'])) !!},
+            datasets: [{
+              label: 'Jumlah Siswa',
+              data: {!! json_encode(array_values($stats['age_stats'])) !!},
+              backgroundColor: '#28a745',
+            }]
+          },
+          options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+              yAxes: [{
+                ticks: { beginAtZero: true, stepSize: 1 }
+              }]
+            }
+          }
+        });
+
+        // 4. Class Distribution Chart
+        new Chart($('#classChart').get(0).getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: {!! json_encode(array_keys($stats['classroom_stats'])) !!},
+            datasets: [{
+              label: 'Siswa Aktif',
+              data: {!! json_encode(array_values($stats['classroom_stats'])) !!},
+              backgroundColor: '#6c757d',
+            }]
+          },
+          options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+              yAxes: [{
+                ticks: { beginAtZero: true, stepSize: 1 }
+              }]
+            }
+          }
+        });
+      })
+    </script>
+  @endpush

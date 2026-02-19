@@ -93,27 +93,37 @@ class SuperAdminReportController extends Controller
       'Kosong' => 0,
     ];
 
+    $studentDetails = [];
     foreach ($activeStudents as $student) {
+      $age = null;
       if (!$student->birth_date) {
         $ageStats['Kosong']++;
-        continue;
-      }
-
-      $age = \Carbon\Carbon::parse($student->birth_date)->age;
-
-      if ($age < 7) {
-        $ageStats['< 7']++;
-      } elseif ($age <= 12) {
-        $ageStats['7-12']++;
-      } elseif ($age <= 15) {
-        $ageStats['13-15']++;
-      } elseif ($age <= 18) {
-        $ageStats['16-18']++;
       } else {
-        $ageStats['> 18']++;
+        $age = \Carbon\Carbon::parse($student->birth_date)->age;
+        if ($age < 7) {
+          $ageStats['< 7']++;
+        } elseif ($age <= 12) {
+          $ageStats['7-12']++;
+        } elseif ($age <= 15) {
+          $ageStats['13-15']++;
+        } elseif ($age <= 18) {
+          $ageStats['16-18']++;
+        } else {
+          $ageStats['> 18']++;
+        }
       }
+
+      $studentDetails[] = [
+        'nama' => $student->nama,
+        'kelas' => $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-'),
+        'gender' => $student->gender,
+        'age' => $age,
+        'birth_date' => $student->birth_date ? \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') : '-'
+      ];
     }
+
     $stats['age_stats'] = $ageStats;
+    $stats['student_details'] = $studentDetails;
 
     tenancy()->end();
 
@@ -167,25 +177,35 @@ class SuperAdminReportController extends Controller
 
     $activeStudents = Student::whereIn('status_kelulusan', ['Aktif', 'aktif'])->get();
     $ageStats = ['< 7' => 0, '7-12' => 0, '13-15' => 0, '16-18' => 0, '> 18' => 0, 'Kosong' => 0];
+    $studentDetails = [];
     foreach ($activeStudents as $student) {
+      $age = null;
       if (!$student->birth_date) {
         $ageStats['Kosong']++;
-        continue;
-      }
-      $age = \Carbon\Carbon::parse($student->birth_date)->age;
-      if ($age < 7) {
-        $ageStats['< 7']++;
-      } elseif ($age <= 12) {
-        $ageStats['7-12']++;
-      } elseif ($age <= 15) {
-        $ageStats['13-15']++;
-      } elseif ($age <= 18) {
-        $ageStats['16-18']++;
       } else {
-        $ageStats['> 18']++;
+        $age = \Carbon\Carbon::parse($student->birth_date)->age;
+        if ($age < 7) {
+          $ageStats['< 7']++;
+        } elseif ($age <= 12) {
+          $ageStats['7-12']++;
+        } elseif ($age <= 15) {
+          $ageStats['13-15']++;
+        } elseif ($age <= 18) {
+          $ageStats['16-18']++;
+        } else {
+          $ageStats['> 18']++;
+        }
       }
+      $studentDetails[] = [
+        'nama' => $student->nama,
+        'kelas' => $student->classroom ? $student->classroom->nama_kelas : ($student->kelas ?? '-'),
+        'gender' => $student->gender,
+        'age' => $age,
+        'birth_date' => $student->birth_date ? \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') : '-'
+      ];
     }
     $stats['age_stats'] = $ageStats;
+    $stats['student_details'] = $studentDetails;
 
     tenancy()->end();
 

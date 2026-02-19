@@ -210,28 +210,34 @@
     </tr>
   </table>
 
-  <div class="section-title">5. Usulan Sarpras (Infrastruktur)</div>
+  <div class="section-title">6. Detail Usia Siswa Aktif</div>
   <table>
-    <tr>
-      <th>Jenis Usulan</th>
-      <th>Jumlah</th>
-    </tr>
-    <tr>
-      <td>Total Usulan Diajukan</td>
-      <td>{{ $stats['infrastructure']['total'] }}</td>
-    </tr>
-    <tr>
-      <td>- Ruang Kelas Baru (RKB)</td>
-      <td>{{ $stats['infrastructure']['rkb'] }}</td>
-    </tr>
-    <tr>
-      <td>- Rehabilitasi (REHAB)</td>
-      <td>{{ $stats['infrastructure']['rehab'] }}</td>
-    </tr>
-    <tr>
-      <td>- Lain-lain</td>
-      <td>{{ $stats['infrastructure']['other'] }}</td>
-    </tr>
+    <thead>
+      <tr>
+        <th style="width: 5%;">No</th>
+        <th style="width: 40%;">Nama Siswa</th>
+        <th style="width: 20%;">Kelas</th>
+        <th style="width: 10%;">L/P</th>
+        <th style="width: 15%;">Tgl Lahir</th>
+        <th style="width: 10%;">Usia</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse($stats['student_details'] as $index => $item)
+        <tr>
+          <td style="text-align: center;">{{ $index + 1 }}</td>
+          <td>{{ $item['nama'] }}</td>
+          <td>{{ $item['kelas'] }}</td>
+          <td style="text-align: center;">{{ $item['gender'] }}</td>
+          <td>{{ $item['birth_date'] }}</td>
+          <td style="text-align: center;">{{ $item['age'] ?? '-' }}</td>
+        </tr>
+      @empty
+        <tr>
+          <td colspan="6" style="text-align: center;">Tidak ada data siswa aktif.</td>
+        </tr>
+      @endforelse
+    </tbody>
   </table>
 
   <div class="footer">
