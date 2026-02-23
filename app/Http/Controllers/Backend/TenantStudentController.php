@@ -29,7 +29,21 @@ class TenantStudentController extends Controller
             $pageTitle = 'Data Siswa Aktif';
         }
 
-        $students = $query->paginate(10);
+        // Search by NISN or Name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nisn', 'like', "%{$search}%")
+                    ->orWhere('nama', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by Graduation Year
+        if ($status == 'Lulus' && $request->filled('tahun_lulus')) {
+            $query->where('tahun_lulus', $request->tahun_lulus);
+        }
+
+        $students = $query->paginate(10)->appends($request->query());
         return view('backend.adminlembaga.students.index', compact('students', 'pageTitle', 'status'));
     }
 

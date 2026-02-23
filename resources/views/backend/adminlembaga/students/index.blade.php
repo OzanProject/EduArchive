@@ -42,6 +42,55 @@
         </div>
         <!-- /.card-header -->
         <div class="card-body table-responsive p-0">
+          {{-- Search Filter --}}
+          <div class="p-3 pb-0">
+            <form action="{{ route($prefix . 'students.index') }}" method="GET" class="mb-3">
+              <input type="hidden" name="status" value="{{ $status }}">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="input-group input-group-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Cari NISN atau Nama Siswa..."
+                      value="{{ request('search') }}">
+                    <div class="input-group-append">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Cari
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                @if($status == 'Lulus')
+                  <div class="col-md-3">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                      </div>
+                      <select name="tahun_lulus" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- Semua Tahun Lulus --</option>
+                        @php
+                          $years = \App\Models\Student::where('status_kelulusan', 'Lulus')
+                            ->whereNotNull('tahun_lulus')
+                            ->distinct()
+                            ->orderBy('tahun_lulus', 'desc')
+                            ->pluck('tahun_lulus');
+                        @endphp
+                        @foreach($years as $year)
+                          <option value="{{ $year }}" {{ request('tahun_lulus') == $year ? 'selected' : '' }}>{{ $year }}
+                          </option>
+                        @endforeach
+                      </select>
+                    </div>
+                  </div>
+                @endif
+                <div class="col-md-2">
+                  @if(request('search') || request('tahun_lulus'))
+                    <a href="{{ route($prefix . 'students.index', ['status' => $status]) }}" class="btn btn-default btn-sm">
+                      <i class="fas fa-times"></i> Reset Filter
+                    </a>
+                  @endif
+                </div>
+              </div>
+            </form>
+          </div>
           <table class="table table-hover text-nowrap">
             <thead>
               <tr>
@@ -149,7 +198,7 @@
         </div>
         <!-- /.card-body -->
         <div class="card-footer clearfix">
-          {{ $students->appends(['status' => $status])->links() }}
+          {{ $students->links() }}
         </div>
       </div>
       <!-- /.card -->
