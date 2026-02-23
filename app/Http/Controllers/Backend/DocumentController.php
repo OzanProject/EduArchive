@@ -17,15 +17,24 @@ class DocumentController extends Controller
         $status = $request->get('status', 'Aktif');
 
         // Filter based on Student Status
-        $query->whereHas('student', function ($q) use ($status) {
+        $query->whereHas('student', function ($q) use ($status, $request) {
             $q->where('status_kelulusan', $status);
+
+            // Search by NISN or Name
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('nisn', 'like', "%{$search}%")
+                        ->orWhere('nama', 'like', "%{$search}%");
+                });
+            }
         });
 
         if ($request->has('student_id')) {
             $query->where('student_id', $request->student_id);
         }
 
-        $documents = $query->paginate(10);
+        $documents = $query->paginate(10)->appends($request->query());
 
         return view('backend.adminlembaga.documents.index', compact('documents', 'status'));
     }
@@ -107,7 +116,10 @@ class DocumentController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $document = \App\Models\Document::with('student')->findOrFail($id);
+        $documentTypes = \App\Models\DocumentType::where('is_active', true)->orderBy('name')->get();
+
+        return view('backend.adminlembaga.documents.edit', compact('document', 'documentTypes'));
     }
 
     /**
@@ -115,7 +127,51 @@ class DocumentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $document = \App\Models\Document::findOrFail($id);
+
+        $validated = $request->validate([
+            'document_type' => 'required|string',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:51200',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        $document->document_type = $validated['document_type'];
+        $document->keterangan = $validated['keterangan'];
+
+        if ($request->hasFile('file_path')) {
+            $file = $request->file('file_path');
+            $newFileSize = $file->getSize();
+            $oldFileSize = $document->file_size;
+
+            // Check storage limit for the size difference
+            $tenant = auth()->user()->tenant;
+            $sizeDiff = $newFileSize - $oldFileSize;
+            if ($tenant && $sizeDiff > 0 && !$tenant->checkStorageLimit($sizeDiff)) {
+                return redirect()->back()->withErrors(['file_path' => 'Kapasitas penyimpanan sekolah sudah penuh.'])->withInput();
+            }
+
+            // Delete old file
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($document->file_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($document->file_path);
+            }
+
+            // Store new file
+            $path = $file->store('documents/' . $document->student_id, 'public');
+            $document->file_path = $path;
+            $document->file_size = $newFileSize;
+            $document->mime_type = $file->getMimeType();
+
+            // Update storage usage
+            if ($tenant) {
+                $tenant->updateStorageUsage($oldFileSize, false); // Remove old
+                $tenant->updateStorageUsage($newFileSize, true);  // Add new
+            }
+        }
+
+        $document->save();
+
+        $prefix = auth()->user()->role === 'operator' ? 'operator.' : 'adminlembaga.';
+        return redirect()->route($prefix . 'documents.index')->with('success', 'Dokumen berhasil diperbarui.');
     }
 
     public function destroy($id)

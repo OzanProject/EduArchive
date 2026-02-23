@@ -39,6 +39,25 @@
               </a>
             </li>
           </ul>
+
+          {{-- Search Filter --}}
+          <form action="{{ route($prefix . 'documents.index') }}" method="GET" class="mb-3">
+            <input type="hidden" name="status" value="{{ $status }}">
+            <div class="input-group input-group-sm" style="max-width: 400px;">
+              <input type="text" name="search" class="form-control" placeholder="Cari NISN atau Nama Siswa..."
+                value="{{ request('search') }}">
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-search"></i> Cari
+                </button>
+                @if(request('search'))
+                  <a href="{{ route($prefix . 'documents.index', ['status' => $status]) }}" class="btn btn-default">
+                    <i class="fas fa-times"></i> Reset
+                  </a>
+                @endif
+              </div>
+            </div>
+          </form>
           <table class="table table-hover text-nowrap">
             <thead>
               <tr>
@@ -101,6 +120,10 @@
                   </td>
                   <td>{{ $document->uploader ? $document->uploader->name : '-' }}</td>
                   <td>
+                    <a href="{{ route($prefix . 'documents.edit', $document->id) }}" class="btn btn-warning btn-xs mr-1"
+                      title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </a>
                     <form action="{{ route($prefix . 'documents.destroy', $document->id) }}" method="POST"
                       style="display:inline-block;">
                       @csrf
