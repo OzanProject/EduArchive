@@ -16,7 +16,7 @@ class MonitoringController extends Controller
 {
   public function index(Request $request)
   {
-    $category = $request->get('category', 'students'); // students or graduates
+    $category = $request->input('category', 'students'); // students or graduates
     $query = Tenant::query();
 
     if ($request->has('table_search') && $request->table_search != '') {
@@ -33,8 +33,8 @@ class MonitoringController extends Controller
   {
     $tenant = Tenant::findOrFail($id);
 
-    $status = $request->get('status', 'aktif');
-    $year = $request->get('year');
+    $status = $request->input('status', 'aktif');
+    $year = $request->input('year');
 
     $students = $tenant->run(function () use ($status, $year, $request) {
 
@@ -60,17 +60,20 @@ class MonitoringController extends Controller
       }
 
       // Filter usia berdasarkan birth_date
-      $ageFilter = $request->get('age_filter');
+      $ageFilter = $request->input('age_filter');
       if ($ageFilter === 'under_25') {
         $cutoff = now()->subYears(25)->format('Y-m-d');
-        $query->where('birth_date', '>', $cutoff); // lahir setelah 25 tahun lalu = usia < 25
+        $query->where('birth_date', '>', $cutoff);
       } elseif ($ageFilter === 'over_25') {
         $cutoff = now()->subYears(25)->format('Y-m-d');
-        $query->where('birth_date', '<=', $cutoff); // lahir sebelum/sama 25 tahun lalu = usia >= 25
+        $query->where('birth_date', '<=', $cutoff);
       }
 
       return $query->latest()->paginate(15);
     });
+
+    // Fix paginator URL — tenant->run() doesn't know the real HTTP path
+    $students->withPath(route('superadmin.monitoring.school', $id));
 
     $graduation_years = $tenant->run(function () {
       return Student::where('status_kelulusan', 'lulus')
@@ -288,8 +291,8 @@ class MonitoringController extends Controller
   public function printRecap(Request $request, $id)
   {
     $tenant = Tenant::findOrFail($id);
-    $status = $request->get('status', 'aktif');
-    $year = $request->get('year');
+    $status = $request->input('status', 'aktif');
+    $year = $request->input('year');
 
     $data = $tenant->run(function () use ($status, $year) {
       $query = Student::with('documents');

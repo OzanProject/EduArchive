@@ -116,7 +116,7 @@
         <!-- /.card-body -->
         @if($students->hasPages())
         <div class="card-footer clearfix">
-          {{ $students->appends(request()->query())->links() }}
+          {{ $students->withQueryString()->links('pagination::bootstrap-4') }}
         </div>
         @endif
       </div>

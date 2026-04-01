@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Use Bootstrap 4 pagination to match AdminLTE theme
+        \Illuminate\Pagination\Paginator::useBootstrapFour();
         // Share app settings via View Composer to support Tenancy/DB switching
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
             try {
