@@ -5,7 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
-    {{ tenant('nama_sekolah') ?? ($app_settings['school_name'] ?? ($app_settings['app_name'] ?? config('app.name'))) }}
+    @if(auth()->check() && auth()->user()->role === 'superadmin')
+      {{ $app_settings['app_name'] ?? config('app.name') }}
+    @else
+      {{ tenant('nama_sekolah') ?? ($app_settings['school_name'] ?? ($app_settings['app_name'] ?? config('app.name'))) }}
+    @endif
     | @yield('title')
   </title>
   <link rel="icon"

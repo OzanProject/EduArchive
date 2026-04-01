@@ -93,6 +93,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/learning-activities/{id}', [\App\Http\Controllers\Backend\SuperAdminLearningActivityController::class, 'show'])->name('learning-activities.show');
             Route::patch('/learning-activities/{id}/status', [\App\Http\Controllers\Backend\SuperAdminLearningActivityController::class, 'updateStatus'])->name('learning-activities.status');
 
+            // Integrity Pacts Monitoring
+            Route::get('/integrity-pacts', [\App\Http\Controllers\Backend\SuperAdminIntegrityPactController::class, 'index'])->name('integrity-pacts.index');
+            Route::get('/integrity-pacts/{id}', [\App\Http\Controllers\Backend\SuperAdminIntegrityPactController::class, 'show'])->name('integrity-pacts.show');
+            Route::patch('/integrity-pacts/{id}/status', [\App\Http\Controllers\Backend\SuperAdminIntegrityPactController::class, 'updateStatus'])->name('integrity-pacts.status');
+
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');

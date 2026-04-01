@@ -59,7 +59,17 @@ class MonitoringController extends Controller
         $query->where('status_kelulusan', 'aktif');
       }
 
-      return $query->latest()->get();
+      // Filter usia berdasarkan birth_date
+      $ageFilter = $request->get('age_filter');
+      if ($ageFilter === 'under_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where('birth_date', '>', $cutoff); // lahir setelah 25 tahun lalu = usia < 25
+      } elseif ($ageFilter === 'over_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where('birth_date', '<=', $cutoff); // lahir sebelum/sama 25 tahun lalu = usia >= 25
+      }
+
+      return $query->latest()->paginate(15);
     });
 
     $graduation_years = $tenant->run(function () {

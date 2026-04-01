@@ -43,6 +43,15 @@
                     </select>
                   </div>
                 @endif
+
+                {{-- Filter Usia --}}
+                <div class="input-group input-group-sm mr-2">
+                  <select name="age_filter" class="form-control" onchange="this.form.submit()">
+                    <option value="">Semua Usia</option>
+                    <option value="under_25" {{ request('age_filter') == 'under_25' ? 'selected' : '' }}>Usia &lt; 25 Tahun</option>
+                    <option value="over_25" {{ request('age_filter') == 'over_25' ? 'selected' : '' }}>Usia &ge; 25 Tahun</option>
+                  </select>
+                </div>
               </form>
 
               <div class="btn-group btn-group-sm mr-2">
@@ -67,6 +76,7 @@
                 <th>No</th>
                 <th>NISN</th>
                 <th>Nama Siswa</th>
+                <th>Tgl. Lahir / Usia</th>
                 <th>No. HP</th>
                 <th>Kelas</th>
                 <th>Aksi</th>
@@ -75,9 +85,17 @@
             <tbody>
               @forelse($students as $student)
                 <tr>
-                  <td>{{ $loop->iteration }}</td>
+                  <td>{{ $students->firstItem() + $loop->index }}</td>
                   <td>{{ $student->nisn }}</td>
                   <td>{{ $student->nama }}</td>
+                  <td>
+                    @if($student->birth_date)
+                      {{ \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') }}<br>
+                      <small class="text-muted">{{ \Carbon\Carbon::parse($student->birth_date)->age }} tahun</small>
+                    @else
+                      <span class="text-muted">-</span>
+                    @endif
+                  </td>
                   <td>{{ $student->no_hp ?? '-' }}</td>
                   <td>{{ $student->kelas }}</td>
                   <td>
@@ -89,13 +107,18 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="5" class="text-center">Tidak ada data siswa ditemukan (Dummy Data).</td>
+                  <td colspan="7" class="text-center">Tidak ada data siswa ditemukan.</td>
                 </tr>
               @endforelse
             </tbody>
           </table>
         </div>
         <!-- /.card-body -->
+        @if($students->hasPages())
+        <div class="card-footer clearfix">
+          {{ $students->appends(request()->query())->links() }}
+        </div>
+        @endif
       </div>
       <!-- /.card -->
     </div>

@@ -7,6 +7,8 @@ use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 use App\Models\SchoolLevel; // Add this
 
@@ -211,16 +213,36 @@ class TenantController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * Cascades: students, teachers, classrooms, documents, school_documents,
+     *           notifications, tenant_users, storage_usages, graduations,
+     *           imports, app_settings, users, learning_activities,
+     *           infrastructure_requests, integrity_pacts (via FK cascade).
+     * Manual purge: document_access_logs, global_audit_logs (no FK cascade).
+     * Physical storage: deletes all tenant storage folder.
      */
     public function destroy(string $id)
     {
         $tenant = Tenant::findOrFail($id);
 
-        // Single DB Mode: Deleting the tenant record automatically cascades to related data via foreign keys.
-        // No manual database deletion needed.
+        // 1. Delete the entire tenant storage folder
+        // Stancl/Tenancy stores each tenant's files under storage/tenant{id}/
+        $tenantFolder = storage_path('tenant' . $id);
+        if (File::isDirectory($tenantFolder)) {
+            File::deleteDirectory($tenantFolder);
+        }
+
+        // 2. Purge tables without FK cascade
+        \App\Models\AuditLog::where('tenant_id', $id)->delete();
+        \DB::table('document_access_logs')->where('tenant_id', $id)->delete();
+
+        // 3. Delete tenant record — DB foreign key cascades will handle the rest
+        //    (students, teachers, classrooms, documents, school_documents,
+        //     notifications, tenant_users, storage_usages, graduations,
+        //     imports, app_settings, users, learning_activities,
+        //     infrastructure_requests, integrity_pacts)
         $tenant->delete();
 
-        return redirect()->route('superadmin.tenants.index')->with('success', 'Sekolah berhasil dihapus!');
+        return redirect()->route('superadmin.tenants.index')->with('success', 'Sekolah dan seluruh datanya berhasil dihapus!');
     }
 
     /**

@@ -108,6 +108,13 @@
                   <p>Monitoring Kegiatan</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.monitoring.integrity-pacts.index') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.monitoring.integrity-pacts.*') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Fakta Integritas</p>
+                </a>
+              </li>
             </ul>
           </li>
 
@@ -336,6 +343,14 @@
             </a>
           </li>
 
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.integrity-pacts.index') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.integrity-pacts.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-file-signature"></i>
+              <p>Fakta Integritas</p>
+            </a>
+          </li>
+
           {{-- Dokumen Siswa (New) --}}
           <li class="nav-item">
             <a href="{{ route('adminlembaga.documents.index') }}"
@@ -433,6 +448,14 @@
               class="nav-link {{ Request::routeIs('operator.school-documents.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-file-archive"></i>
               <p>Arsip Dokumen</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{{ route('operator.integrity-pacts.index') }}"
+              class="nav-link {{ Request::routeIs('operator.integrity-pacts.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-file-signature"></i>
+              <p>Fakta Integritas</p>
             </a>
           </li>
 
