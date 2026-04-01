@@ -55,7 +55,7 @@
               </form>
 
               <div class="btn-group btn-group-sm mr-2">
-                <a href="{{ route('superadmin.monitoring.print_recap', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year')]) }}"
+                <a href="{{ route('superadmin.monitoring.print_recap', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
                   target="_blank" class="btn btn-warning btn-sm">
                   <i class="fas fa-print"></i> Cetak Rekap
                 </a>

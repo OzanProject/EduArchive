@@ -80,19 +80,69 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ route('superadmin.monitoring.index', ['category' => 'students']) }}"
-                  class="nav-link {{ ((Request::routeIs('superadmin.monitoring.index') && request('category', 'students') == 'students') || (Request::routeIs('superadmin.monitoring.school') && request('status', 'aktif') == 'aktif')) ? 'active' : '' }}">
+              <li class="nav-item has-treeview {{ (request('category', 'students') == 'students' && !Request::routeIs('superadmin.monitoring.infrastructure.*') && !Request::routeIs('superadmin.monitoring.learning-activities.*') && !Request::routeIs('superadmin.monitoring.integrity-pacts.*')) ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ (request('category', 'students') == 'students' && !Request::routeIs('superadmin.monitoring.infrastructure.*') && !Request::routeIs('superadmin.monitoring.learning-activities.*') && !Request::routeIs('superadmin.monitoring.integrity-pacts.*')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Siswa Aktif</p>
+                  <p>
+                    Siswa Aktif
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{ route('superadmin.monitoring.index', ['category' => 'students']) }}"
+                      class="nav-link {{ ((Request::routeIs('superadmin.monitoring.index') && request('category') == 'students' && !request('age_filter')) || (Request::routeIs('superadmin.monitoring.school') && request('status') == 'aktif' && !request('age_filter'))) ? 'active' : '' }}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Semua Siswa</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ route('superadmin.monitoring.index', ['category' => 'students', 'age_filter' => 'under_25']) }}"
+                      class="nav-link {{ (request('category') == 'students' && request('age_filter') == 'under_25') ? 'active' : '' }}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Usia < 25 Tahun</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ route('superadmin.monitoring.index', ['category' => 'students', 'age_filter' => 'over_25']) }}"
+                      class="nav-link {{ (request('category') == 'students' && request('age_filter') == 'over_25') ? 'active' : '' }}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Usia ≥ 25 Tahun</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
-              <li class="nav-item">
-                <a href="{{ route('superadmin.monitoring.index', ['category' => 'graduates']) }}"
-                  class="nav-link {{ ((Request::routeIs('superadmin.monitoring.index') && request('category') == 'graduates') || (Request::routeIs('superadmin.monitoring.school') && request('status') == 'lulus')) ? 'active' : '' }}">
+              <li class="nav-item has-treeview {{ (request('category') == 'graduates' || (Request::routeIs('superadmin.monitoring.school') && request('status') == 'lulus')) ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ (request('category') == 'graduates' || (Request::routeIs('superadmin.monitoring.school') && request('status') == 'lulus')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Data Lulusan</p>
+                  <p>
+                    Data Lulusan
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{ route('superadmin.monitoring.index', ['category' => 'graduates']) }}"
+                      class="nav-link {{ ((Request::routeIs('superadmin.monitoring.index') && request('category') == 'graduates' && !request('age_filter')) || (Request::routeIs('superadmin.monitoring.school') && request('status') == 'lulus' && !request('age_filter'))) ? 'active' : '' }}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Semua Lulusan</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ route('superadmin.monitoring.index', ['category' => 'graduates', 'age_filter' => 'under_25']) }}"
+                      class="nav-link {{ (request('category') == 'graduates' && request('age_filter') == 'under_25') ? 'active' : '' }}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Usia < 25 Tahun</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ route('superadmin.monitoring.index', ['category' => 'graduates', 'age_filter' => 'over_25']) }}"
+                      class="nav-link {{ (request('category') == 'graduates' && request('age_filter') == 'over_25') ? 'active' : '' }}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Usia ≥ 25 Tahun</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="{{ route('superadmin.monitoring.infrastructure.index') }}"

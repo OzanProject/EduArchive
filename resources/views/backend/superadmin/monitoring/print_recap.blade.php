@@ -68,17 +68,23 @@
   <div class="header">
     <h2>REKAPITULASI KELENGKAPAN DOKUMEN</h2>
     <h3>{{ $tenant->nama_sekolah }}</h3>
-    <p>Status: {{ ucfirst($status) }} {{ $year ? '- Tahun Lulus: ' . $year : '' }}</p>
+    <p>
+      Status: {{ ucfirst($status) }} {{ $year ? '- Tahun Lulus: ' . $year : '' }}
+      @if($age_filter)
+        | Filter Usia: {{ $age_filter == 'under_25' ? 'Di Bawah 25 Tahun' : '25 Tahun ke Atas' }}
+      @endif
+    </p>
   </div>
 
   <table>
     <thead>
       <tr>
         <th width="5%">No</th>
-        <th width="15%">NISN</th>
-        <th width="25%">Nama Siswa</th>
-        <th width="15%">No. HP</th>
-        <th width="15%">{{ $status == 'lulus' ? 'Tahun Lulus' : 'Kelas' }}</th>
+        <th width="12%">NISN</th>
+        <th width="20%">Nama Siswa</th>
+        <th width="15%">Tgl. Lahir / Usia</th>
+        <th width="12%">No. HP</th>
+        <th width="11%">{{ $status == 'lulus' ? 'Tahun Lulus' : 'Kelas' }}</th>
         <th width="25%">Status Dokumen</th>
       </tr>
     </thead>
@@ -88,11 +94,25 @@
           <td style="text-align: center;">{{ $loop->iteration }}</td>
           <td>{{ $student->nisn }}</td>
           <td>{{ $student->nama }}</td>
+          <td>
+            @if($student->birth_date)
+              {{ \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') }}
+              ({{ \Carbon\Carbon::parse($student->birth_date)->age }} thn)
+            @else
+              -
+            @endif
+          </td>
           <td>{{ $student->no_hp ?? '-' }}</td>
           <td>{{ $status == 'lulus' ? $student->tahun_lulus : $student->kelas }}</td>
           <td>
-            @if($student->documents->count() > 0)
-              <span class="success">LENGKAP ({{ $student->documents->count() }} Dokumen)</span>
+            @php
+              $docs_count = $student->documents->count();
+              $approved_count = $student->documents->where('validation_status', 'approved')->count();
+            @endphp
+            @if($docs_count > 0)
+              <span class="{{ $approved_count == $docs_count ? 'success' : '' }}">
+                {{ $approved_count }} Disetujui dari {{ $docs_count }} Dokumen
+              </span>
             @else
               <span class="danger">BELUM ADA DOKUMEN</span>
             @endif
@@ -100,7 +120,7 @@
         </tr>
       @empty
         <tr>
-          <td colspan="5" style="text-align: center;">Tidak ada data siswa.</td>
+          <td colspan="7" style="text-align: center;">Tidak ada data siswa ditemukan.</td>
         </tr>
       @endforelse
     </tbody>

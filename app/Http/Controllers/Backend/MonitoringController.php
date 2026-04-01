@@ -17,6 +17,7 @@ class MonitoringController extends Controller
   public function index(Request $request)
   {
     $category = $request->input('category', 'students'); // students or graduates
+    $age_filter = $request->input('age_filter');
     $query = Tenant::query();
 
     if ($request->has('table_search') && $request->table_search != '') {
@@ -26,7 +27,7 @@ class MonitoringController extends Controller
     }
 
     $tenants = $query->paginate(10);
-    return view('backend.superadmin.monitoring.index', compact('tenants', 'category'));
+    return view('backend.superadmin.monitoring.index', compact('tenants', 'category', 'age_filter'));
   }
 
   public function showSchool(Request $request, $id)
@@ -293,8 +294,9 @@ class MonitoringController extends Controller
     $tenant = Tenant::findOrFail($id);
     $status = $request->input('status', 'aktif');
     $year = $request->input('year');
+    $age_filter = $request->input('age_filter');
 
-    $data = $tenant->run(function () use ($status, $year) {
+    $data = $tenant->run(function () use ($status, $year, $age_filter) {
       $query = Student::with('documents');
 
       if ($status == 'lulus') {
@@ -306,10 +308,19 @@ class MonitoringController extends Controller
         $query->where('status_kelulusan', 'aktif');
       }
 
+      // Filter usia berdasarkan birth_date (Cetak Rekap)
+      if ($age_filter === 'under_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where('birth_date', '>', $cutoff);
+      } elseif ($age_filter === 'over_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where('birth_date', '<=', $cutoff);
+      }
+
       return $query->oldest('nama')->get();
     });
 
-    return view('backend.superadmin.monitoring.print_recap', compact('tenant', 'data', 'status', 'year'));
+    return view('backend.superadmin.monitoring.print_recap', compact('tenant', 'data', 'status', 'year', 'age_filter'));
   }
 
   public function auditLogs()
