@@ -376,8 +376,8 @@
         });
 
         // ---- Cascading Wilayah Indonesia ----
-        // Menggunakan API publik emsifa.github.io (tidak perlu file lokal di server)
-        const API = 'https://emsifa.github.io/api-wilayah-indonesia/api';
+        // Menggunakan proxy backend Laravel (bebas CORS, server-to-server)
+        const baseUrl = window.location.origin;
 
         // Saved values from database
         const savedProvinceCode  = $('#school_province_code').val();
@@ -409,7 +409,7 @@
         }
 
         // Load Provinces
-        $.getJSON(`${API}/provinces.json`, function (data) {
+        $.getJSON(`${baseUrl}/api/wilayah/provinces`, function (data) {
           populateSelect('sel_province', data, savedProvinceCode, savedProvinceName, 'school_province_code', 'sel_regency');
 
           // If province already saved, auto-load regencies
@@ -418,40 +418,40 @@
             const provCode = $prov.data('code') || savedProvinceCode;
             if (provCode) loadRegencies(provCode, true);
           }
-        });
+        }).fail(function() { console.error('Gagal memuat data provinsi.'); });
 
         function loadRegencies(provinceCode, autoLoad) {
           $('#sel_regency').html('<option>Memuat...</option>').prop('disabled', true);
           $('#sel_district').html('<option>-- Pilih Kecamatan --</option>').prop('disabled', true);
           $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
-          $.getJSON(`${API}/regencies/${provinceCode}.json`, function (data) {
+          $.getJSON(`${baseUrl}/api/wilayah/regencies/${provinceCode}`, function (data) {
             populateSelect('sel_regency', data, savedRegencyCode, savedRegencyName, 'school_regency_code', 'sel_district');
             if (autoLoad && (savedRegencyCode || savedRegencyName)) {
               const $reg = $('#sel_regency option:selected');
               const regCode = $reg.data('code') || savedRegencyCode;
               if (regCode) loadDistricts(regCode, true);
             }
-          });
+          }).fail(function() { console.error('Gagal memuat data kabupaten/kota.'); });
         }
 
         function loadDistricts(regencyCode, autoLoad) {
           $('#sel_district').html('<option>Memuat...</option>').prop('disabled', true);
           $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
-          $.getJSON(`${API}/districts/${regencyCode}.json`, function (data) {
+          $.getJSON(`${baseUrl}/api/wilayah/districts/${regencyCode}`, function (data) {
             populateSelect('sel_district', data, savedDistrictCode, savedDistrictName, 'school_district_code', 'sel_village');
             if (autoLoad && (savedDistrictCode || savedDistrictName)) {
               const $dis = $('#sel_district option:selected');
               const disCode = $dis.data('code') || savedDistrictCode;
               if (disCode) loadVillages(disCode, true);
             }
-          });
+          }).fail(function() { console.error('Gagal memuat data kecamatan.'); });
         }
 
         function loadVillages(districtCode, autoLoad) {
           $('#sel_village').html('<option>Memuat...</option>').prop('disabled', true);
-          $.getJSON(`${API}/villages/${districtCode}.json`, function (data) {
+          $.getJSON(`${baseUrl}/api/wilayah/villages/${districtCode}`, function (data) {
             populateSelect('sel_village', data, savedVillageCode, savedVillageName, 'school_village_code', null);
-          });
+          }).fail(function() { console.error('Gagal memuat data desa/kelurahan.'); });
         }
 
         // Event: Province changed

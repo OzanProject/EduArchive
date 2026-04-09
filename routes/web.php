@@ -150,6 +150,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/p/{slug}', [\App\Http\Controllers\Frontend\PageController::class, 'show'])->name('page.show');
 
+// ===== API Wilayah Proxy (server-to-server, bebas CORS) =====
+Route::prefix('api/wilayah')->name('api.wilayah.')->group(function () {
+    Route::get('/provinces', [\App\Http\Controllers\Backend\WilayahController::class, 'provinces'])->name('provinces');
+    Route::get('/regencies/{provinceCode}', [\App\Http\Controllers\Backend\WilayahController::class, 'regencies'])->name('regencies');
+    Route::get('/districts/{regencyCode}', [\App\Http\Controllers\Backend\WilayahController::class, 'districts'])->name('districts');
+    Route::get('/villages/{districtCode}', [\App\Http\Controllers\Backend\WilayahController::class, 'villages'])->name('villages');
+});
+
 require __DIR__ . '/auth.php';
 
 Route::get('/debug-logo', function () {
