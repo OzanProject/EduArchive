@@ -66,6 +66,8 @@ class RegisteredUserController extends Controller
                 'role' => 'admin_sekolah',
             ]);
 
+            $user->assignRole('admin_sekolah');
+
             event(new Registered($user));
         });
 

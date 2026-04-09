@@ -63,13 +63,15 @@ class AuthenticatedSessionController extends Controller
             return $this->logoutAndRedirectError($request, 'Akun sekolah Anda belum diaktifkan oleh Super Admin. Harap tunggu persetujuan.');
         }
 
-        return match ($user->role) {
-            'superadmin' => redirect()->route('superadmin.dashboard'),
-            'admin_sekolah', 'operator' => tenant()
-            ? redirect()->route($user->role === 'operator' ? 'operator.dashboard' : 'adminlembaga.dashboard', ['tenant' => tenant('id')])
-            : $this->logoutAndRedirectError($request, 'Akun Sekolah harus login melalui Portal Sekolah (pilih tab Sekolah).'),
-            default => tenant() ? redirect()->route('dashboard', ['tenant' => tenant('id')]) : redirect()->route('dashboard'), // Handle generic user dashboard
-        };
+        if ($user->hasRole('superadmin')) {
+            return redirect()->route('superadmin.dashboard');
+        } elseif ($user->hasRole('admin_sekolah') || $user->hasRole('operator')) {
+            return tenant()
+                ? redirect()->route($user->hasRole('operator') ? 'operator.dashboard' : 'adminlembaga.dashboard', ['tenant' => tenant('id')])
+                : $this->logoutAndRedirectError($request, 'Akun Sekolah harus login melalui Portal Sekolah (pilih tab Sekolah).');
+        }
+
+        return tenant() ? redirect()->route('dashboard', ['tenant' => tenant('id')]) : redirect()->route('dashboard');
     }
 
     /**

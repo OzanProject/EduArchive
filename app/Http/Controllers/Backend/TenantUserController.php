@@ -53,13 +53,15 @@ class TenantUserController extends Controller
       'password' => 'required|confirmed|min:8',
     ]);
 
-    User::create([
+    $user = User::create([
       'name' => $request->name,
       'email' => $request->email,
       'password' => Hash::make($request->password),
       'role' => 'operator',
       'tenant_id' => tenant('id'), // Scope to current tenant
     ]);
+
+    $user->assignRole('operator');
 
     return redirect()->route('adminlembaga.users.index')
       ->with('success', 'Operator berhasil ditambahkan.');

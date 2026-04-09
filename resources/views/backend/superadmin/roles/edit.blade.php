@@ -26,15 +26,26 @@
             </div>
 
             <div class="form-group">
-              <label>Permissions (Hak Akses)</label>
+              <label class="d-block mb-3">Permissions (Hak Akses)</label>
               <div class="row">
-                @foreach($permissions as $value)
-                  <div class="col-md-3">
-                    <div class="custom-control custom-checkbox">
-                      <input class="custom-control-input" type="checkbox" id="perm_{{ $value->id }}" name="permission[]"
-                        value="{{ $value->id }}" {{ in_array($value->id, $rolePermissions) ? 'checked' : '' }}>
-                      <label for="perm_{{ $value->id }}"
-                        class="custom-control-label font-weight-normal">{{ $value->name }}</label>
+                @foreach($permissionGroups as $group => $permissionsList)
+                  <div class="col-md-4 mb-3">
+                    <div class="card card-outline card-secondary h-100 shadow-sm border-top-0">
+                      <div class="card-header bg-light py-2">
+                        <h3 class="card-title text-capitalize font-weight-bold" style="font-size: 1rem;">
+                          <i class="fas fa-layer-group text-secondary mr-1"></i> Modul {{ Str::replace('-', ' ', $group) }}
+                        </h3>
+                      </div>
+                      <div class="card-body py-2">
+                        @foreach($permissionsList as $value)
+                          <div class="custom-control custom-checkbox mb-2">
+                            <input class="custom-control-input" type="checkbox" id="perm_{{ $value->id }}" name="permission[]"
+                              value="{{ $value->id }}" {{ in_array($value->id, $rolePermissions) ? 'checked' : '' }}>
+                            <label for="perm_{{ $value->id }}"
+                              class="custom-control-label font-weight-normal">{{ $value->name }}</label>
+                          </div>
+                        @endforeach
+                      </div>
                     </div>
                   </div>
                 @endforeach

@@ -25,7 +25,10 @@ class RoleController extends Controller
   public function create()
   {
     $permissions = Permission::get();
-    return view('backend.superadmin.roles.create', compact('permissions'));
+    $permissionGroups = $permissions->groupBy(function($permission) {
+       return explode('-', $permission->name)[0];
+    });
+    return view('backend.superadmin.roles.create', compact('permissions', 'permissionGroups'));
   }
 
   /**
@@ -67,11 +70,14 @@ class RoleController extends Controller
   {
     $role = Role::findOrFail($id);
     $permissions = Permission::get();
+    $permissionGroups = $permissions->groupBy(function($permission) {
+       return explode('-', $permission->name)[0];
+    });
     $rolePermissions = \DB::table("role_has_permissions")->where("role_has_permissions.role_id", $id)
       ->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')
       ->all();
 
-    return view('backend.superadmin.roles.edit', compact('role', 'permissions', 'rolePermissions'));
+    return view('backend.superadmin.roles.edit', compact('role', 'permissions', 'permissionGroups', 'rolePermissions'));
   }
 
   /**
