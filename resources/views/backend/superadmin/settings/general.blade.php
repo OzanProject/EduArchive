@@ -115,14 +115,13 @@
                   </div>
                 </div>
               </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+              </div>
+            </form>
           </div>
-          <div class="card-footer">
-            <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
-          </div>
-          </form>
         </div>
       </div>
-    </div>
     </div>
   </section>
 
