@@ -376,8 +376,8 @@
         });
 
         // ---- Cascading Wilayah Indonesia ----
-        // Menggunakan data JSON secara lokal dari file yang sudah ada di aplikasi
-        const API = '{{ asset("api-wilayah/static/api") }}';
+        // Menggunakan API publik emsifa.github.io (tidak perlu file lokal di server)
+        const API = 'https://emsifa.github.io/api-wilayah-indonesia/api';
 
         // Saved values from database
         const savedProvinceCode  = $('#school_province_code').val();
