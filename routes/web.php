@@ -38,6 +38,7 @@ Route::get('storage/{path}', function ($path) {
 // Root Route
 // Root Route
 Route::get('/', [\App\Http\Controllers\FrontendController::class, 'index'])->name('home');
+Route::get('/progres', [\App\Http\Controllers\FrontendController::class, 'progress'])->name('progress');
 Route::get('/fitur', [\App\Http\Controllers\FrontendController::class, 'features'])->name('features');
 Route::get('/arsitektur', [\App\Http\Controllers\FrontendController::class, 'architecture'])->name('architecture');
 Route::get('/keamanan', [\App\Http\Controllers\FrontendController::class, 'security'])->name('security');
@@ -140,6 +141,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Reports
         Route::get('reports/{report}/pdf', [\App\Http\Controllers\Backend\SuperAdminReportController::class, 'pdfExport'])->name('reports.pdf');
         Route::resource('reports', \App\Http\Controllers\Backend\SuperAdminReportController::class)->only(['index', 'show']);
+
+        // PIP Data Monitoring
+        Route::patch('pip/{pip}/status', [\App\Http\Controllers\Backend\SuperAdminPipController::class, 'updateStatus'])->name('pip.updateStatus');
+        Route::resource('pip', \App\Http\Controllers\Backend\SuperAdminPipController::class)->only(['index', 'destroy']);
     });
 });
 

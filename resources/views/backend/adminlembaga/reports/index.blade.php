@@ -92,6 +92,13 @@
           <span class="info-box-number">{{ $stats['documents'] }} File</span>
         </div>
       </div>
+      <div class="info-box mb-3 bg-purple">
+        <span class="info-box-icon"><i class="fas fa-hand-holding-usd"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Penerima PIP</span>
+          <span class="info-box-number">{{ $stats['pip'] }} Siswa</span>
+        </div>
+      </div>
 
       <div class="card">
         <div class="card-header">

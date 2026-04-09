@@ -117,13 +117,13 @@
               <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-circle me-3">
                 <i class="fas fa-check"></i>
               </div>
-              <small class="fw-bold text-dark">Terakreditasi A</small>
+              <small class="fw-bold text-dark">Terakreditasi {{ $app_settings['school_accreditation'] ?? 'A' }}</small>
             </div>
             <div class="d-flex align-items-center">
               <div class="bg-success bg-opacity-10 text-success p-2 rounded-circle me-3">
                 <i class="fas fa-check"></i>
               </div>
-              <small class="fw-bold text-dark">Kurikulum Merdeka</small>
+              <small class="fw-bold text-dark">{{ $app_settings['school_curriculum'] ?? 'Kurikulum Merdeka' }}</small>
             </div>
           </div>
         </div>

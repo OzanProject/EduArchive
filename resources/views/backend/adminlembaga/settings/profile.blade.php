@@ -96,9 +96,76 @@
                   <input type="text" name="school_curriculum" class="form-control" placeholder="Contoh: Kurikulum Merdeka"
                     value="{{ $settings['school_curriculum'] ?? '' }}">
                 </div>
-              </div>
+
+                {{-- ===== LOKASI SEKOLAH ===== --}}
+                <h5 class="text-primary mt-4"><i class="fas fa-map-marker-alt mr-2"></i> Lokasi Sekolah</h5>
+                <hr>
+
+                {{-- Hidden fields to store name text alongside code --}}
+                <input type="hidden" name="school_province_code" id="school_province_code" value="{{ $settings['school_province_code'] ?? '' }}">
+                <input type="hidden" name="school_regency_code" id="school_regency_code" value="{{ $settings['school_regency_code'] ?? '' }}">
+                <input type="hidden" name="school_district_code" id="school_district_code" value="{{ $settings['school_district_code'] ?? '' }}">
+                <input type="hidden" name="school_village_code" id="school_village_code" value="{{ $settings['school_village_code'] ?? '' }}">
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Provinsi</label>
+                      <select name="school_province" id="sel_province" class="form-control select2">
+                        <option value="">-- Pilih Provinsi --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Kabupaten / Kota</label>
+                      <select name="school_regency" id="sel_regency" class="form-control select2" disabled>
+                        <option value="">-- Pilih Kabupaten/Kota --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Kecamatan</label>
+                      <select name="school_district" id="sel_district" class="form-control select2" disabled>
+                        <option value="">-- Pilih Kecamatan --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Desa / Kelurahan</label>
+                      <select name="school_village" id="sel_village" class="form-control select2" disabled>
+                        <option value="">-- Pilih Desa/Kelurahan --</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Alamat Lengkap Sekolah</label>
+                  <textarea name="school_address" class="form-control" rows="2"
+                    placeholder="Contoh: Jl. Merdeka No.1, RT 001/RW 002">{{ $settings['school_address'] ?? '' }}</textarea>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Kode Pos</label>
+                      <input type="text" name="school_postal_code" class="form-control" placeholder="Contoh: 44151"
+                        value="{{ $settings['school_postal_code'] ?? '' }}">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Nomor Telepon Sekolah</label>
+                      <input type="text" name="school_phone" class="form-control" placeholder="Contoh: 0262-123456"
+                        value="{{ $settings['school_phone'] ?? '' }}">
+                    </div>
+                  </div>
+                </div>
 
               <!-- Kolom Kanan: Kepala Sekolah & Data Tambahan -->
+              </div>{{-- end col-md-6 left --}}
               <div class="col-md-6">
                 <h5 class="text-primary"><i class="fas fa-user-tie mr-2"></i> Kepala Sekolah</h5>
                 <hr>
@@ -278,37 +345,163 @@
       </div>
     </div>
   </div>
-
   @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
     <script>
-      $(functio           n() {
+      $(function () {
         bsCustomFileInput.init();
 
+        // ---- Image Preview ----
         function previewImage(input, containerId) {
-        if(!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      if (!file.type.startsWith('image/')) {
-        alert('File harus berupa gambar!');
-        input.value = '';
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const html = `<img src="${e.target.result}" class="border p-2 bg-light rounded shadow-sm" style="max-height:150px; object-fit:contain;">`;
-        $('#' + containerId).html(html);
-      };
-      reader.readAsDataURL(file);
-                        }
+          if (!input.files || !input.files[0]) return;
+          const file = input.files[0];
+          if (!file.type.startsWith('image/')) {
+            alert('File harus berupa gambar!');
+            input.value = '';
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const html = `<img src="${e.target.result}" class="border p-2 bg-light rounded shadow-sm" style="max-height:150px; object-fit:contain;">`;
+            $('#' + containerId).html(html);
+          };
+          reader.readAsDataURL(file);
+        }
 
-      $('#school_headmaster_photo').on('change', function () {
-        previewImage(this, 'preview-container-school_headmaster_photo');
-      });
+        $('#school_headmaster_photo').on('change', function () {
+          previewImage(this, 'preview-container-school_headmaster_photo');
+        });
+        $('#school_hero_image').on('change', function () {
+          previewImage(this, 'preview-container-school_hero_image');
+        });
 
-      $('#school_hero_image').on('change', function () {
-        previewImage(this, 'preview-container-school_hero_image');
+        // ---- Cascading Wilayah Indonesia ----
+        // Menggunakan data JSON secara lokal dari file yang sudah ada di aplikasi
+        const API = '{{ asset("api-wilayah/static/api") }}';
+
+        // Saved values from database
+        const savedProvinceCode  = $('#school_province_code').val();
+        const savedRegencyCode   = $('#school_regency_code').val();
+        const savedDistrictCode  = $('#school_district_code').val();
+        const savedVillageCode   = $('#school_village_code').val();
+        const savedProvinceName  = '{{ $settings["school_province"] ?? "" }}';
+        const savedRegencyName   = '{{ $settings["school_regency"] ?? "" }}';
+        const savedDistrictName  = '{{ $settings["school_district"] ?? "" }}';
+        const savedVillageName   = '{{ $settings["school_village"] ?? "" }}';
+
+        function populateSelect(selectId, data, selectedCode, selectedName, codeHiddenId, nextSelectId) {
+          const $sel = $('#' + selectId);
+          $sel.empty().append('<option value="">-- Pilih --</option>');
+          data.forEach(item => {
+            const selected = (item.id == selectedCode || item.name == selectedName) ? 'selected' : '';
+            $sel.append(`<option value="${item.name}" data-code="${item.id}" ${selected}>${item.name}</option>`);
+          });
+          $sel.prop('disabled', false);
+
+          // If a value was pre-selected, trigger next level
+          if (selectedCode || selectedName) {
+            const $selected = $sel.find('option:selected');
+            if ($selected.val()) {
+              const code = $selected.data('code');
+              $('#' + codeHiddenId).val(code);
+            }
+          }
+        }
+
+        // Load Provinces
+        $.getJSON(`${API}/provinces.json`, function (data) {
+          populateSelect('sel_province', data, savedProvinceCode, savedProvinceName, 'school_province_code', 'sel_regency');
+
+          // If province already saved, auto-load regencies
+          if (savedProvinceCode || savedProvinceName) {
+            const $prov = $('#sel_province option:selected');
+            const provCode = $prov.data('code') || savedProvinceCode;
+            if (provCode) loadRegencies(provCode, true);
+          }
+        });
+
+        function loadRegencies(provinceCode, autoLoad) {
+          $('#sel_regency').html('<option>Memuat...</option>').prop('disabled', true);
+          $('#sel_district').html('<option>-- Pilih Kecamatan --</option>').prop('disabled', true);
+          $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
+          $.getJSON(`${API}/regencies/${provinceCode}.json`, function (data) {
+            populateSelect('sel_regency', data, savedRegencyCode, savedRegencyName, 'school_regency_code', 'sel_district');
+            if (autoLoad && (savedRegencyCode || savedRegencyName)) {
+              const $reg = $('#sel_regency option:selected');
+              const regCode = $reg.data('code') || savedRegencyCode;
+              if (regCode) loadDistricts(regCode, true);
+            }
+          });
+        }
+
+        function loadDistricts(regencyCode, autoLoad) {
+          $('#sel_district').html('<option>Memuat...</option>').prop('disabled', true);
+          $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
+          $.getJSON(`${API}/districts/${regencyCode}.json`, function (data) {
+            populateSelect('sel_district', data, savedDistrictCode, savedDistrictName, 'school_district_code', 'sel_village');
+            if (autoLoad && (savedDistrictCode || savedDistrictName)) {
+              const $dis = $('#sel_district option:selected');
+              const disCode = $dis.data('code') || savedDistrictCode;
+              if (disCode) loadVillages(disCode, true);
+            }
+          });
+        }
+
+        function loadVillages(districtCode, autoLoad) {
+          $('#sel_village').html('<option>Memuat...</option>').prop('disabled', true);
+          $.getJSON(`${API}/villages/${districtCode}.json`, function (data) {
+            populateSelect('sel_village', data, savedVillageCode, savedVillageName, 'school_village_code', null);
+          });
+        }
+
+        // Event: Province changed
+        $('#sel_province').on('change', function () {
+          const code = $(this).find('option:selected').data('code');
+          $('#school_province_code').val(code || '');
+          $('#school_regency_code').val('');
+          $('#school_district_code').val('');
+          $('#school_village_code').val('');
+          if (code) {
+            loadRegencies(code, false);
+          } else {
+            $('#sel_regency').html('<option>-- Pilih Kabupaten/Kota --</option>').prop('disabled', true);
+            $('#sel_district').html('<option>-- Pilih Kecamatan --</option>').prop('disabled', true);
+            $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
+          }
+        });
+
+        // Event: Regency changed
+        $('#sel_regency').on('change', function () {
+          const code = $(this).find('option:selected').data('code');
+          $('#school_regency_code').val(code || '');
+          $('#school_district_code').val('');
+          $('#school_village_code').val('');
+          if (code) {
+            loadDistricts(code, false);
+          } else {
+            $('#sel_district').html('<option>-- Pilih Kecamatan --</option>').prop('disabled', true);
+            $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
+          }
+        });
+
+        // Event: District changed
+        $('#sel_district').on('change', function () {
+          const code = $(this).find('option:selected').data('code');
+          $('#school_district_code').val(code || '');
+          $('#school_village_code').val('');
+          if (code) {
+            loadVillages(code, false);
+          } else {
+            $('#sel_village').html('<option>-- Pilih Desa/Kelurahan --</option>').prop('disabled', true);
+          }
+        });
+
+        // Event: Village changed
+        $('#sel_village').on('change', function () {
+          const code = $(this).find('option:selected').data('code');
+          $('#school_village_code').val(code || '');
+        });
       });
-                      });
     </script>
   @endpush
 @endsection

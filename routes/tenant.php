@@ -97,6 +97,11 @@ Route::group([
         Route::resource('users', \App\Http\Controllers\Backend\TenantUserController::class); // Manage Operators
         Route::get('reports', [\App\Http\Controllers\Backend\ReportController::class, 'index'])->name('reports.index');
 
+        // PIP Routes
+        Route::get('pip/template', [\App\Http\Controllers\Backend\TenantPipController::class, 'template'])->name('pip.template');
+        Route::post('pip/import', [\App\Http\Controllers\Backend\TenantPipController::class, 'import'])->name('pip.import');
+        Route::resource('pip', \App\Http\Controllers\Backend\TenantPipController::class)->except(['show', 'edit', 'update']);
+
         // Settings
         Route::get('settings/profile', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'editProfile'])->name('settings.profile');
         Route::get('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'index'])->name('settings.index');
@@ -121,6 +126,11 @@ Route::group([
         Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class);
         Route::resource('integrity-pacts', \App\Http\Controllers\Backend\IntegrityPactController::class);
         Route::resource('school-documents', \App\Http\Controllers\Backend\SchoolDocumentController::class)->except(['show', 'edit', 'update']);
+
+        // PIP Routes
+        Route::get('pip/template', [\App\Http\Controllers\Backend\TenantPipController::class, 'template'])->name('pip.template');
+        Route::post('pip/import', [\App\Http\Controllers\Backend\TenantPipController::class, 'import'])->name('pip.import');
+        Route::resource('pip', \App\Http\Controllers\Backend\TenantPipController::class)->except(['show', 'edit', 'update']);
 
         // Guide
         Route::get('guide', [\App\Http\Controllers\Backend\GuideController::class, 'index'])->name('guide');

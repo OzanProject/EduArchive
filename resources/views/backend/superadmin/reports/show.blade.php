@@ -86,6 +86,7 @@
 
   <div class="row mt-4">
     <!-- Class Stats -->
+    @if($tenant->id !== 'all')
     <div class="col-md-8">
       <div class="card card-secondary card-outline">
         <div class="card-header">
@@ -96,10 +97,11 @@
         </div>
       </div>
     </div>
+    @endif
 
     <!-- Teacher & General Stats -->
-    <div class="col-md-4">
-      <div class="card card-warning card-outline">
+    <div class="{{ $tenant->id === 'all' ? 'col-md-12' : 'col-md-4' }}">
+      <div class="card card-warning card-outline h-100">
         <div class="card-header">
           <h3 class="card-title">Statistik Guru & Arsip</h3>
         </div>
@@ -132,7 +134,16 @@
               <span class="info-box-number">{{ $stats['documents'] }} File</span>
             </div>
           </div>
-          <hr>
+          <div class="info-box mb-3 bg-purple">
+            <span class="info-box-icon"><i class="fas fa-hand-holding-usd"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Penerima PIP</span>
+              <span class="info-box-number">{{ $stats['pip']['total'] ?? 0 }} Terdata</span>
+              <span class="progress-description text-sm">
+                {{ $stats['pip']['disetujui'] ?? 0 }} Valid (Verified)
+              </span>
+            </div>
+          </div>
           <hr>
           <div class="text-center">
             <a href="{{ route('superadmin.reports.pdf', $tenant->id) }}" class="btn btn-danger btn-block mb-2">
@@ -211,7 +222,7 @@
         </div>
       </div>
     </div>
-
+    @if($tenant->id !== 'all')
     <div class="row mt-4">
       <div class="col-12">
         <div class="card card-outline card-info">
@@ -262,6 +273,7 @@
         </div>
       </div>
     </div>
+    @endif
 @endsection
 
   @push('styles')
@@ -379,6 +391,7 @@
           }
         });
 
+        @if($tenant->id !== 'all')
         // 4. Class Distribution Chart
         new Chart($('#classChart').get(0).getContext('2d'), {
           type: 'bar',
@@ -407,6 +420,7 @@
             }
           }
         });
+        @endif
       })
     </script>
   @endpush

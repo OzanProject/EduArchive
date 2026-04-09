@@ -4,6 +4,7 @@
 
   @include('frontend.landing.hero')
   @include('frontend.landing.trusted-by')
+  @include('frontend.landing.progress')
   @include('frontend.landing.features')
   @include('frontend.landing.architecture')
   @include('frontend.landing.security')

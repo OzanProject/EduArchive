@@ -1,6 +1,6 @@
 <header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-[#e7ebf3] px-6 md:px-20 py-4">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-3">
+    <a href="{{ route('home') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
       @if(isset($app_settings['app_logo']))
         <img src="{{ asset($app_settings['app_logo']) }}" alt="Logo" class="h-10 w-auto rounded-lg">
       @else
@@ -9,8 +9,10 @@
         </div>
       @endif
       <h2 class="text-[#0d121b] text-xl font-bold tracking-tight">{{ $settings['app_name'] ?? 'EduArchive' }}</h2>
-    </div>
+    </a>
     <nav class="hidden md:flex items-center gap-8">
+      <a class="text-sm font-semibold hover:text-primary transition-colors {{ Route::is('progress') ? 'text-primary' : '' }}"
+        href="{{ route('progress') }}">Progres Pendataan</a>
       <a class="text-sm font-semibold hover:text-primary transition-colors {{ Route::is('features') ? 'text-primary' : '' }}"
         href="{{ route('features') }}">Fitur</a>
       <a class="text-sm font-semibold hover:text-primary transition-colors {{ Route::is('architecture') ? 'text-primary' : '' }}"
@@ -39,6 +41,8 @@
   <!-- Mobile Menu Dropdown -->
   <div id="mobile-menu"
     class="hidden md:hidden border-t border-slate-100 bg-white absolute top-full left-0 w-full shadow-lg p-4 flex-col gap-4 animate-fade-in-down">
+    <a class="block px-4 py-2 hover:bg-slate-50 rounded-lg text-sm font-semibold {{ Route::is('progress') ? 'text-primary bg-primary/5' : '' }}"
+      href="{{ route('progress') }}">Progres Pendataan</a>
     <a class="block px-4 py-2 hover:bg-slate-50 rounded-lg text-sm font-semibold {{ Route::is('features') ? 'text-primary bg-primary/5' : '' }}"
       href="{{ route('features') }}">Fitur</a>
     <a class="block px-4 py-2 hover:bg-slate-50 rounded-lg text-sm font-semibold {{ Route::is('architecture') ? 'text-primary bg-primary/5' : '' }}"

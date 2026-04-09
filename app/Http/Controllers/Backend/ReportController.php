@@ -30,6 +30,7 @@ class ReportController extends Controller
             'classrooms' => Classroom::count(),
             'documents' => Document::count(),
             'school_documents' => SchoolDocument::count(),
+            'pip' => \App\Models\PipData::count(),
         ];
 
         return view('backend.adminlembaga.reports.index', compact('stats'));

@@ -70,9 +70,9 @@
             </a>
           </li>
           <li
-            class="nav-item has-treeview {{ (Request::routeIs('superadmin.monitoring.*') && !Request::routeIs('superadmin.monitoring.audit_logs')) ? 'menu-open' : '' }}">
+            class="nav-item has-treeview {{ (Request::routeIs('superadmin.monitoring.*') && !Request::routeIs('superadmin.monitoring.audit_logs')) || Request::routeIs('superadmin.pip.*') ? 'menu-open' : '' }}">
             <a href="#"
-              class="nav-link {{ (Request::routeIs('superadmin.monitoring.*') && !Request::routeIs('superadmin.monitoring.audit_logs')) ? 'active' : '' }}">
+              class="nav-link {{ (Request::routeIs('superadmin.monitoring.*') && !Request::routeIs('superadmin.monitoring.audit_logs')) || Request::routeIs('superadmin.pip.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-desktop"></i>
               <p>
                 Monitoring
@@ -163,6 +163,13 @@
                   class="nav-link {{ Request::routeIs('superadmin.monitoring.integrity-pacts.*') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Fakta Integritas</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.pip.index') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.pip.*') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon text-warning"></i>
+                  <p>Data PIP</p>
                 </a>
               </li>
             </ul>
@@ -401,6 +408,15 @@
             </a>
           </li>
 
+          {{-- Data PIP (Program Indonesia Pintar) --}}
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.pip.index') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.pip.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-hand-holding-usd text-warning"></i>
+              <p>Data PIP</p>
+            </a>
+          </li>
+
           {{-- Dokumen Siswa (New) --}}
           <li class="nav-item">
             <a href="{{ route('adminlembaga.documents.index') }}"
@@ -506,6 +522,14 @@
               class="nav-link {{ Request::routeIs('operator.integrity-pacts.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-file-signature"></i>
               <p>Fakta Integritas</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{{ route('operator.pip.index') }}"
+              class="nav-link {{ Request::routeIs('operator.pip.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-hand-holding-usd text-warning"></i>
+              <p>Data PIP</p>
             </a>
           </li>
 
