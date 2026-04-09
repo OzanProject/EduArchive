@@ -48,9 +48,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', function () {
-        if (auth()->user()->role === 'superadmin') {
+        $user = auth()->user();
+
+        if ($user->role === 'superadmin' || $user->hasRole('superadmin')) {
             return redirect()->route('superadmin.dashboard');
         }
+
+        if (in_array($user->role, ['admin_sekolah', 'operator']) || $user->hasAnyRole(['admin_sekolah', 'operator'])) {
+            $tenantId = $user->tenant_id;
+
+            if (!$tenantId) {
+                return view('dashboard');
+            }
+
+            $routeName = ($user->role === 'operator' || $user->hasRole('operator'))
+                ? 'operator.dashboard'
+                : 'adminlembaga.dashboard';
+
+            return redirect()->route($routeName, ['tenant' => $tenantId]);
+        }
+
         return view('dashboard');
     })->name('dashboard');
 
