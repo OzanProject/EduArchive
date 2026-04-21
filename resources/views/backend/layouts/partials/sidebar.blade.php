@@ -69,6 +69,54 @@
               <p>Dashboard</p>
             </a>
           </li>
+
+          <li class="nav-item has-treeview {{ Request::routeIs('superadmin.settings.*') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ Request::routeIs('superadmin.settings.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Pengaturan
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ route('superadmin.settings.general') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.settings.general') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Umum</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.settings.landing') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.settings.landing') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Landing Page</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.settings.footer') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.settings.footer') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Footer & Social</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.settings.smtp') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.settings.smtp') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Email Server</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('superadmin.settings.whatsapp') }}"
+                  class="nav-link {{ Request::routeIs('superadmin.settings.whatsapp') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>WhatsApp Gateway</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
           <li
             class="nav-item has-treeview {{ (Request::routeIs('superadmin.monitoring.*') && !Request::routeIs('superadmin.monitoring.audit_logs')) || Request::routeIs('superadmin.pip.*') ? 'menu-open' : '' }}">
             <a href="#"
@@ -261,52 +309,6 @@
             </ul>
           </li>
 
-          <li class="nav-item has-treeview {{ Request::routeIs('superadmin.settings.*') ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ Request::routeIs('superadmin.settings.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-cogs"></i>
-              <p>
-                Pengaturan
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ route('superadmin.settings.general') }}"
-                  class="nav-link {{ Request::routeIs('superadmin.settings.general') ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Umum</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('superadmin.settings.landing') }}"
-                  class="nav-link {{ Request::routeIs('superadmin.settings.landing') ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Landing Page</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('superadmin.settings.footer') }}"
-                  class="nav-link {{ Request::routeIs('superadmin.settings.footer') ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Footer & Social</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('superadmin.settings.smtp') }}"
-                  class="nav-link {{ Request::routeIs('superadmin.settings.smtp') ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Email Server</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('superadmin.settings.whatsapp') }}"
-                  class="nav-link {{ Request::routeIs('superadmin.settings.whatsapp') ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>WhatsApp Gateway</p>
-                </a>
-              </li>
-            </ul>
-          </li>
         @endif
 
         {{-- Admin Lembaga Menu --}}
@@ -320,6 +322,45 @@
               <p>Dashboard</p>
             </a>
           </li>
+
+          {{-- Settings Group --}}
+          <li class="nav-item has-treeview {{ request()->routeIs('adminlembaga.settings.*') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->routeIs('adminlembaga.settings.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Pengaturan Sekolah
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.profile') }}"
+                  class="nav-link {{ request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon text-info"></i>
+                  <p>Profil Publik</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.index') }}#general" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Konfigurasi Umum</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.index') }}#doc" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Dokumen & Kop Surat</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('adminlembaga.settings.index') }}#account" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Info Akun</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
 
           {{-- Data Sekolah (Group) --}}
           <li
@@ -443,43 +484,6 @@
             </a>
           </li>
 
-          {{-- Settings Group --}}
-          <li class="nav-item has-treeview {{ request()->routeIs('adminlembaga.settings.*') ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ request()->routeIs('adminlembaga.settings.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-cogs"></i>
-              <p>
-                Pengaturan Sekolah
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ route('adminlembaga.settings.profile') }}"
-                  class="nav-link {{ request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon text-info"></i>
-                  <p>Profil Publik</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('adminlembaga.settings.index') }}#general" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Konfigurasi Umum</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('adminlembaga.settings.index') }}#doc" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Dokumen & Kop Surat</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ route('adminlembaga.settings.index') }}#account" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Info Akun</p>
-                </a>
-              </li>
-            </ul>
-          </li>
         @endif
 
         {{-- Operator Menu --}}
