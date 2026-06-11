@@ -16,7 +16,7 @@ class UserController extends Controller
    */
   public function index(Request $request)
   {
-    $users = User::orderByRaw("CASE WHEN id = 1 THEN 0 ELSE 1 END, created_at DESC")->paginate(10);
+    $users = User::orderByRaw("CASE WHEN id = 1 THEN 0 ELSE 1 END, created_at DESC")->get();
     return view('backend.superadmin.users.index', compact('users'));
   }
 

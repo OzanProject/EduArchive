@@ -9,6 +9,13 @@
 @endsection
 
 @section('content')
+  @push('styles')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('adminlte3/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('adminlte3/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('adminlte3/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+  @endpush
+
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -21,8 +28,8 @@
           </div>
         </div>
         <!-- /.card-header -->
-        <div class="card-body table-responsive p-0">
-          <table class="table table-hover text-nowrap">
+        <div class="card-body table-responsive p-3">
+          <table id="users-table" class="table table-bordered table-hover text-nowrap">
             <thead>
               <tr>
                 <th>No</th>
@@ -35,7 +42,7 @@
             <tbody>
               @foreach($users as $key => $user)
                 <tr>
-                  <td>{{ $users->firstItem() + $key }}</td>
+                  <td>{{ $loop->iteration }}</td>
                   <td>{{ $user->name }}</td>
                   <td>{{ $user->email }}</td>
                   <td>
@@ -66,11 +73,33 @@
           </table>
         </div>
         <!-- /.card-body -->
-        <div class="card-footer clearfix">
-          {{ $users->links() }}
-        </div>
       </div>
       <!-- /.card -->
     </div>
   </div>
+
+  @push('scripts')
+    <!-- DataTables  & Plugins -->
+    <script src="{{ asset('adminlte3/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('adminlte3/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('adminlte3/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('adminlte3/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+    
+    <script>
+      $(function () {
+        $('#users-table').DataTable({
+          "paging": true,
+          "lengthChange": true,
+          "searching": true,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+          "responsive": true,
+          "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+          }
+        });
+      });
+    </script>
+  @endpush
 @endsection
