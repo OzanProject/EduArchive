@@ -39,7 +39,28 @@ Route::group([
                 return redirect()->route('operator.dashboard', ['tenant' => tenant('id')]);
             }
         }
-        return view('tenant.welcome');
+
+        // Cache the public stats for 1 hour (3600 seconds)
+        $stats = \Illuminate\Support\Facades\Cache::remember('tenant_public_stats_' . tenant('id'), 3600, function () {
+            $data = [
+                'students' => 0,
+                'teachers' => 0,
+                'classrooms' => 0,
+            ];
+
+            try {
+                $data['students'] = \App\Models\Student::count();
+                $data['teachers'] = \App\Models\Teacher::count();
+                $data['classrooms'] = \App\Models\Classroom::count();
+            } catch (\Exception $e) {
+                // Return 0 if tables don't exist, preventing Error 500
+                \Illuminate\Support\Facades\Log::error("Failed to fetch public stats for tenant " . tenant('id') . ": " . $e->getMessage());
+            }
+
+            return $data;
+        });
+
+        return view('tenant.welcome', compact('stats'));
     })->name('tenant.home'); // added name for easier redirection
 
     Route::get('/profil', [\App\Http\Controllers\Tenant\PublicProfileController::class, 'index'])->name('tenant.profile');

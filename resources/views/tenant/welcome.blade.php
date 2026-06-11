@@ -7,20 +7,18 @@
     /* Hero Section */
     .hero-section {
       position: relative;
-      padding: 10rem 0 6rem;
-      /* Increased top padding */
+      padding: 4rem 0 4rem; /* Disesuaikan ke 4rem agar pas, tidak terlalu jauh */
       overflow: hidden;
       background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
     }
 
     .hero-title {
-      font-size: 3.5rem;
+      font-size: 3rem; /* Dikecilkan sedikit agar proporsional di layar laptop */
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1.3; /* Dilonggarkan agar teks tidak saling tumpang tindih */
       letter-spacing: -1px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
       margin-top: 1rem;
-      /* Added margin top */
       background: -webkit-linear-gradient(25deg, #0f172a 0%, #2563eb 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -135,7 +133,7 @@
             <img
               src="{{ !empty($app_settings['school_hero_image']) ? $app_settings['school_hero_image'] : asset('adminlte3/dist/img/photo1.png') }}"
               class="img-fluid position-relative z-1 rounded-3 shadow-lg" alt="School Illustration"
-              style="object-fit: cover; width: 100%; max-height: 400px; border-radius: 20px;">
+              style="object-fit: cover; width: 100%; height: 350px; border-radius: 20px;">
           </div>
         </div>
       </div>
@@ -148,19 +146,19 @@
       <div class="row text-center g-4">
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
           <div class="stat-item">
-            <h3 class="counter">{{ \App\Models\Student::count() }}</h3>
+            <h3 class="counter">{{ $stats['students'] ?? 0 }}</h3>
             <p class="text-uppercase tracking-wider">Siswa Aktif</p>
           </div>
         </div>
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
           <div class="stat-item">
-            <h3 class="counter">{{ \App\Models\Teacher::count() }}</h3>
+            <h3 class="counter">{{ $stats['teachers'] ?? 0 }}</h3>
             <p class="text-uppercase tracking-wider">Guru & Tendik</p>
           </div>
         </div>
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
           <div class="stat-item">
-            <h3 class="counter">{{ \App\Models\Classroom::count() }}</h3>
+            <h3 class="counter">{{ $stats['classrooms'] ?? 0 }}</h3>
             <p class="text-uppercase tracking-wider">Rombongan Belajar</p>
           </div>
         </div>

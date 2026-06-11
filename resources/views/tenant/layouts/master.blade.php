@@ -40,8 +40,7 @@
 
     /* Navbar Customization */
     .navbar-school {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 1);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       padding: 1rem 0;
       transition: all 0.3s ease;
@@ -121,9 +120,9 @@
     .bg-light-custom {
       background-color: #f1f5f9;
     }
-
-    @yield('styles')
   </style>
+
+  @yield('styles')
 </head>
 
 <body class="d-flex flex-column min-vh-100">

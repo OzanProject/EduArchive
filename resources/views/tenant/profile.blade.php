@@ -219,27 +219,7 @@
         <!-- Detail Menu Grid -->
         <h5 class="fw-bold mb-3 text-dark border-start border-4 border-primary ps-3">Detail Informasi</h5>
         <div class="row g-3">
-          <!-- Siswa -->
-          <div class="col-md-6" data-aos="fade-up" data-aos-delay="150">
-            <div class="detail-card" onclick="openDetailModal('Siswa')">
-              <div class="detail-icon bg-primary bg-opacity-10 text-primary">
-                <i class="fas fa-user-graduate"></i>
-              </div>
-              <h5 class="fw-bold text-dark mb-1">Data Siswa</h5>
-              <p class="text-muted small mb-0">Statistik, Jumlah, dan Data Kelulusan.</p>
-            </div>
-          </div>
-
-          <!-- Guru -->
-          <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="detail-card" onclick="openDetailModal('Guru & Tendik')">
-              <div class="detail-icon bg-success bg-opacity-10 text-success">
-                <i class="fas fa-chalkboard-teacher"></i>
-              </div>
-              <h5 class="fw-bold text-dark mb-1">Guru & Tendik</h5>
-              <p class="text-muted small mb-0">Daftar Tenaga Pendidik dan Kependidikan.</p>
-            </div>
-          </div>
+          <!-- Data Siswa dan Guru disembunyikan untuk publik (Privasi Data/PII) -->
 
           <!-- Rombel -->
           <div class="col-md-6" data-aos="fade-up" data-aos-delay="250">
