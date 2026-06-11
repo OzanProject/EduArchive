@@ -16,7 +16,11 @@ class UserController extends Controller
    */
   public function index(Request $request)
   {
-    $users = User::orderByRaw("CASE WHEN id = 1 THEN 0 ELSE 1 END, created_at DESC")->get();
+    $users = User::with('roles')->get()->sortBy(function($user) {
+        if ($user->hasRole('superadmin')) return 0;
+        if ($user->hasRole('admin_sekolah')) return 1;
+        return 2;
+    })->values();
     return view('backend.superadmin.users.index', compact('users'));
   }
 
