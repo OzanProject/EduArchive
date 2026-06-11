@@ -78,36 +78,12 @@
       <div class="col-lg-3 col-6">
         <div class="small-box bg-danger">
           <div class="inner">
-            @php
-              $used = $data['storage_usage'];
-              $limit = $data['storage_limit'];
-
-              if ($limit === null || $limit <= 0) {
-                $percentage = 0; // Or handle as "Unlimited"
-                $limitFormatted = 'Unlimited';
-              } else {
-                $percentage = ($used / $limit) * 100;
-
-                $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-                $bytesLimit = max($limit, 0);
-                $powLimit = floor(($bytesLimit ? log($bytesLimit) : 0) / log(1024));
-                $powLimit = min($powLimit, count($units) - 1);
-                $limitFormatted = round($bytesLimit / (1024 ** $powLimit), 2) . ' ' . $units[$powLimit];
-              }
-
-              // Format Used Bytes
-              $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-              $bytes = max($used, 0);
-              $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-              $pow = min($pow, count($units) - 1);
-              $usedFormatted = round($bytes / (1024 ** $pow), 2) . ' ' . $units[$pow];
-            @endphp
-            @if($limit === null || $limit <= 0)
-              <h3>{{ $usedFormatted }}</h3>
+            @if($data['storage_limit'] === null || $data['storage_limit'] <= 0)
+              <h3>{{ $data['used_formatted'] }}</h3>
               <p>Penyimpanan: Unlimited</p>
             @else
-              <h3>{{ round($percentage, 1) }}<sup style="font-size: 20px">%</sup></h3>
-              <p>Penyimpanan: {{ $usedFormatted }} / {{ $limitFormatted }}</p>
+              <h3>{{ $data['storage_percentage'] }}<sup style="font-size: 20px">%</sup></h3>
+              <p>Penyimpanan: {{ $data['used_formatted'] }} / {{ $data['limit_formatted'] }}</p>
             @endif
           </div>
           <div class="icon">
@@ -115,7 +91,7 @@
           </div>
           <div class="small-box-footer">
             <div class="progress" style="height: 5px; margin: 0 10px;">
-              <div class="progress-bar" style="width: {{ $percentage }}%"></div>
+              <div class="progress-bar" style="width: {{ $data['storage_percentage'] }}%"></div>
             </div>
           </div>
         </div>
