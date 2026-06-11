@@ -15,7 +15,15 @@
         <div class="card-header">
           <h3 class="card-title">Daftar Sekolah Terdaftar</h3>
           <div class="card-tools d-flex">
-            <form action="{{ route('superadmin.tenants.index') }}" method="GET" class="form-inline mr-2">
+            <form action="{{ route('superadmin.tenants.index') }}" method="GET" class="form-inline mr-2" id="searchForm">
+              <div class="input-group input-group-sm mr-2">
+                <select name="per_page" class="form-control" onchange="document.getElementById('searchForm').submit()">
+                  <option value="10" {{ (isset($perPage) && $perPage == 10) ? 'selected' : '' }}>10 Baris</option>
+                  <option value="20" {{ (isset($perPage) && $perPage == 20) ? 'selected' : '' }}>20 Baris</option>
+                  <option value="50" {{ (isset($perPage) && $perPage == 50) ? 'selected' : '' }}>50 Baris</option>
+                  <option value="100" {{ (isset($perPage) && $perPage == 100) ? 'selected' : '' }}>100 Baris</option>
+                </select>
+              </div>
               <div class="input-group input-group-sm" style="width: 200px;">
                 <input type="text" name="table_search" class="form-control float-right" placeholder="Cari Sekolah..."
                   value="{{ request('table_search') }}">
@@ -148,6 +156,11 @@
           </div>
         </div>
         <!-- /.card-body -->
+        @if($tenants->hasPages())
+        <div class="card-footer clearfix">
+          {{ $tenants->links('pagination::bootstrap-4') }}
+        </div>
+        @endif
       </div>
       <!-- /.card -->
     </div>

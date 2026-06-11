@@ -27,8 +27,10 @@ class TenantController extends Controller
                 ->orWhere('nama_sekolah', 'like', "%{$search}%");
         }
 
-        $tenants = $query->get();
-        return view('backend.superadmin.tenants.index', compact('tenants'));
+        $perPage = $request->input('per_page', 10);
+        $tenants = $query->paginate($perPage)->withQueryString();
+        
+        return view('backend.superadmin.tenants.index', compact('tenants', 'perPage'));
     }
 
     /**
