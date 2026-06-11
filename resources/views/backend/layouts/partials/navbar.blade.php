@@ -10,31 +10,21 @@
       <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars text-secondary"></i></a>
     </li>
 
-    <!-- Live Clock Widget (Compact) -->
-    <li class="nav-item d-none d-sm-inline-block ml-2">
-      <div class="d-flex flex-column" style="line-height: 1.1;">
-        <span class="text-xs text-muted font-weight-bold text-uppercase" id="live-day-date">...</span>
-        <span class="font-weight-bold text-dark text-sm" id="live-time">...</span>
-      </div>
-    </li>
-  </ul>
-
-  <!-- GLOBAL SEARCH (Center) -->
-  <div class="mx-auto d-none d-md-flex align-items-center justify-content-center flex-grow-1" style="max-width: 500px;">
-    <div class="w-100 position-relative">
+    <!-- GLOBAL SEARCH (Left) -->
+    <li class="nav-item d-none d-md-block ml-3">
       @if(auth()->user()->role !== 'superadmin')
-        <form action="{{ route('adminlembaga.students.index') }}" method="GET" class="w-100">
+        <form action="{{ route('adminlembaga.students.index') }}" method="GET" class="m-0">
       @endif
 
-        <div class="input-group shadow-sm border"
-          style="border-radius: 0.5rem; overflow: hidden; background-color: #f4f6f9;">
+        <div class="input-group input-group-sm shadow-sm border"
+          style="border-radius: 0.5rem; overflow: hidden; background-color: #f4f6f9; width: 300px;">
           <div class="input-group-prepend">
-            <span class="input-group-text border-0 pl-3" style="background-color: transparent;"><i
+            <span class="input-group-text border-0" style="background-color: transparent;"><i
                 class="fas fa-search text-muted"></i></span>
           </div>
-          <input class="form-control border-0 py-2" style="background-color: transparent;" type="search"
+          <input class="form-control border-0" style="background-color: transparent;" type="search"
             name="{{ auth()->user()->role !== 'superadmin' ? 'search' : '' }}"
-            placeholder="{{ auth()->user()->role === 'superadmin' ? 'Cari Siswa, Sekolah, atau NPSN...' : 'Cari Siswa...' }}"
+            placeholder="{{ auth()->user()->role === 'superadmin' ? 'Cari Siswa, Sekolah...' : 'Cari Siswa...' }}"
             aria-label="Search">
 
           @if(auth()->user()->role !== 'superadmin')
@@ -45,22 +35,13 @@
         @if(auth()->user()->role !== 'superadmin')
           </form>
         @endif
-    </div>
-  </div>
+    </li>
+  </ul>
 
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto align-items-center">
 
-    @if(auth()->user()->role === 'superadmin')
-      <!-- Quick Stats (Super Admin) -->
-      <li class="nav-item d-none d-lg-block mr-4">
-        <div class="text-xs text-muted">
-          <span class="mr-2"><i class="fas fa-school text-primary mr-1"></i> <b>{{ \App\Models\Tenant::count() }}</b>
-            Sekolah</span>
-          <span><i class="fas fa-user-graduate text-success mr-1"></i> <b>{{ $global_student_count }}</b> Siswa</span>
-        </div>
-      </li>
-    @elseif(auth()->user()->role === 'admin_sekolah' || auth()->user()->role === 'operator')
+    @if(auth()->user()->role === 'admin_sekolah' || auth()->user()->role === 'operator')
       <!-- Quick Stats (Tenant) -->
       <li class="nav-item d-none d-lg-block mr-3">
         <div class="d-flex flex-column text-right" style="line-height: 1.1;">
@@ -75,6 +56,14 @@
         </div>
       </li>
     @endif
+
+    <!-- Live Clock Widget (Right Side) -->
+    <li class="nav-item d-none d-sm-inline-block mr-3">
+      <div class="d-flex flex-column text-right" style="line-height: 1.1;">
+        <span class="text-xs text-muted font-weight-bold text-uppercase" id="live-day-date">...</span>
+        <span class="font-weight-bold text-dark text-sm" id="live-time">...</span>
+      </div>
+    </li>
 
     <!-- Fullscreen Toggle -->
     <li class="nav-item">
