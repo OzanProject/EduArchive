@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Monitoring Routes
         Route::prefix('monitoring')->name('monitoring.')->group(function () {
             Route::get('/', [MonitoringController::class, 'index'])->name('index');
+            Route::get('/print-all', [MonitoringController::class, 'printAllRecap'])->name('print_all');
             Route::get('/{id}/print', [MonitoringController::class, 'printRecap'])->name('print_recap');
             Route::get('/audit-logs', [MonitoringController::class, 'auditLogs'])->name('audit_logs');
             Route::post('/audit-logs/bulk-destroy', [MonitoringController::class, 'bulkDestroyAuditLog'])->name('audit_logs.bulk_destroy');

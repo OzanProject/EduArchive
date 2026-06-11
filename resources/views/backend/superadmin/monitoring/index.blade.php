@@ -18,10 +18,13 @@
           <div class="d-flex justify-content-between align-items-center">
             <h3 class="card-title">Pilih Sekolah untuk Monitoring {{ $category == 'graduates' ? 'Lulusan' : 'Siswa' }}
             </h3>
-            <div class="card-tools">
-              <form action="{{ route('superadmin.monitoring.index') }}" method="GET">
+            <div class="card-tools d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <a href="{{ route('superadmin.monitoring.print_all', request()->query()) }}" target="_blank" class="btn btn-warning btn-sm">
+                <i class="fas fa-print"></i> Cetak Semua
+              </a>
+              <form action="{{ route('superadmin.monitoring.index') }}" method="GET" class="m-0">
                 <input type="hidden" name="category" value="{{ $category }}">
-                <div class="input-group input-group-sm" style="width: 450px;">
+                <div class="input-group input-group-sm" style="max-width: 450px; width: 100%;">
                   <select name="age_filter" class="form-control mr-2" onchange="this.form.submit()">
                     <option value="">Semua Usia</option>
                     <option value="under_25" {{ $age_filter == 'under_25' ? 'selected' : '' }}>Usia < 25 Tahun</option>
@@ -65,10 +68,16 @@
                     @endif
                   </td>
                   <td>
-                    <a href="{{ route('superadmin.monitoring.school', ['id' => $tenant->id, 'status' => ($category == 'graduates' ? 'lulus' : 'aktif'), 'age_filter' => $age_filter]) }}"
-                      class="btn btn-info btn-sm">
-                      <i class="fas fa-eye"></i> Lihat {{ $category == 'graduates' ? 'Lulusan' : 'Siswa' }}
-                    </a>
+                    <div class="d-flex flex-wrap" style="gap: 5px;">
+                      <a href="{{ route('superadmin.monitoring.school', ['id' => $tenant->id, 'status' => ($category == 'graduates' ? 'lulus' : 'aktif'), 'age_filter' => $age_filter]) }}"
+                        class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i> Lihat {{ $category == 'graduates' ? 'Lulusan' : 'Siswa' }}
+                      </a>
+                      <a href="{{ route('superadmin.monitoring.print_recap', ['id' => $tenant->id, 'status' => ($category == 'graduates' ? 'lulus' : 'aktif'), 'age_filter' => $age_filter]) }}"
+                        target="_blank" class="btn btn-warning btn-sm">
+                        <i class="fas fa-print"></i> Cetak Rekap
+                      </a>
+                    </div>
                   </td>
                 </tr>
               @empty

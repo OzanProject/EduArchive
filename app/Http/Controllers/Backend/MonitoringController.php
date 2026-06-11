@@ -289,6 +289,54 @@ class MonitoringController extends Controller
     }
   }
 
+  public function printAllRecap(Request $request)
+  {
+    $category = $request->input('category', 'students');
+    $status = $category == 'graduates' ? 'lulus' : 'aktif';
+    $age_filter = $request->input('age_filter');
+
+    $query = Tenant::query();
+
+    if ($request->has('table_search') && $request->table_search != '') {
+      $search = $request->table_search;
+      $query->where('npsn', 'like', "%{$search}%")
+        ->orWhere('nama_sekolah', 'like', "%{$search}%");
+    }
+
+    $tenants = $query->get();
+
+    $recapData = [];
+    foreach ($tenants as $tenant) {
+      /** @var \App\Models\Tenant $tenant */
+      $data = $tenant->run(function () use ($status, $age_filter) {
+        $q = Student::with('documents');
+
+        if ($status == 'lulus') {
+          $q->where('status_kelulusan', 'lulus');
+        } else {
+          $q->where('status_kelulusan', 'aktif');
+        }
+
+        if ($age_filter === 'under_25') {
+          $cutoff = now()->subYears(25)->format('Y-m-d');
+          $q->where('birth_date', '>', $cutoff);
+        } elseif ($age_filter === 'over_25') {
+          $cutoff = now()->subYears(25)->format('Y-m-d');
+          $q->where('birth_date', '<=', $cutoff);
+        }
+
+        return $q->oldest('nama')->get();
+      });
+
+      $recapData[] = [
+        'tenant' => $tenant,
+        'data' => $data
+      ];
+    }
+
+    return view('backend.superadmin.monitoring.print_all_recap', compact('recapData', 'status', 'age_filter'));
+  }
+
   public function printRecap(Request $request, $id)
   {
     $tenant = Tenant::findOrFail($id);
