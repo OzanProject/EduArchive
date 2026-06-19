@@ -133,6 +133,12 @@ Route::group([
         Route::post('api-tokens', [\App\Http\Controllers\Backend\ApiTokenController::class, 'store'])->name('api_tokens.store');
         Route::delete('api-tokens/{tokenId}', [\App\Http\Controllers\Backend\ApiTokenController::class, 'destroy'])->name('api_tokens.destroy');
 
+        // Dapodik Integration (Pull Data)
+        Route::get('dapodik', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'index'])->name('dapodik.index');
+        Route::post('dapodik/save', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'saveSettings'])->name('dapodik.save');
+        Route::post('dapodik/test', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'testConnection'])->name('dapodik.test');
+        Route::post('dapodik/pull', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'pullData'])->name('dapodik.pull');
+
 
         // Guide
         Route::get('guide', [\App\Http\Controllers\Backend\GuideController::class, 'index'])->name('guide');

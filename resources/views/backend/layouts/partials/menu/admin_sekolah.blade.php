@@ -161,6 +161,14 @@
           </li>
 
           <li class="nav-item">
+            <a href="{{ route('adminlembaga.dapodik.index', tenant('id')) }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.dapodik.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-cloud-download-alt text-success"></i>
+              <p>Integrasi Dapodik</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
             <a href="{{ route('adminlembaga.api_tokens.index', tenant('id')) }}"
               class="nav-link {{ request()->routeIs('adminlembaga.api_tokens.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-project-diagram"></i>
