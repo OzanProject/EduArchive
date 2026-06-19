@@ -23,7 +23,7 @@ class BackupController extends Controller
                     'file_path' => $f,
                     'file_name' => str_replace(config('backup.backup.name') . '/', '', $f),
                     'file_size' => $this->humanFilesize($disk->size($f)),
-                    'created_at' => Carbon::createFromTimestamp($disk->lastModified($f))->format('d-M-Y H:i:s'),
+                    'created_at' => Carbon::createFromTimestamp($disk->lastModified($f))->timezone('Asia/Jakarta')->format('d-M-Y H:i:s'),
                     'timestamp' => $disk->lastModified($f)
                 ];
             }
