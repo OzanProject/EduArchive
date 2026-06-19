@@ -128,6 +128,12 @@ Route::group([
         Route::get('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'index'])->name('settings.index');
         Route::post('settings', [\App\Http\Controllers\Backend\SchoolSettingController::class, 'update'])->name('settings.update');
 
+        // Web Service API Tokens
+        Route::get('api-tokens', [\App\Http\Controllers\Backend\ApiTokenController::class, 'index'])->name('api_tokens.index');
+        Route::post('api-tokens', [\App\Http\Controllers\Backend\ApiTokenController::class, 'store'])->name('api_tokens.store');
+        Route::delete('api-tokens/{tokenId}', [\App\Http\Controllers\Backend\ApiTokenController::class, 'destroy'])->name('api_tokens.destroy');
+
+
         // Guide
         Route::get('guide', [\App\Http\Controllers\Backend\GuideController::class, 'index'])->name('guide');
     });
