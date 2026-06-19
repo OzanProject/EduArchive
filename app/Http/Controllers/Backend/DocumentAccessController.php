@@ -33,13 +33,13 @@ class DocumentAccessController extends Controller
             'target_type' => \App\Models\Document::class,
             'target_id' => $request->document_id,
             'ip_address' => $request->ip(),
-            'details' => json_encode([
+            'details' => [
                 'student_id' => $request->student_id,
                 'student_nisn' => $request->student_nisn ?? '-',
                 'document_name' => $document->jenis_dokumen,
                 'reason' => $request->reason,
                 'user_agent' => $request->userAgent()
-            ]),
+            ],
         ]);
 
         // 3. Generate View URL (Simulated)

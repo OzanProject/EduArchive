@@ -19,6 +19,10 @@ class AuditLog extends Model
     'details',
   ];
 
+  protected $casts = [
+    'details' => 'array',
+  ];
+
   public function user()
   {
     return $this->belongsTo(User::class)->withoutGlobalScopes(); // Can be Super Admin or Tenant User

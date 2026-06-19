@@ -247,3 +247,11 @@
             </ul>
           </li>
 
+          <li class="nav-item">
+            <a href="{{ route('superadmin.backups.index') }}"
+              class="nav-link {{ Request::routeIs('superadmin.backups.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-archive"></i>
+              <p>Backup & Restore</p>
+            </a>
+          </li>
+

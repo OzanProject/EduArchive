@@ -22,8 +22,8 @@ class MonitoringController extends Controller
 
     if ($request->has('table_search') && $request->table_search != '') {
       $search = $request->table_search;
-      $query->where('npsn', 'like', "%{$search}%")
-        ->orWhere('nama_sekolah', 'like', "%{$search}%");
+      $query->where([['npsn', 'like', "%{$search}%"]])
+        ->orWhere([['nama_sekolah', 'like', "%{$search}%"]]);
     }
 
     $tenants = $query->paginate(10);
@@ -45,29 +45,29 @@ class MonitoringController extends Controller
         $search = $request->table_search;
 
         $query->where(function ($q) use ($search) {
-          $q->where('nama', 'like', "%{$search}%")
-            ->orWhere('nisn', 'like', "%{$search}%");
+          $q->where([['nama', 'like', "%{$search}%"]])
+            ->orWhere([['nisn', 'like', "%{$search}%"]]);
         });
       }
 
       if ($status === 'lulus') {
-        $query->where('status_kelulusan', 'lulus');
+        $query->where(['status_kelulusan' => 'lulus']);
 
         if ($year) {
-          $query->where('tahun_lulus', $year);
+          $query->where(['tahun_lulus' => $year]);
         }
       } else {
-        $query->where('status_kelulusan', 'aktif');
+        $query->where(['status_kelulusan' => 'aktif']);
       }
 
       // Filter usia berdasarkan birth_date
       $ageFilter = $request->input('age_filter');
       if ($ageFilter === 'under_25') {
         $cutoff = now()->subYears(25)->format('Y-m-d');
-        $query->where('birth_date', '>', $cutoff);
+        $query->where([['birth_date', '>', $cutoff]]);
       } elseif ($ageFilter === 'over_25') {
         $cutoff = now()->subYears(25)->format('Y-m-d');
-        $query->where('birth_date', '<=', $cutoff);
+        $query->where([['birth_date', '<=', $cutoff]]);
       }
 
       return $query->latest()->paginate(15);
@@ -77,10 +77,10 @@ class MonitoringController extends Controller
     $students->withPath(route('superadmin.monitoring.school', $id));
 
     $graduation_years = $tenant->run(function () {
-      return Student::where('status_kelulusan', 'lulus')
+      return Student::where(['status_kelulusan' => 'lulus'])
         ->select('tahun_lulus')
         ->distinct()
-        ->orderBy('tahun_lulus', 'desc')
+        ->orderByRaw('tahun_lulus desc')
         ->pluck('tahun_lulus');
     });
 
@@ -102,7 +102,7 @@ class MonitoringController extends Controller
     // ✅ PAGINATION DOKUMEN (AMAN UNTUK HOSTING)
     $documents = $tenant->run(function () use ($id) {
       return Document::with('validator')
-        ->where('student_id', $id)
+        ->where(['student_id' => $id])
         ->latest()
         ->paginate(10);
     });
@@ -110,13 +110,11 @@ class MonitoringController extends Controller
     // ===============================
     // HITUNG COMPLETENESS (LOGIKA TETAP)
     // ===============================
-    $required_types = DocumentType::where('is_required', true)
-      ->where('is_active', true)
+    $required_types = DocumentType::where(['is_required' => true, 'is_active' => true])
       ->pluck('name');
 
     $approved_docs = $tenant->run(function () use ($id) {
-      return Document::where('student_id', $id)
-        ->where('validation_status', 'approved')
+      return Document::where(['student_id' => $id, 'validation_status' => 'approved'])
         ->get();
     });
 
@@ -141,7 +139,7 @@ class MonitoringController extends Controller
     // ===============================
     // AUDIT LOG
     // ===============================
-    $logs = AuditLog::where('tenant_id', $tenant_id)
+    $logs = AuditLog::where(['tenant_id' => $tenant_id])
       ->where(function ($q) use ($id) {
         $q->where('details', 'like', '%"student_id":"' . $id . '"%')
           ->orWhere('details', 'like', '%"student_id":' . $id . '%');
@@ -151,14 +149,12 @@ class MonitoringController extends Controller
       ->limit(10)
       ->get()
       ->map(function ($log) {
-        $details = json_decode($log->details, true);
-
         return (object) [
           'user' => $log->user,
-          'document_name' => $details['document_name'] ?? 'Unknown',
+          'document_name' => $log->details['document_name'] ?? 'Unknown',
           'created_at' => $log->created_at,
           'action' => $log->action,
-          'details' => $details
+          'details' => $log->details
         ];
       });
 
@@ -299,33 +295,33 @@ class MonitoringController extends Controller
 
     if ($request->has('table_search') && $request->table_search != '') {
       $search = $request->table_search;
-      $query->where('npsn', 'like', "%{$search}%")
-        ->orWhere('nama_sekolah', 'like', "%{$search}%");
+      $query->where([['npsn', 'like', "%{$search}%"]])
+        ->orWhere([['nama_sekolah', 'like', "%{$search}%"]]);
     }
 
     $tenants = $query->get();
 
     $recapData = [];
     foreach ($tenants as $tenant) {
-      /** @var \App\Models\Tenant $tenant */
+      /** @var Tenant $tenant */
       $data = $tenant->run(function () use ($status, $age_filter) {
         $q = Student::with('documents');
 
         if ($status == 'lulus') {
-          $q->where('status_kelulusan', 'lulus');
+          $q->where(['status_kelulusan' => 'lulus']);
         } else {
-          $q->where('status_kelulusan', 'aktif');
+          $q->where(['status_kelulusan' => 'aktif']);
         }
 
         if ($age_filter === 'under_25') {
           $cutoff = now()->subYears(25)->format('Y-m-d');
-          $q->where('birth_date', '>', $cutoff);
+          $q->where([['birth_date', '>', $cutoff]]);
         } elseif ($age_filter === 'over_25') {
           $cutoff = now()->subYears(25)->format('Y-m-d');
-          $q->where('birth_date', '<=', $cutoff);
+          $q->where([['birth_date', '<=', $cutoff]]);
         }
 
-        return $q->oldest('nama')->get();
+        return $q->orderByRaw('nama ASC')->get();
       });
 
       $recapData[] = [
@@ -348,24 +344,24 @@ class MonitoringController extends Controller
       $query = Student::with('documents');
 
       if ($status == 'lulus') {
-        $query->where('status_kelulusan', 'lulus');
+        $query->where(['status_kelulusan' => 'lulus']);
         if ($year) {
-          $query->where('tahun_lulus', $year);
+          $query->where(['tahun_lulus' => $year]);
         }
       } else {
-        $query->where('status_kelulusan', 'aktif');
+        $query->where(['status_kelulusan' => 'aktif']);
       }
 
       // Filter usia berdasarkan birth_date (Cetak Rekap)
       if ($age_filter === 'under_25') {
         $cutoff = now()->subYears(25)->format('Y-m-d');
-        $query->where('birth_date', '>', $cutoff);
+        $query->where([['birth_date', '>', $cutoff]]);
       } elseif ($age_filter === 'over_25') {
         $cutoff = now()->subYears(25)->format('Y-m-d');
-        $query->where('birth_date', '<=', $cutoff);
+        $query->where([['birth_date', '<=', $cutoff]]);
       }
 
-      return $query->oldest('nama')->get();
+      return $query->orderByRaw('nama ASC')->get();
     });
 
     return view('backend.superadmin.monitoring.print_recap', compact('tenant', 'data', 'status', 'year', 'age_filter'));
@@ -387,10 +383,12 @@ class MonitoringController extends Controller
 
   public function bulkDestroyAuditLog(Request $request)
   {
+    $request->validate([
+      'ids' => 'required|array',
+      'ids.*' => 'integer|exists:audit_logs,id'
+    ]);
+
     $ids = $request->input('ids');
-    if (empty($ids)) {
-      return redirect()->back()->with('error', 'Pilih log yang ingin dihapus.');
-    }
 
     AuditLog::whereIn('id', $ids)->delete();
 
@@ -406,12 +404,12 @@ class MonitoringController extends Controller
       'target_type' => $target_type,
       'target_id' => $target_id,
       'ip_address' => request()->ip(),
-      'details' => json_encode(array_merge($details, [
+      'details' => array_merge($details, [
         'student_id' => $student_id,
         'student_nisn' => request()->input('student_nisn', '-'),
         'student_nama' => request()->input('student_nama', 'Unknown'),
         'user_agent' => request()->userAgent()
-      ])),
+      ]),
     ]);
   }
 }

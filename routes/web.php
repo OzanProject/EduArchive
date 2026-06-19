@@ -121,7 +121,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
             Route::get('/{tenant_id}/student/{id}/document/{document_id}/view', [MonitoringController::class, 'viewDocument'])->name('view_document');
-            Route::post('/{tenant_id}/student/{id}/document/{document_id}', [MonitoringController::class, 'logAccess'])->name('access_document');
 
             // Document Validation
             Route::post('/{tenant_id}/student/{student_id}/document/{document_id}/approve', [MonitoringController::class, 'approveDocument'])->name('document.approve');
@@ -140,6 +139,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/smtp', [SettingController::class, 'smtp'])->name('smtp');
             Route::get('/whatsapp', [SettingController::class, 'whatsapp'])->name('whatsapp');
             Route::post('/update', [SettingController::class, 'update'])->name('update');
+        });
+
+        // Backups
+        Route::prefix('backups')->name('backups.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Backend\BackupController::class, 'index'])->name('index');
+            Route::post('/create', [\App\Http\Controllers\Backend\BackupController::class, 'create'])->name('create');
+            Route::get('/download/{file_name}', [\App\Http\Controllers\Backend\BackupController::class, 'download'])->name('download');
+            Route::delete('/{file_name}', [\App\Http\Controllers\Backend\BackupController::class, 'destroy'])->name('destroy');
         });
 
         // Role Management (RBAC)

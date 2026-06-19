@@ -46,9 +46,6 @@
               </thead>
               <tbody>
                 @forelse($logs as $log)
-                  @php
-                    $details = json_decode($log->details, true);
-                  @endphp
                   <tr>
                     <td>
                       <div class="custom-control custom-checkbox">
@@ -62,8 +59,8 @@
                     <td>
                       <span class="badge badge-info">{{ $log->tenant->nama_sekolah ?? $log->tenant_id }}</span>
                     </td>
-                    <td>{{ $details['student_nisn'] ?? '-' }}</td>
-                    <td>{{ $details['document_name'] ?? '-' }}</td>
+                    <td>{{ $log->details['student_nisn'] ?? '-' }}</td>
+                    <td>{{ $log->details['document_name'] ?? '-' }}</td>
                     <td>
                       @if($log->action == 'VIEW')
                         <span class="badge badge-primary">LIHAT</span>
@@ -140,7 +137,7 @@
     function deleteSingleLog(id) {
       if (confirm('Yakin ingin menghapus log ini?')) {
         const form = $('#delete-single-form');
-        form.attr('action', `/superadmin/monitoring/audit-logs/${id}`);
+        form.attr('action', `{{ route('audit_logs.destroy', '') }}/${id}`);
         form.submit();
       }
     }
