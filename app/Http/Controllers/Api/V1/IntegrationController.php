@@ -25,11 +25,12 @@ class IntegrationController extends Controller
             return response()->json(['error' => 'Unauthorized or Invalid Token Owner'], 401);
         }
 
+        tenancy()->initialize($tenant);
+
         // We can optionally support pagination
         $limit = $request->query('limit', 100);
 
-        $students = Student::where('tenant_id', $tenant->id)
-            ->with(['classroom' => function($q) {
+        $students = Student::with(['classroom' => function($q) {
                 $q->select('id', 'name');
             }])
             ->paginate($limit);
@@ -57,9 +58,11 @@ class IntegrationController extends Controller
             return response()->json(['error' => 'Unauthorized or Invalid Token Owner'], 401);
         }
 
+        tenancy()->initialize($tenant);
+
         $limit = $request->query('limit', 100);
 
-        $teachers = Teacher::where('tenant_id', $tenant->id)->paginate($limit);
+        $teachers = Teacher::paginate($limit);
 
         return response()->json([
             'status' => 'success',
@@ -84,8 +87,9 @@ class IntegrationController extends Controller
             return response()->json(['error' => 'Unauthorized or Invalid Token Owner'], 401);
         }
 
-        $classrooms = Classroom::where('tenant_id', $tenant->id)
-            ->with(['homeroomTeacher' => function($q) {
+        tenancy()->initialize($tenant);
+
+        $classrooms = Classroom::with(['homeroomTeacher' => function($q) {
                 $q->select('id', 'name', 'nip');
             }])
             ->get(); // Classrooms are usually few, so get() is fine.
