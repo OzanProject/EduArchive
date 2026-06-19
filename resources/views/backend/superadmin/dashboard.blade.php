@@ -192,7 +192,7 @@
                 <tbody>
                   @forelse($recent_logs as $log)
                     @php
-                      $details = json_decode($log->details, true);
+                      $details = is_array($log->details) ? $log->details : json_decode($log->details, true);
                       $docName = $details['document_name'] ?? 'Dokumen';
                       $user = $log->user->name ?? 'System';
                     @endphp
