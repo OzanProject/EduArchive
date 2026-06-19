@@ -70,17 +70,29 @@
         </div>
         <!-- /.card-body -->
       </div>
-      <!-- /.card -->
-      
-      <div class="callout callout-warning">
-        <h5><i class="fas fa-exclamation-triangle"></i> Penting: Tentang Proses Restore</h5>
-        <p>Proses pemulihan data (Restore) sangat berisiko jika dilakukan melalui web browser karena dapat terputus di tengah jalan. Praktik terbaik untuk keamanan data Anda adalah:</p>
-        <ol>
-            <li>Klik tombol <strong>Download</strong> pada file backup yang diinginkan.</li>
-            <li>Ekstrak file `.zip` tersebut di komputer Anda. Di dalamnya terdapat folder `db-dumps` (berisi file .sql) dan file lain.</li>
-            <li>Import file `.sql` tersebut langsung melalui phpMyAdmin, HeidiSQL, atau Terminal MySQL di server untuk merestore database.</li>
-            <li>Jika Anda memilih Backup Full, salin folder `storage` hasil ekstrak ke server Anda jika ingin merestore file/dokumen.</li>
-        </ol>
+      <div class="card card-warning card-outline">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-upload"></i> Restore Database</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> <strong>Peringatan:</strong> Melakukan restore database akan <strong>menimpa seluruh data saat ini</strong>. Pastikan Anda memiliki backup terbaru sebelum melanjutkan!</p>
+          <form action="{{ route('superadmin.backups.restore') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirm('SANGAT PENTING: Apakah Anda benar-benar yakin ingin me-restore database ini? Data saat ini akan tertimpa permanen!');">
+            @csrf
+            <div class="form-group">
+              <label for="sql_file">Upload File Database (.sql)</label>
+              <div class="input-group">
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="sql_file" name="sql_file" accept=".sql" required>
+                  <label class="custom-file-label" for="sql_file">Pilih file .sql</label>
+                </div>
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-warning"><i class="fas fa-history"></i> Proses Restore</button>
+                </div>
+              </div>
+              <small class="form-text text-muted">Ekstrak file zip backup Anda terlebih dahulu, lalu upload file <code>.sql</code> yang ada di dalam folder <code>db-dumps</code>.</small>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>

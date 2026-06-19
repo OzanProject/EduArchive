@@ -147,6 +147,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/create', [\App\Http\Controllers\Backend\BackupController::class, 'create'])->name('create');
             Route::get('/download/{file_name}', [\App\Http\Controllers\Backend\BackupController::class, 'download'])->name('download');
             Route::delete('/{file_name}', [\App\Http\Controllers\Backend\BackupController::class, 'destroy'])->name('destroy');
+            Route::post('/restore', [\App\Http\Controllers\Backend\BackupController::class, 'restore'])->name('restore');
         });
 
         // Role Management (RBAC)

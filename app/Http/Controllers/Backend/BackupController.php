@@ -84,6 +84,26 @@ class BackupController extends Controller
         }
     }
 
+    public function restore(Request $request)
+    {
+        $request->validate([
+            'sql_file' => 'required|file|mimetypes:text/plain,application/sql|max:102400', // max 100MB
+        ]);
+
+        try {
+            $file = $request->file('sql_file');
+            $sqlContent = file_get_contents($file->getRealPath());
+
+            \Illuminate\Support\Facades\DB::unprepared($sqlContent);
+
+            Log::info("Database successfully restored by Superadmin.");
+            return back()->with('success', 'Database berhasil di-restore dari file SQL.');
+        } catch (\Exception $e) {
+            Log::error("Database Restore Error: " . $e->getMessage());
+            return back()->with('error', 'Gagal melakukan restore database: ' . $e->getMessage());
+        }
+    }
+
     private function humanFilesize($size, $precision = 2)
     {
         if ($size > 0) {
