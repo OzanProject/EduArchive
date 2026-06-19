@@ -37,6 +37,18 @@ class Student extends Model
     'birth_date' => 'date',
   ];
 
+  protected static function booted()
+  {
+      $clearCache = function () {
+          if (function_exists('tenant') && tenant('id')) {
+              \Illuminate\Support\Facades\Cache::forget('tenant_public_stats_' . tenant('id'));
+          }
+      };
+
+      static::saved($clearCache);
+      static::deleted($clearCache);
+  }
+
   public function documents()
   {
     return $this->hasMany(Document::class);

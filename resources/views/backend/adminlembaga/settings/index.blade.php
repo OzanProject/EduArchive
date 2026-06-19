@@ -64,6 +64,12 @@
                 </div>
 
                 <div class="form-group">
+                  <label>Kota / Kabupaten (Untuk Cetak Surat)</label>
+                  <input type="text" name="school_city" class="form-control"
+                    value="{{ $settings['school_city'] ?? 'Cianjur' }}" placeholder="Contoh: Cianjur, Bandung, Jakarta">
+                </div>
+
+                <div class="form-group">
                   <label>No. Telepon</label>
                   <input type="text" name="school_phone" class="form-control"
                     value="{{ $settings['school_phone'] ?? '' }}">

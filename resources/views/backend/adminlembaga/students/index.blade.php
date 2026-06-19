@@ -66,13 +66,7 @@
                       </div>
                       <select name="tahun_lulus" class="form-control" onchange="this.form.submit()">
                         <option value="">-- Semua Tahun Lulus --</option>
-                        @php
-                          $years = \App\Models\Student::where('status_kelulusan', 'Lulus')
-                            ->whereNotNull('tahun_lulus')
-                            ->distinct()
-                            ->orderBy('tahun_lulus', 'desc')
-                            ->pluck('tahun_lulus');
-                        @endphp
+                        {{-- $years is now passed from the controller --}}
                         @foreach($years as $year)
                           <option value="{{ $year }}" {{ request('tahun_lulus') == $year ? 'selected' : '' }}>{{ $year }}
                           </option>
@@ -226,7 +220,7 @@
               <label>Kelas Tujuan</label>
               <select name="target_classroom_id" class="form-control select2" style="width: 100%;" required>
                 <option value="">-- Pilih Kelas --</option>
-                @foreach(\App\Models\Classroom::where('is_active', true)->orderBy('nama_kelas')->get() as $classroom)
+                @foreach($classroomsList as $classroom)
                   <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})
                   </option>
                 @endforeach
@@ -313,7 +307,7 @@
 
         // Use a strict form submission for DELETE
         var form = $('#bulk-action-form');
-        form.attr('action', '{{ route("adminlembaga.students.bulkDestroy") }}');
+        form.attr('action', '{{ route($prefix . "students.bulkDestroy") }}');
         form.empty(); // clear previous inputs
         form.append('@csrf'); // append CSRF again
 
@@ -332,7 +326,7 @@
 
         if (ids.length === 0) return;
 
-        var url = '{{ route("adminlembaga.students.bulkPrint") }}' + '?ids=' + ids.join(',');
+        var url = '{{ route($prefix . "students.bulkPrint") }}' + '?ids=' + ids.join(',');
         window.open(url, '_blank');
       }
 

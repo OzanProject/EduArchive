@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
+use Illuminate\Support\Facades\DB;
 
 class TenantStudentController extends Controller
 {
@@ -12,7 +15,7 @@ class TenantStudentController extends Controller
      */
     public function index(Request $request)
     {
-        $status = $request->get('status', 'Aktif');
+        $status = $request->input('status', 'Aktif');
 
         // Strict check to ensure valid status for view/import
         if ($status !== 'Lulus') {
@@ -22,10 +25,10 @@ class TenantStudentController extends Controller
         $query = \App\Models\Student::with('classroom')->latest();
 
         if ($status == 'Lulus') {
-            $query->where('status_kelulusan', 'Lulus');
+            $query->where(['status_kelulusan' => 'Lulus']);
             $pageTitle = 'Data Siswa Lulusan';
         } else {
-            $query->where('status_kelulusan', 'Aktif');
+            $query->where(['status_kelulusan' => 'Aktif']);
             $pageTitle = 'Data Siswa Aktif';
         }
 
@@ -40,11 +43,22 @@ class TenantStudentController extends Controller
 
         // Filter by Graduation Year
         if ($status == 'Lulus' && $request->filled('tahun_lulus')) {
-            $query->where('tahun_lulus', $request->tahun_lulus);
+            $query->where(['tahun_lulus' => $request->tahun_lulus]);
         }
 
         $students = $query->paginate(10)->appends($request->query());
-        return view('backend.adminlembaga.students.index', compact('students', 'pageTitle', 'status'));
+
+        $years = [];
+        if ($status == 'Lulus') {
+            $years = \App\Models\Student::where(['status_kelulusan' => 'Lulus'])
+                ->whereNotNull('tahun_lulus')
+                ->distinct()
+                ->orderByRaw('tahun_lulus DESC')
+                ->pluck('tahun_lulus');
+        }
+        $classroomsList = \App\Models\Classroom::where(['is_active' => true])->orderByRaw('nama_kelas ASC')->get();
+
+        return view('backend.adminlembaga.students.index', compact('students', 'pageTitle', 'status', 'years', 'classroomsList'));
     }
 
     /**
@@ -52,37 +66,19 @@ class TenantStudentController extends Controller
      */
     public function create()
     {
-        $classrooms = \App\Models\Classroom::where('is_active', true)->orderBy('nama_kelas')->get();
+        $classrooms = \App\Models\Classroom::where(['is_active' => true])->orderByRaw('nama_kelas ASC')->get();
         return view('backend.adminlembaga.students.create', compact('classrooms'));
     }
 
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'gender' => 'required|in:L,P', // Added gender validation
-            'no_hp' => 'nullable|string|max:20', // Added no_hp validation
-            'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string|unique:students,nik',
-            'nisn' => 'nullable|string|unique:students,nisn',
-            'foto_profil' => 'nullable|image|max:2048',
-        ]);
-
-        // Default status for new students
+        $validated = $request->validated();
         $validated['status_kelulusan'] = 'Aktif';
 
         if ($request->hasFile('foto_profil')) {
             $validated['foto_profil'] = $request->file('foto_profil')->store('students', 'public');
         }
 
-        // Add other non-validated but allowed fields
-        $validated['birth_place'] = $request->birth_place;
-        $validated['birth_date'] = $request->birth_date;
-        $validated['address'] = $request->address;
-        $validated['parent_name'] = $request->parent_name;
-        $validated['year_in'] = $request->year_in;
-        // Sync 'kelas' string field for legacy support if needed, or just rely on relationship
-        // For now, let's look up classroom name if ID is present
         if ($request->classroom_id) {
             $classroom = \App\Models\Classroom::find($request->classroom_id);
             $validated['kelas'] = $classroom ? $classroom->nama_kelas : null;
@@ -97,43 +93,20 @@ class TenantStudentController extends Controller
     public function edit(string $id)
     {
         $student = \App\Models\Student::findOrFail($id);
-        $classrooms = \App\Models\Classroom::where('is_active', true)->orderBy('nama_kelas')->get();
+        $classrooms = \App\Models\Classroom::where(['is_active' => true])->orderByRaw('nama_kelas ASC')->get();
         return view('backend.adminlembaga.students.edit', compact('student', 'classrooms'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(UpdateStudentRequest $request, string $id)
     {
         $student = \App\Models\Student::findOrFail($id);
-
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'gender' => 'required|in:L,P', // Added gender validation
-            'no_hp' => 'nullable|string|max:20', // Added no_hp validation
-            'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string|unique:students,nik,' . $id,
-            'nisn' => 'nullable|string|unique:students,nisn,' . $id,
-            'no_seri_ijazah' => 'nullable|string',
-            'status_kelulusan' => 'nullable|in:Aktif,Lulus,Pindah,DO',
-            'foto_profil' => 'nullable|image|max:2048',
-            'tahun_lulus' => 'nullable|integer|min:2000|max:' . (date('Y') + 1),
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('foto_profil')) {
             if ($student->foto_profil) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($student->foto_profil);
             }
             $validated['foto_profil'] = $request->file('foto_profil')->store('students', 'public');
-        }
-
-        // Add other non-validated but allowed fields
-        $validated['birth_place'] = $request->birth_place;
-        $validated['birth_date'] = $request->birth_date;
-        $validated['address'] = $request->address;
-        $validated['parent_name'] = $request->parent_name;
-        $validated['year_in'] = $request->year_in;
-
-        if ($request->filled('tahun_lulus')) {
-            $validated['tahun_lulus'] = $request->tahun_lulus;
         }
 
         if ($request->classroom_id) {
@@ -175,10 +148,29 @@ class TenantStudentController extends Controller
         return redirect()->route($prefix . 'students.index', ['status' => $student->status_kelulusan])->with('success', 'Data Siswa berhasil dihapus.');
     }
 
+    private function getPrintSettings()
+    {
+        return [
+            'logoKab' => \App\Models\AppSetting::getSetting('logo_kabupaten'),
+            'logoSchool' => \App\Models\AppSetting::getSetting('school_logo'),
+            'schoolName' => \App\Models\AppSetting::getSetting('school_name', tenant('id')),
+            'schoolAddress' => \App\Models\AppSetting::getSetting('school_address', 'Alamat Sekolah Belum Diisi'),
+            'schoolEmail' => \App\Models\AppSetting::getSetting('school_email', '-'),
+            'schoolNpsn' => \App\Models\AppSetting::getSetting('school_npsn', '-'),
+            'schoolDistrictHeader' => \App\Models\AppSetting::getSetting('school_district_header', 'PEMERINTAH KABUPATEN CIANJUR'),
+            'schoolCity' => \App\Models\AppSetting::getSetting('school_city', 'Cianjur'),
+            'headmaster' => \App\Models\AppSetting::getSetting('school_headmaster_name', '..........................'),
+            'nip' => \App\Models\AppSetting::getSetting('school_headmaster_nip', '..........................'),
+            'signature' => \App\Models\AppSetting::getSetting('school_signature'),
+            'stamp' => \App\Models\AppSetting::getSetting('school_stamp'),
+        ];
+    }
+
     public function print(string $id)
     {
         $student = \App\Models\Student::with('classroom')->findOrFail($id);
-        return view('backend.adminlembaga.students.print', compact('student'));
+        $printSettings = $this->getPrintSettings();
+        return view('backend.adminlembaga.students.print', compact('student', 'printSettings'));
     }
 
     public function bulkDelete(Request $request)
@@ -188,14 +180,15 @@ class TenantStudentController extends Controller
             return redirect()->back()->with('error', 'Tidak ada siswa yang dipilih.');
         }
 
-        $students = \App\Models\Student::whereIn('id', $ids)->get();
-        foreach ($students as $student) {
-            /** @var \App\Models\Student $student */
-            if ($student->foto_profil) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($student->foto_profil);
+        DB::transaction(function () use ($ids) {
+            $students = \App\Models\Student::whereIn('id', $ids)->get();
+            foreach ($students as $student) {
+                if ($student->foto_profil) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($student->foto_profil);
+                }
+                $student->delete();
             }
-            $student->delete();
-        }
+        });
 
         return redirect()->back()->with('success', count($ids) . ' siswa berhasil dihapus.');
     }
@@ -216,12 +209,14 @@ class TenantStudentController extends Controller
             return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
         }
 
-        return view('backend.adminlembaga.students.print_bulk', compact('students'));
+        $printSettings = $this->getPrintSettings();
+
+        return view('backend.adminlembaga.students.print_bulk', compact('students', 'printSettings'));
     }
 
     public function downloadTemplate(Request $request)
     {
-        $status = $request->get('status', 'Aktif');
+        $status = $request->input('status', 'Aktif');
 
         if ($status == 'Lulus') {
             return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\GraduatedStudentTemplateExport, 'template_siswa_lulusan.xlsx');
@@ -240,10 +235,12 @@ class TenantStudentController extends Controller
 
         $targetClassroom = \App\Models\Classroom::findOrFail($request->target_classroom_id);
 
-        \App\Models\Student::whereIn('id', $request->ids)->update([
-            'classroom_id' => $targetClassroom->id,
-            'kelas' => $targetClassroom->nama_kelas, // Sync legacy field
-        ]);
+        DB::transaction(function () use ($request, $targetClassroom) {
+            \App\Models\Student::whereIn('id', $request->ids)->update([
+                'classroom_id' => $targetClassroom->id,
+                'kelas' => $targetClassroom->nama_kelas,
+            ]);
+        });
 
         return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil dinaikkan ke kelas ' . $targetClassroom->nama_kelas]);
     }
@@ -256,12 +253,12 @@ class TenantStudentController extends Controller
             'graduation_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
         ]);
 
-        \App\Models\Student::whereIn('id', $request->ids)->update([
-            'status_kelulusan' => 'Lulus',
-            'tahun_lulus' => $request->graduation_year,
-            // Optional: Detach from classroom or keep as history
-            // 'classroom_id' => null, 
-        ]);
+        DB::transaction(function () use ($request) {
+            \App\Models\Student::whereIn('id', $request->ids)->update([
+                'status_kelulusan' => 'Lulus',
+                'tahun_lulus' => $request->graduation_year,
+            ]);
+        });
 
         return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil diluluskan.']);
 

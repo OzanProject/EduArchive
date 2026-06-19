@@ -18,6 +18,18 @@ class Teacher extends Model
         'tanggal_lahir' => 'date',
     ];
 
+    protected static function booted()
+    {
+        $clearCache = function () {
+            if (function_exists('tenant') && tenant('id')) {
+                \Illuminate\Support\Facades\Cache::forget('tenant_public_stats_' . tenant('id'));
+            }
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
+
     public function classrooms()
     {
         return $this->hasMany(Classroom::class, 'wali_kelas_id');

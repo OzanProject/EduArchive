@@ -11,6 +11,18 @@ class Classroom extends Model
     protected $connection = 'mysql';
     protected $guarded = ['id'];
 
+    protected static function booted()
+    {
+        $clearCache = function () {
+            if (function_exists('tenant') && tenant('id')) {
+                \Illuminate\Support\Facades\Cache::forget('tenant_public_stats_' . tenant('id'));
+            }
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
+
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'wali_kelas_id');
