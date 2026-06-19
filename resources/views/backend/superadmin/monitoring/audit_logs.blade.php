@@ -137,7 +137,8 @@
     function deleteSingleLog(id) {
       if (confirm('Yakin ingin menghapus log ini?')) {
         const form = $('#delete-single-form');
-        form.attr('action', `{{ route('superadmin.monitoring.audit_logs.destroy', '') }}/${id}`);
+        let url = '{{ route("superadmin.monitoring.audit_logs.destroy", "ID_PLACEHOLDER") }}';
+        form.attr('action', url.replace('ID_PLACEHOLDER', id));
         form.submit();
       }
     }
