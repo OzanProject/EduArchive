@@ -31,7 +31,7 @@ class IntegrationController extends Controller
         $limit = $request->query('limit', 100);
 
         $students = Student::with(['classroom' => function($q) {
-                $q->select('id', 'name');
+                $q->select('id', 'nama_kelas');
             }])
             ->paginate($limit);
 
@@ -89,8 +89,8 @@ class IntegrationController extends Controller
 
         tenancy()->initialize($tenant);
 
-        $classrooms = Classroom::with(['homeroomTeacher' => function($q) {
-                $q->select('id', 'name', 'nip');
+        $classrooms = Classroom::with(['teacher' => function($q) {
+                $q->select('id', 'nama_lengkap', 'nip');
             }])
             ->get(); // Classrooms are usually few, so get() is fine.
 

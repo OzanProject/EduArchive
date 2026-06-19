@@ -191,17 +191,17 @@ class DapodikIntegrationController extends Controller
                     continue;
                 } else {
                     $existing->update([
-                        'name' => $nama,
-                        'gender' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : $existing->gender,
+                        'nama_lengkap' => $nama,
+                        'jenis_kelamin' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : $existing->jenis_kelamin,
                     ]);
                     $countUpdate++;
                 }
             } else {
                 Teacher::create([
                     'nip' => $nip,
-                    'name' => $nama,
-                    'gender' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : 'L',
-                    'position' => 'Guru',
+                    'nama_lengkap' => $nama,
+                    'jenis_kelamin' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : 'L',
+                    'status_kepegawaian' => 'Lainnya',
                     'is_active' => true
                 ]);
                 $countInsert++;
@@ -237,7 +237,7 @@ class DapodikIntegrationController extends Controller
             $name = $row['nama'] ?? null;
             if (!$name) continue;
 
-            $existing = Classroom::where('name', $name)->first();
+            $existing = Classroom::where('nama_kelas', $name)->first();
 
             if ($existing) {
                 if ($mode === 'skip') {
@@ -249,7 +249,7 @@ class DapodikIntegrationController extends Controller
                 }
             } else {
                 Classroom::create([
-                    'name' => $name,
+                    'nama_kelas' => $name,
                     'is_active' => true
                 ]);
                 $countInsert++;
