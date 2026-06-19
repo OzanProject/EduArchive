@@ -121,7 +121,7 @@ class DapodikIntegrationController extends Controller
                 $nisn = $row['peserta_didik_id'] ?? uniqid();
             }
 
-            $existing = Student::where('nisn', $nisn)->first();
+            $existing = Student::query()->where('nisn', $nisn)->first();
 
             if ($existing) {
                 if ($mode === 'skip') {
@@ -183,7 +183,7 @@ class DapodikIntegrationController extends Controller
                 $nip = $row['nik'] ?? ($row['ptk_id'] ?? uniqid());
             }
 
-            $existing = Teacher::where('nip', $nip)->first();
+            $existing = Teacher::query()->where('nip', $nip)->first();
 
             if ($existing) {
                 if ($mode === 'skip') {
@@ -237,7 +237,7 @@ class DapodikIntegrationController extends Controller
             $name = $row['nama'] ?? null;
             if (!$name) continue;
 
-            $existing = Classroom::where('nama_kelas', $name)->first();
+            $existing = Classroom::query()->where('nama_kelas', $name)->first();
 
             if ($existing) {
                 if ($mode === 'skip') {
