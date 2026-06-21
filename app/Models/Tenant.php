@@ -50,6 +50,8 @@ class Tenant extends BaseTenant
       'status_aktif',
       'subscription_plan',
       'storage_limit',
+      'dapodik_url',
+      'dapodik_key',
     ];
   }
 
