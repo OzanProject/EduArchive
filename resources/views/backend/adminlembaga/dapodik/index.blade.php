@@ -19,7 +19,29 @@
       <li>Klik tombol <strong>Tambah</strong>, lalu isi:<br>
         <ul>
           <li><strong>Nama Aplikasi:</strong> EduArchive</li>
-          <li><strong>IP Address:</strong> masukkan IP publik server EduArchive ini <code>{{ request()->server('SERVER_ADDR') ?? 'lihat di hosting Anda' }}</code></li>
+          <li>
+            <strong>IP Address:</strong>
+            @php
+              $serverIp = request()->server('SERVER_ADDR');
+              $isLocal = in_array($serverIp, ['127.0.0.1', '::1', 'localhost']);
+              $publicHost = request()->getHost();
+            @endphp
+            @if($isLocal)
+              {{-- Running on localhost --}}
+              <span class="text-muted">(Sedang berjalan di <em>localhost</em>)</span><br>
+              <small class="text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Anda sedang membuka halaman ini dari <strong>jaringan lokal</strong>.
+                Jika EduArchive dihosting di internet, masukkan <strong>IP Publik server hosting</strong> Anda ke Dapodik
+                (cek di cPanel / VPS panel → "Shared IP Address" atau "Main IP").
+              </small>
+            @else
+              <code>{{ $serverIp }}</code>
+              <small class="text-muted d-block">
+                (IP publik server EduArchive ini — inilah yang dimasukkan ke kolom IP Address di Dapodik)
+              </small>
+            @endif
+          </li>
         </ul>
       </li>
       <li>Klik <strong>Simpan</strong>. Dapodik akan men-generate sebuah <strong>Key</strong> (seperti <code>w4lzw4bWiWZRPf</code>).</li>
