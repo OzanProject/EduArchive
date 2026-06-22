@@ -10,43 +10,58 @@
 
 @section('content')
 
-  {{-- Panduan Langkah 0 --}}
-  <div class="callout callout-info">
-    <h5><i class="fas fa-info-circle"></i> Cara Mendapatkan Key Web Service Dapodik</h5>
-    <p class="mb-1">Sebelum mengisi form di bawah, lakukan langkah berikut di aplikasi <strong>Dapodik</strong> sekolah Anda:</p>
-    <ol class="mb-0">
-      <li>Buka aplikasi Dapodik, klik menu <strong>Pengaturan</strong> → <strong>Web Service Dapodik</strong>.</li>
-      <li>Klik tombol <strong>Tambah</strong>, lalu isi:<br>
-        <ul>
-          <li><strong>Nama Aplikasi:</strong> EduArchive</li>
-          <li>
-            <strong>IP Address:</strong>
-            @php
-              $serverIp = request()->server('SERVER_ADDR');
-              $isLocal = in_array($serverIp, ['127.0.0.1', '::1', 'localhost']);
-              $publicHost = request()->getHost();
-            @endphp
-            @if($isLocal)
-              {{-- Running on localhost --}}
-              <span class="text-muted">(Sedang berjalan di <em>localhost</em>)</span><br>
-              <small class="text-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                Anda sedang membuka halaman ini dari <strong>jaringan lokal</strong>.
-                Jika EduArchive dihosting di internet, masukkan <strong>IP Publik server hosting</strong> Anda ke Dapodik
-                (cek di cPanel / VPS panel → "Shared IP Address" atau "Main IP").
-              </small>
-            @else
-              <code>{{ $serverIp }}</code>
-              <small class="text-muted d-block">
-                (IP publik server EduArchive ini — inilah yang dimasukkan ke kolom IP Address di Dapodik)
-              </small>
-            @endif
-          </li>
-        </ul>
-      </li>
-      <li>Klik <strong>Simpan</strong>. Dapodik akan men-generate sebuah <strong>Key</strong> (seperti <code>w4lzw4bWiWZRPf</code>).</li>
-      <li>Salin Key tersebut, lalu isi form di bawah ini.</li>
-    </ol>
+  {{-- Panduan Integrasi --}}
+  <div class="row">
+    <div class="col-12">
+      <div class="card card-outline card-info">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-book-reader"></i> Panduan Koneksi Web Service Dapodik</h3>
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+              <i class="fas fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h5><strong>Langkah 1: Atur IP Address di Dapodik</strong></h5>
+              <p>Agar EduArchive diizinkan menarik data, daftarkan IP Server EduArchive ke dalam Dapodik sekolah Anda:</p>
+              <ol>
+                <li>Buka aplikasi <strong>Dapodik</strong> (Gunakan akun Admin/Operator).</li>
+                <li>Pilih menu <strong>Pengaturan</strong> &rarr; <strong>Web Service Dapodik</strong>.</li>
+                <li>Klik tombol <strong>Tambah</strong>, lalu masukkan data berikut:
+                  <ul class="mt-1">
+                    <li><strong>Nama Aplikasi:</strong> <code>EduArchive</code></li>
+                    <li><strong>IP Address:</strong> 
+                      @php
+                        $serverIp = request()->server('SERVER_ADDR');
+                        $isLocal = in_array($serverIp, ['127.0.0.1', '::1', 'localhost']);
+                      @endphp
+                      @if($isLocal)
+                        <span class="text-danger">Aplikasi EduArchive ini berjalan di Localhost. Masukkan <code>127.0.0.1</code></span>
+                      @else
+                        <code>{{ $serverIp }}</code> <small class="text-muted">(IP Publik Server ini)</small>
+                      @endif
+                    </li>
+                  </ul>
+                </li>
+                <li>Klik <strong>Simpan</strong>. Dapodik akan otomatis men-generate sebuah <strong>Key</strong>. Salin Key tersebut.</li>
+              </ol>
+            </div>
+            <div class="col-md-6">
+              <h5><strong>Langkah 2: Syarat URL / IP Dapodik</strong></h5>
+              <div class="alert alert-warning">
+                <h5><i class="icon fas fa-exclamation-triangle"></i> Penting: Aturan Jaringan</h5>
+                Jika aplikasi EduArchive ini sudah <strong>dionline-kan (Hosting/VPS)</strong>, EduArchive <strong>TIDAK BISA</strong> menggunakan URL <code>http://localhost:5774</code> atau IP Lokal <code>http://192.168.x.x:5774</code> untuk mengakses Dapodik.
+                <br><br>
+                <strong>Solusi:</strong> Komputer Dapodik di sekolah Anda WAJIB disambungkan ke internet menggunakan <em>Tunneling</em> (Contoh: <strong>Ngrok</strong> atau <strong>Cloudflare Zero Trust</strong>) agar mendapatkan URL Publik (misal: <code>https://dapodik.sekolahmu.com</code>). Masukkan URL Publik tersebut di form bawah.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="row">
