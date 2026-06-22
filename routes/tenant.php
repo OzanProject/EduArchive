@@ -138,6 +138,7 @@ Route::group([
         Route::post('dapodik/save', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'saveSettings'])->name('dapodik.save');
         Route::post('dapodik/test', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'testConnection'])->name('dapodik.test');
         Route::post('dapodik/pull', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'pullData'])->name('dapodik.pull');
+        Route::get('dapodik/progress', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'checkProgress'])->name('dapodik.progress');
 
 
         // Guide

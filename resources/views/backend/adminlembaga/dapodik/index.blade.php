@@ -163,13 +163,12 @@
           @else
             <p class="text-muted">Fitur ini akan menghubungi server Dapodik secara langsung dan memasukkan datanya ke database EduArchive.</p>
 
-            <form action="{{ route('adminlembaga.dapodik.pull') }}" method="POST"
-              onsubmit="return confirm('Proses ini mungkin membutuhkan waktu. Jangan tutup halaman saat loading. Lanjutkan?')">
+            <form id="pull-data-form" action="{{ route('adminlembaga.dapodik.pull') }}" method="POST">
               @csrf
 
               <div class="form-group">
                 <label><i class="fas fa-database"></i> Pilih Jenis Data yang Akan Ditarik:</label>
-                <select name="data_type" class="form-control" required>
+                <select id="data_type" name="data_type" class="form-control" required>
                   <option value="classrooms">📚 Rombongan Belajar (Rombel / Kelas)</option>
                   <option value="teachers">👩‍🏫 Guru & Tenaga Pendidik</option>
                   <option value="students">👨‍🎓 Peserta Didik (Siswa)</option>
@@ -196,7 +195,16 @@
               </div>
 
               <hr>
-              <button type="submit" class="btn btn-success btn-lg btn-block">
+              
+              <div id="progress-container" class="d-none mb-3">
+                <label id="progress-text">Menyiapkan Sinkronisasi...</label>
+                <div class="progress">
+                  <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <small id="progress-message" class="form-text text-muted mt-1">Harap tunggu, proses sedang berjalan di latar belakang.</small>
+              </div>
+
+              <button type="submit" id="btn-submit-pull" class="btn btn-success btn-lg btn-block">
                 <i class="fas fa-cloud-download-alt"></i> Tarik Data dari Dapodik Sekarang
               </button>
             </form>
@@ -241,4 +249,107 @@
       </div>
     </div>
   </div>
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('pull-data-form');
+    if(!form) return; // if not configured
+
+    const btnSubmit = document.getElementById('btn-submit-pull');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const progressMessage = document.getElementById('progress-message');
+    const dataTypeSelect = document.getElementById('data_type');
+    let pollingInterval;
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!confirm('Proses sinkronisasi akan berjalan di latar belakang. Lanjutkan?')) return;
+
+      const formData = new FormData(form);
+      const url = form.getAttribute('action');
+      const dataType = formData.get('data_type');
+
+      // UI Update
+      btnSubmit.setAttribute('disabled', 'disabled');
+      btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memulai Antrean...';
+      progressContainer.classList.remove('d-none');
+      updateBar(0, 'Menunggu antrean...', 'bg-success', true);
+
+      fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Start Polling
+          startPolling(dataType);
+        } else {
+          showError(data.message || 'Terjadi kesalahan tidak terduga.');
+        }
+      })
+      .catch(err => {
+        showError('Terjadi kesalahan server saat mencoba memulai sinkronisasi.');
+      });
+    });
+
+    function startPolling(dataType) {
+      pollingInterval = setInterval(() => {
+        fetch(`{{ route('adminlembaga.dapodik.progress') }}?data_type=${dataType}`, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+          .then(res => res.json())
+          .then(data => {
+            const pct = data.progress || 0;
+            const status = data.status || 'idle';
+            const msg = data.message || '';
+
+            if (status === 'error') {
+              updateBar(pct, msg, 'bg-danger', false);
+              clearInterval(pollingInterval);
+              enableSubmit();
+            } else if (status === 'success') {
+              updateBar(100, msg, 'bg-success', false);
+              clearInterval(pollingInterval);
+              enableSubmit();
+            } else {
+              // processing or queued
+              updateBar(pct, msg, 'bg-success', true);
+            }
+          })
+          .catch(err => console.error('Polling error:', err));
+      }, 1000); // Poll every 1 second
+    }
+
+    function updateBar(percent, text, colorClass, animated) {
+      progressBar.style.width = `${percent}%`;
+      progressBar.setAttribute('aria-valuenow', percent);
+      progressBar.innerText = `${percent}%`;
+      progressMessage.innerText = text;
+      
+      progressBar.className = `progress-bar ${colorClass}`;
+      if (animated) {
+        progressBar.classList.add('progress-bar-striped', 'progress-bar-animated');
+      }
+    }
+
+    function showError(msg) {
+      updateBar(100, msg, 'bg-danger', false);
+      enableSubmit();
+    }
+
+    function enableSubmit() {
+      btnSubmit.removeAttribute('disabled');
+      btnSubmit.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Tarik Data dari Dapodik Sekarang';
+    }
+  });
+</script>
+@endpush
 @endsection
