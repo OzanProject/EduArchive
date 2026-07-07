@@ -10,20 +10,27 @@
 
     <div
       class="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-70 hover:opacity-100 transition-opacity">
-      @for($i = 1; $i <= 5; $i++)
-        @if(isset($settings['landing_partner_logo_' . $i]) && $settings['landing_partner_logo_' . $i])
+      @if(isset($partnerTenants) && $partnerTenants->count() > 0)
+        @foreach($partnerTenants as $tenant)
           <img class="h-10 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
-            src="{{ asset($settings['landing_partner_logo_' . $i]) }}" alt="Partner {{ $i }}" />
-        @else
-          @if(config('app.env') === 'local')
-            <!-- Placeholder for local dev if empty -->
-            <div
-              class="h-10 w-32 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400 border border-slate-200 border-dashed">
-              Slot Partner {{ $i }}
-            </div>
+            src="{{ asset('storage/tenant' . $tenant->id . '/' . ltrim($tenant->logo, '/')) }}" alt="{{ $tenant->nama_sekolah }}" title="{{ $tenant->nama_sekolah }}" />
+        @endforeach
+      @else
+        @for($i = 1; $i <= 5; $i++)
+          @if(isset($settings['landing_partner_logo_' . $i]) && $settings['landing_partner_logo_' . $i])
+            <img class="h-10 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
+              src="{{ asset($settings['landing_partner_logo_' . $i]) }}" alt="Partner {{ $i }}" />
+          @else
+            @if(config('app.env') === 'local')
+              <!-- Placeholder for local dev if empty -->
+              <div
+                class="h-10 w-32 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400 border border-slate-200 border-dashed">
+                Slot Partner {{ $i }}
+              </div>
+            @endif
           @endif
-        @endif
-      @endfor
+        @endfor
+      @endif
     </div>
   </div>
 </section>

@@ -44,17 +44,17 @@
     </div>
 
     {{-- Tab Nav --}}
-    <div class="flex gap-1 bg-slate-100 rounded-xl p-1 mb-6 max-w-xl mx-auto">
+    <div class="flex flex-col sm:flex-row gap-1 bg-slate-100 rounded-xl p-1 mb-6 max-w-xl mx-auto">
       <button onclick="switchTab('tab-nisn')" id="btn-tab-nisn"
-        class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-white text-blue-700 shadow-sm">
+        class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-white text-blue-700 shadow-sm whitespace-nowrap">
         📋 Kelengkapan Data Siswa
       </button>
       <button onclick="switchTab('tab-profil')" id="btn-tab-profil"
-        class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-700">
+        class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-700 whitespace-nowrap">
         🏫 Profil Lembaga
       </button>
       <button onclick="switchTab('tab-dokumen')" id="btn-tab-dokumen"
-        class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-700">
+        class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-700 whitespace-nowrap">
         📁 Dokumen Siswa
       </button>
     </div>

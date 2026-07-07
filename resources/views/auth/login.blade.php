@@ -28,7 +28,7 @@
     if ($isTenant && tenant('logo')) {
         $logo = tenant_asset(tenant('logo'));
     } else {
-        $logo = $globalLogo ? asset($globalLogo) : asset('adminlte/dist/img/AdminLTELogo.png');
+        $logo = $globalLogo ? asset($globalLogo) : asset('adminlte3/dist/img/AdminLTELogo.png');
     }
 
     // APP NAME LOGIC

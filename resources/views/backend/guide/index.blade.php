@@ -17,36 +17,35 @@
         </div>
         <div class="card-body">
           <div class="callout callout-info">
-            <h5><i class="fas fa-info-circle"></i> Tentang Sistem</h5>
-            <p>EduArchive adalah sistem manajemen arsip dokumen siswa berbasis web yang memudahkan sekolah dalam
-              mengelola, menyimpan, dan mengakses dokumen-dokumen penting siswa secara digital.</p>
+            <h5><i class="fas fa-info-circle"></i> Tentang Sistem EduArchive</h5>
+            <p>EduArchive adalah sistem informasi dan manajemen arsip terpadu untuk Satuan Pendidikan. Melalui sistem ini, Anda dapat mengelola integrasi Dapodik, data kesiswaan, kelulusan, dokumen siswa, arsip kelembagaan, hingga laporan statistik secara real-time.</p>
           </div>
 
           {{-- Navigation Tabs --}}
           <ul class="nav nav-tabs" id="guideTab" role="tablist">
             <li class="nav-item">
               <a class="nav-link active" id="intro-tab" data-toggle="pill" href="#intro" role="tab">
-                <i class="fas fa-home"></i> Pengenalan
+                <i class="fas fa-home"></i> Pengenalan & Integrasi
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="students-tab" data-toggle="pill" href="#students" role="tab">
-                <i class="fas fa-user-graduate"></i> Kelola Siswa
+              <a class="nav-link" id="master-tab" data-toggle="pill" href="#master" role="tab">
+                <i class="fas fa-database"></i> Data Master
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="documents-tab" data-toggle="pill" href="#documents" role="tab">
-                <i class="fas fa-file-alt"></i> Kelola Dokumen
+              <a class="nav-link" id="kesiswaan-tab" data-toggle="pill" href="#kesiswaan" role="tab">
+                <i class="fas fa-user-graduate"></i> Kesiswaan
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="teachers-tab" data-toggle="pill" href="#teachers" role="tab">
-                <i class="fas fa-chalkboard-teacher"></i> Kelola GTK
+              <a class="nav-link" id="sarana-tab" data-toggle="pill" href="#sarana" role="tab">
+                <i class="fas fa-building"></i> Sarana & Admin
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" id="settings-tab" data-toggle="pill" href="#settings" role="tab">
-                <i class="fas fa-cog"></i> Pengaturan
+                <i class="fas fa-cogs"></i> Pengaturan
               </a>
             </li>
             <li class="nav-item">
@@ -58,213 +57,139 @@
 
           <div class="tab-content mt-3" id="guideTabContent">
 
-            {{-- INTRO TAB --}}
+            {{-- INTRO & DAPODIK TAB --}}
             <div class="tab-pane fade show active" id="intro" role="tabpanel">
-              <h4 class="text-primary"><i class="fas fa-rocket"></i> Memulai Penggunaan</h4>
+              <h4 class="text-primary"><i class="fas fa-rocket"></i> Memulai Penggunaan & Integrasi</h4>
               <hr>
 
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="info-box bg-light">
-                    <span class="info-box-icon bg-info"><i class="fas fa-user-shield"></i></span>
-                    <div class="info-box-content">
-                      <span class="info-box-text"><strong>Admin Sekolah</strong></span>
-                      <span class="info-box-number">Akses Penuh ke Semua Fitur</span>
-                      <small>Mengelola seluruh data sekolah, siswa, guru, dokumen, dan pengaturan sistem.</small>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="info-box bg-light">
-                    <span class="info-box-icon bg-success"><i class="fas fa-user-tie"></i></span>
-                    <div class="info-box-content">
-                      <span class="info-box-text"><strong>Operator</strong></span>
-                      <span class="info-box-number">Akses Terbatas</span>
-                      <small>Mengelola data siswa dan dokumen siswa sesuai wewenang yang diberikan.</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <h5 class="mt-4"><i class="fas fa-list-ol"></i> Langkah Awal</h5>
+              <h5 class="mt-4"><i class="fas fa-cloud-download-alt text-success"></i> Sinkronisasi Data Dapodik</h5>
+              <p>Anda dapat menghemat waktu dengan menarik data (Siswa, GTK, Rombel/Kelas) langsung dari Web Service Dapodik lokal Anda.</p>
               <ol class="lead">
-                <li>Login menggunakan email dan password yang telah diberikan oleh Super Admin</li>
-                <li>Lengkapi <strong>Profil Sekolah</strong> di menu <code>Pengaturan</code></li>
-                <li>Upload <strong>Logo Sekolah</strong> dan <strong>Dokumen Kop Surat</strong></li>
-                <li>Mulai menambahkan data <strong>Siswa</strong> dan <strong>Guru</strong></li>
-                <li>Upload <strong>Dokumen Siswa</strong> untuk pengarsipan digital</li>
+                <li>Buka menu <strong>Integrasi Dapodik</strong> di *sidebar* sebelah kiri.</li>
+                <li>Pilih jenis data yang ingin ditarik: <span class="badge badge-info">Siswa</span>, <span class="badge badge-info">GTK</span>, atau <span class="badge badge-info">Rombongan Belajar (Kelas)</span>.</li>
+                <li>Klik tombol <strong>Tarik Data Baru</strong>.</li>
+                <li>Tunggu proses sinkronisasi selesai. Semakin banyak data, semakin lama waktu yang dibutuhkan.</li>
               </ol>
-
+              
               <div class="alert alert-warning">
                 <i class="fas fa-exclamation-triangle"></i> <strong>Penting!</strong>
-                Pastikan data yang diinput sudah benar karena akan digunakan untuk laporan resmi dan cetak dokumen.
+                Pastikan aplikasi Dapodik di komputer Anda / server sedang berjalan dan token sinkronisasi (API) sudah diatur dengan benar di menu <strong>Web Service API</strong>.
               </div>
+
+              <h5 class="mt-4"><i class="fas fa-chart-pie text-primary"></i> Laporan & Statistik</h5>
+              <p>Setelah data terisi (baik via Dapodik atau manual), Anda dapat memantau ringkasan data sekolah pada menu <strong>Laporan & Statistik</strong>. Menu ini menyajikan visualisasi data berupa grafik mengenai jumlah siswa per kelas, persentase kelulusan, hingga demografi guru.</p>
             </div>
 
-            {{-- STUDENTS TAB --}}
-            <div class="tab-pane fade" id="students" role="tabpanel">
-              <h4 class="text-primary"><i class="fas fa-user-graduate"></i> Panduan Kelola Data Siswa</h4>
+            {{-- DATA MASTER TAB --}}
+            <div class="tab-pane fade" id="master" role="tabpanel">
+              <h4 class="text-primary"><i class="fas fa-database"></i> Panduan Kelola Data Master</h4>
               <hr>
 
-              <h5><i class="fas fa-plus-circle text-success"></i> Menambah Data Siswa Baru</h5>
+              <h5><i class="fas fa-chalkboard-teacher text-info"></i> Data Kelas / Rombel</h5>
               <ol>
-                <li>Klik menu <strong>Data Akademik > Data Siswa Aktif</strong></li>
-                <li>Klik tombol <span class="badge badge-primary"><i class="fas fa-plus"></i> Tambah Siswa</span></li>
-                <li>Isi form dengan data lengkap:
-                  <ul>
-                    <li><strong>NIK</strong>: Nomor Induk Kependudukan (16 digit)</li>
-                    <li><strong>NISN</strong>: Nomor Induk Siswa Nasional</li>
-                    <li><strong>Nama Lengkap</strong>: Sesuai Akta/KK</li>
-                    <li><strong>Jenis Kelamin</strong>: Laki-laki / Perempuan</li>
-                    <li><strong>Kelas</strong>: Pilih kelas aktif siswa</li>
-                    <li><strong>Tahun Masuk</strong>: Tahun siswa diterima</li>
-                    <li><strong>Foto Profil</strong>: Pas foto siswa (opsional)</li>
-                  </ul>
-                </li>
-                <li>Klik tombol <span class="badge badge-success">Simpan</span></li>
+                <li>Akses menu <strong>Data Master > Data Kelas</strong>.</li>
+                <li>Klik tombol <strong>Tambah Kelas</strong> untuk membuat kelas baru.</li>
+                <li>Isikan <strong>Tingkat Kelas</strong> dan <strong>Nama Rombel</strong> (misal: VII-A, X IPA 1).</li>
+                <li>Anda bisa menugaskan seorang <strong>Wali Kelas</strong> (diambil dari data Guru).</li>
+                <li>Data kelas ini akan muncul sebagai opsi saat Anda menambahkan Siswa.</li>
               </ol>
 
-              <h5 class="mt-4"><i class="fas fa-edit text-warning"></i> Mengubah Data Siswa</h5>
+              <h5 class="mt-4"><i class="fas fa-user-tie text-success"></i> Guru & Tenaga Kependidikan (GTK)</h5>
+              <p>Anda bisa menarik data GTK dari Dapodik atau menambahkannya secara manual:</p>
               <ol>
-                <li>Cari siswa yang ingin diubah di tabel</li>
-                <li>Klik tombol <span class="badge badge-warning"><i class="fas fa-edit"></i> Edit</span></li>
-                <li>Ubah data yang diperlukan</li>
-                <li>Klik <span class="badge badge-success">Update</span></li>
+                <li>Akses menu <strong>Data Master > Guru & Tendik</strong>.</li>
+                <li>Klik tombol <strong>Tambah GTK</strong>.</li>
+                <li>Isi NIP/NUPTK, Nama, Jabatan, dan data pendukung lainnya.</li>
+                <li>Guru yang terdaftar di sini dapat dipilih sebagai Wali Kelas.</li>
               </ol>
 
-              <h5 class="mt-4"><i class="fas fa-graduation-cap text-info"></i> Meluluskan Siswa</h5>
+              <h5 class="mt-4"><i class="fas fa-users-cog text-warning"></i> Operator Sekolah</h5>
+              <p>Sebagai Admin Utama Lembaga, Anda dapat mendelegasikan tugas ke staf lain:</p>
               <ol>
-                <li>Pilih siswa yang akan diluluskan (centang checkbox)</li>
-                <li>Pilih <strong>Aksi Massal > Luluskan Siswa</strong></li>
-                <li>Masukkan <strong>Tahun Lulus</strong> dan <strong>No. Seri Ijazah</strong></li>
-                <li>Klik <span class="badge badge-success">Luluskan</span></li>
-                <li>Data siswa akan dipindah ke <strong>Data Siswa Lulusan</strong></li>
+                <li>Akses menu <strong>Data Master > Operator Sekolah</strong>.</li>
+                <li>Klik <strong>Tambah Operator</strong> dan buatkan akun login (Email & Password).</li>
+                <li>Operator ini bisa masuk ke EduArchive dan membantu mengelola data kesiswaan atau dokumen.</li>
               </ol>
-
-              <div class="callout callout-success">
-                <h5><i class="fas fa-lightbulb"></i> Tips!</h5>
-                <p>Gunakan fitur <strong>Import Excel</strong> untuk menambahkan banyak siswa sekaligus. Template bisa
-                  diunduh dari halaman Data Siswa.</p>
-              </div>
             </div>
 
-            {{-- DOCUMENTS TAB --}}
-            <div class="tab-pane fade" id="documents" role="tabpanel">
-              <h4 class="text-primary"><i class="fas fa-file-alt"></i> Panduan Kelola Dokumen Siswa</h4>
+            {{-- KESISWAAN TAB --}}
+            <div class="tab-pane fade" id="kesiswaan" role="tabpanel">
+              <h4 class="text-primary"><i class="fas fa-user-graduate"></i> Manajemen Kesiswaan & Lulusan</h4>
               <hr>
 
-              <h5><i class="fas fa-upload text-success"></i> Upload Dokumen Siswa</h5>
-              <ol>
-                <li>Klik menu <strong>Arsip Dokumen > Dokumen Siswa</strong></li>
-                <li>Klik tombol <span class="badge badge-primary"><i class="fas fa-plus"></i> Upload Dokumen</span></li>
-                <li>Pilih <strong>Nama Siswa</strong> dari dropdown</li>
-                <li>Pilih <strong>Jenis Dokumen</strong> (Ijazah, KK, Akta, dll)</li>
-                <li>Upload file (PDF max 5MB, atau gambar max 2MB)</li>
-                <li>Tambahkan <strong>Keterangan</strong> jika diperlukan</li>
-                <li>Klik <span class="badge badge-success">Simpan</span></li>
-              </ol>
-
-              <h5 class="mt-4"><i class="fas fa-search text-info"></i> Mencari Dokumen</h5>
+              <h5><i class="fas fa-users text-primary"></i> Mengelola Siswa Aktif</h5>
               <ul>
-                <li>Gunakan <strong>Filter Status</strong>: Siswa Aktif / Lulusan</li>
-                <li>Gunakan <strong>Search Box</strong> untuk cari berdasarkan nama siswa atau NISN</li>
-                <li>Klik tombol <span class="badge badge-info"><i class="fas fa-eye"></i> Lihat</span> untuk preview
-                  dokumen</li>
+                <li>Buka menu <strong>Kesiswaan > Data Siswa Aktif</strong>.</li>
+                <li>Untuk menambah data tunggal, klik tombol <span class="badge badge-primary"><i class="fas fa-plus"></i> Tambah Siswa</span>.</li>
+                <li><strong>Naik Kelas Massal:</strong> Pilih tombol <strong>Kenaikan Kelas</strong>, pilih kelas asal dan kelas tujuan, lalu proses pindah kelas untuk satu rombongan belajar sekaligus.</li>
               </ul>
 
-              <h5 class="mt-4"><i class="fas fa-file-pdf text-danger"></i> Jenis Dokumen yang Bisa Diupload</h5>
-              <div class="row">
-                <div class="col-md-6">
-                  <ul>
-                    <li><i class="fas fa-check text-success"></i> Kartu Keluarga (KK)</li>
-                    <li><i class="fas fa-check text-success"></i> Akta Kelahiran</li>
-                    <li><i class="fas fa-check text-success"></i> Ijazah</li>
-                    <li><i class="fas fa-check text-success"></i> SKHUN</li>
-                  </ul>
-                </div>
-                <div class="col-md-6">
-                  <ul>
-                    <li><i class="fas fa-check text-success"></i> Raport</li>
-                    <li><i class="fas fa-check text-success"></i> Surat Keterangan</li>
-                    <li><i class="fas fa-check text-success"></i> Foto</li>
-                    <li><i class="fas fa-check text-success"></i> Dokumen Lainnya</li>
-                  </ul>
-                </div>
-              </div>
+              <h5 class="mt-4"><i class="fas fa-user-check text-success"></i> Meluluskan Siswa & Data Lulusan</h5>
+              <ul>
+                <li>Dari halaman <strong>Siswa Aktif</strong>, pilih siswa kelas tingkat akhir.</li>
+                <li>Klik opsi <strong>Kelulusan</strong>, masukkan tahun lulus, lalu konfirmasi.</li>
+                <li>Siswa yang diluluskan akan otomatis dipindahkan ke menu <strong>Data Siswa Lulusan</strong>.</li>
+                <li>Di Data Lulusan, Anda bisa melacak jejak alumni (apakah mereka lanjut studi atau bekerja).</li>
+              </ul>
 
-              <div class="alert alert-info mt-3">
-                <i class="fas fa-info-circle"></i> <strong>Catatan:</strong>
-                Semua dokumen tersimpan aman di server dan hanya bisa diakses oleh admin sekolah dan operator yang
-                berwenang.
-              </div>
-            </div>
-
-            {{-- TEACHERS TAB --}}
-            <div class="tab-pane fade" id="teachers" role="tabpanel">
-              <h4 class="text-primary"><i class="fas fa-chalkboard-teacher"></i> Panduan Kelola Data Guru & Tendik</h4>
-              <hr>
-
-              <h5><i class="fas fa-user-plus text-success"></i> Menambah Data GTK</h5>
+              <h5 class="mt-4"><i class="fas fa-folder-open text-warning"></i> Arsip Dokumen Siswa</h5>
               <ol>
-                <li>Klik menu <strong>Data Akademik > Data Guru & Tendik</strong></li>
-                <li>Klik tombol <span class="badge badge-primary"><i class="fas fa-plus"></i> Tambah GTK</span></li>
-                <li>Isi form dengan lengkap:
-                  <ul>
-                    <li><strong>NIP/NUPTK</strong>: Nomor Induk Pegawai</li>
-                    <li><strong>Nama Lengkap</strong></li>
-                    <li><strong>Jenis Kelamin</strong></li>
-                    <li><strong>Jabatan</strong>: Guru / Tenaga Kependidikan</li>
-                    <li><strong>Status</strong>: PNS / Non-PNS</li>
-                    <li><strong>Tanggal Lahir</strong></li>
-                    <li><strong>No. Telepon</strong></li>
-                    <li><strong>Email</strong></li>
-                    <li><strong>Alamat</strong></li>
-                    <li><strong>Foto</strong> (opsional)</li>
-                  </ul>
-                </li>
-                <li>Klik <span class="badge badge-success">Simpan</span></li>
+                <li>Buka menu <strong>Kesiswaan > Dokumen Siswa</strong>.</li>
+                <li>Klik <strong>Upload Dokumen</strong>.</li>
+                <li>Pilih nama siswa, lalu pilih jenis dokumen yang akan diarsip (misal: Ijazah, KK, Akta Kelahiran).</li>
+                <li>Upload file PDF atau Gambar. Dokumen ini akan tersimpan permanen secara digital.</li>
               </ol>
 
-              <div class="callout callout-warning">
-                <h5><i class="fas fa-exclamation-triangle"></i> Perhatian!</h5>
-                <p>Data GTK akan ditampilkan di halaman profil publik sekolah. Pastikan data yang diinput sudah akurat.
-                </p>
-              </div>
+              <h5 class="mt-4"><i class="fas fa-hand-holding-usd text-info"></i> Data PIP (Program Indonesia Pintar)</h5>
+              <p>Kelola data pencairan bantuan siswa secara rapi melalui menu <strong>Data PIP</strong>. Anda bisa mencatat nominal bantuan, tanggal pencairan, serta mengunggah bukti pencairan.</p>
+            </div>
+
+            {{-- SARANA TAB --}}
+            <div class="tab-pane fade" id="sarana" role="tabpanel">
+              <h4 class="text-primary"><i class="fas fa-building"></i> Sarana & Administrasi Lembaga</h4>
+              <hr>
+
+              <h5><i class="fas fa-file-archive text-primary"></i> Arsip Lembaga</h5>
+              <p>Simpan dokumen legal dan administratif sekolah Anda di cloud:</p>
+              <ul>
+                <li>SK Pendirian Sekolah</li>
+                <li>Sertifikat Akreditasi</li>
+                <li>NPSN / Izin Operasional</li>
+              </ul>
+
+              <h5 class="mt-4"><i class="fas fa-tools text-success"></i> RKB & REHAB (Infrastruktur)</h5>
+              <p>Kelola pencatatan ruang kelas baru (RKB) atau rehabilitasi gedung. Anda dapat menyimpan data pengerjaan, anggaran, persentase progres, dan dokumentasi foto proyek.</p>
+
+              <h5 class="mt-4"><i class="fas fa-calendar-alt text-warning"></i> Kegiatan Belajar</h5>
+              <p>Catat jadwal akademik, jurnal mengajar guru, atau log kegiatan harian sekolah secara terpusat untuk keperluan monev (monitoring dan evaluasi).</p>
+
+              <h5 class="mt-4"><i class="fas fa-file-signature text-danger"></i> Fakta Integritas</h5>
+              <p>Dokumentasikan file Fakta Integritas yang wajib ditandatangani oleh Guru, Kepala Sekolah, atau Tenaga Kependidikan setiap tahun ajaran baru.</p>
             </div>
 
             {{-- SETTINGS TAB --}}
             <div class="tab-pane fade" id="settings" role="tabpanel">
-              <h4 class="text-primary"><i class="fas fa-cog"></i> Panduan Pengaturan Sistem</h4>
+              <h4 class="text-primary"><i class="fas fa-cogs"></i> Pengaturan Sistem & Profil</h4>
               <hr>
 
-              <h5><i class="fas fa-school text-info"></i> Profil Sekolah</h5>
-              <p>Menu: <strong>Pengaturan > Profil Sekolah</strong></p>
+              <h5><i class="fas fa-school text-info"></i> Pengaturan Sekolah</h5>
+              <p>Di menu ini, lengkapi identitas utama sekolah (Nama, Alamat, Email, No. Telp, dll). Pastikan Anda mengisi nama Kepala Sekolah berserta NIP untuk keperluan kop surat otomatis.</p>
+
+              <h5 class="mt-4"><i class="fas fa-image text-success"></i> Profil Publik (Branding)</h5>
+              <p>Menu <strong>Pengaturan Sistem > Profil Publik</strong> digunakan untuk mengatur bagaimana sekolah Anda ditampilkan ke masyarakat umum atau portal dinas.</p>
               <ul>
-                <li><strong>Nama Sekolah</strong>: Nama resmi sekolah</li>
-                <li><strong>NPSN</strong>: Nomor Pokok Sekolah Nasional</li>
-                <li><strong>Alamat Lengkap</strong></li>
-                <li><strong>No. Telepon</strong> dan <strong>Email Sekolah</strong></li>
-                <li><strong>Nama Kepala Sekolah</strong> dan <strong>NIP</strong></li>
+                <li><strong>Logo Sekolah:</strong> Upload logo transparan untuk kop dan halaman depan.</li>
+                <li><strong>Kop Surat:</strong> Upload logo daerah dan tanda tangan digital kepala sekolah (opsional).</li>
+                <li><strong>Cover/Banner:</strong> Gambar utama untuk landing page sekolah Anda.</li>
               </ul>
 
-              <h5 class="mt-4"><i class="fas fa-image text-warning"></i> Dokumen & Kop Surat</h5>
-              <p>Menu: <strong>Pengaturan > Dokumen & Kop Surat</strong></p>
-              <ul>
-                <li><strong>Logo Kabupaten</strong>: Logo pemda (kiri)</li>
-                <li><strong>Logo Sekolah</strong>: Logo sekolah (kanan)</li>
-                <li><strong>Tanda Tangan</strong>: Scan tanda tangan kepala sekolah</li>
-                <li><strong>Stempel</strong>: Scan stempel sekolah</li>
-              </ul>
-              <p class="text-muted"><i class="fas fa-info-circle"></i> Logo dan tanda tangan akan otomatis digunakan saat
-                cetak dokumen resmi.</p>
-
-              <h5 class="mt-4"><i class="fas fa-users-cog text-success"></i> Kelola Operator (Admin Sekolah)</h5>
-              <p>Menu: <strong>Manajemen User > Operator</strong></p>
+              <h5 class="mt-4"><i class="fas fa-project-diagram text-warning"></i> Web Service API (Dapodik)</h5>
               <ol>
-                <li>Klik <span class="badge badge-primary"><i class="fas fa-plus"></i> Tambah Operator</span></li>
-                <li>Isi Nama, Email, dan Password</li>
-                <li>Klik <span class="badge badge-success">Simpan</span></li>
-                <li>Operator bisa login dan membantu admin sekolah mengelola data</li>
+                <li>Untuk menarik data dari Dapodik, Anda butuh konfigurasi API.</li>
+                <li>Masuk ke menu <strong>Pengaturan Sistem > Web Service API</strong>.</li>
+                <li>Masukkan <strong>IP Address / URL Aplikasi Dapodik Lokal</strong> (contoh: http://localhost:5774).</li>
+                <li>Masukkan <strong>Token API</strong> yang didapat dari pengaturan Web Service Dapodik lokal Anda.</li>
+                <li>Klik Simpan dan Tes Koneksi.</li>
               </ol>
             </div>
 
@@ -275,7 +200,7 @@
 
               <div class="card card-outline card-info collapsed-card">
                 <div class="card-header">
-                  <h3 class="card-title"><i class="fas fa-question"></i> Bagaimana cara reset password?</h3>
+                  <h3 class="card-title"><i class="fas fa-question"></i> Tarik data Dapodik gagal (Timeout / Connection Refused). Apa solusinya?</h3>
                   <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                       <i class="fas fa-plus"></i>
@@ -283,13 +208,13 @@
                   </div>
                 </div>
                 <div class="card-body">
-                  Hubungi Super Admin melalui support untuk melakukan reset password akun Anda.
+                  Pastikan laptop/PC tempat aplikasi Dapodik terinstall sedang menyala, aplikasi Dapodik bisa dibuka, dan IP URL Web Service (contoh: http://localhost:5774) dapat diakses dari jaringan internet server EduArchive (bisa menggunakan aplikasi bantuan seperti Ngrok jika Anda menggunakan jaringan lokal).
                 </div>
               </div>
 
               <div class="card card-outline card-info collapsed-card">
                 <div class="card-header">
-                  <h3 class="card-title"><i class="fas fa-question"></i> Berapa batas maksimal upload dokumen?</h3>
+                  <h3 class="card-title"><i class="fas fa-question"></i> Kenapa data siswa tidak muncul di fitur Kenaikan Kelas?</h3>
                   <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                       <i class="fas fa-plus"></i>
@@ -297,14 +222,13 @@
                   </div>
                 </div>
                 <div class="card-body">
-                  Batas penyimpanan ditentukan oleh paket langganan sekolah. Cek di menu <strong>Pengaturan > Info
-                    Akun</strong> untuk melihat batas storage Anda.
+                  Pastikan Anda sudah mengelompokkan siswa tersebut ke dalam Rombel/Kelas. Siswa tanpa kelas (unassigned) tidak dapat dinaikkan kelasnya secara massal. Edit data siswa tersebut dan assign ke kelas asal terlebih dahulu.
                 </div>
               </div>
 
               <div class="card card-outline card-info collapsed-card">
                 <div class="card-header">
-                  <h3 class="card-title"><i class="fas fa-question"></i> Apakah data aman?</h3>
+                  <h3 class="card-title"><i class="fas fa-question"></i> Apakah data aman? Siapa yang bisa melihat dokumen arsip?</h3>
                   <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                       <i class="fas fa-plus"></i>
@@ -312,47 +236,8 @@
                   </div>
                 </div>
                 <div class="card-body">
-                  Ya, semua data ter-enkripsi dan tersimpan di server yang aman. Setiap akses dokumen penting akan
-                  tercatat di Audit Log oleh Super Admin.
+                  Data bersifat terisolasi. Fitur Multi-Tenant EduArchive menjamin file dan database lembaga Anda tidak bisa diakses oleh sekolah lain. Hanya Admin Sekolah, Operator, dan (jika diizinkan) Dinas Pendidikan setempat yang memiliki hak akses untuk memonitor arsip tersebut.
                 </div>
-              </div>
-
-              <div class="card card-outline card-info collapsed-card">
-                <div class="card-header">
-                  <h3 class="card-title"><i class="fas fa-question"></i> Bagaimana cara cetak dokumen siswa?</h3>
-                  <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="card-body">
-                  Klik tombol <span class="badge badge-info"><i class="fas fa-print"></i> Cetak</span> di halaman Data
-                  Siswa. Sistem akan otomatis menambahkan kop surat dan logo sekolah.
-                </div>
-              </div>
-
-              <div class="card card-outline card-info collapsed-card">
-                <div class="card-header">
-                  <h3 class="card-title"><i class="fas fa-question"></i> Apa perbedaan Admin Sekolah dan Operator?</h3>
-                  <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <strong>Admin Sekolah</strong> memiliki akses penuh ke semua fitur termasuk pengaturan sistem dan
-                  menambah operator.
-                  <strong>Operator</strong> hanya bisa mengelola data siswa dan dokumen, tidak bisa mengubah pengaturan
-                  sistem.
-                </div>
-              </div>
-
-              <div class="alert alert-success mt-4">
-                <h5><i class="fas fa-headset"></i> Butuh Bantuan Lebih Lanjut?</h5>
-                <p>Hubungi tim support kami melalui tombol <strong>Hubungi Support</strong> yang tersedia di menu
-                  <strong>Pengaturan > Info Akun</strong>.</p>
               </div>
             </div>
 

@@ -1,13 +1,35 @@
 @php
-    $dinas_logo = \Illuminate\Support\Facades\Cache::get('dinas_app_logo');
-    $logo = $dinas_logo ?? asset('adminlte/dist/img/AdminLTELogo.png');
-    $appName = \App\Models\AppSetting::getSetting('app_name', config('app.name'));
+    use App\Models\AppSetting;
+    use Illuminate\Support\Facades\Cache;
+    use Stancl\Tenancy\Database\TenantScope;
+
+    // Helper to get setting with Global Fallback
+    $getSetting = function ($key, $default = null) {
+        return Cache::rememberForever("global_app_setting_{$key}", function () use ($key, $default) {
+            return AppSetting::withoutGlobalScope(TenantScope::class)
+                ->whereNull('tenant_id')
+                ->where('key', $key)
+                ->value('value') ?? $default;
+        });
+    };
+
+    $globalLogo = $getSetting('app_logo', null);
+    $logo = $globalLogo ? asset($globalLogo) : asset('adminlte3/dist/img/AdminLTELogo.png');
+    $appName = $getSetting('app_name', config('app.name'));
+    $appDesc = $getSetting('app_description', 'Solusi terintegrasi untuk manajemen surat, arsip digital, dan legalisir ijazah yang aman dan efisien.');
+
+    $coverImage = $getSetting('login_cover_image', 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop');
+    if ($coverImage && !str_starts_with($coverImage, 'http')) {
+        $coverImage = asset($coverImage);
+    }
+    
+    $favicon = $getSetting('app_favicon', null) ? asset($getSetting('app_favicon', null)) : asset('favicon.ico');
 
     // Legal Links Logic
-    $privacyLink = \App\Models\AppSetting::getSetting('link_privacy');
+    $privacyLink = $getSetting('link_privacy', null);
     $privacyLink = ($privacyLink && $privacyLink !== '#') ? $privacyLink : route('page.show', 'privacy-policy');
 
-    $termsLink = \App\Models\AppSetting::getSetting('link_terms');
+    $termsLink = $getSetting('link_terms', null);
     $termsLink = ($termsLink && $termsLink !== '#') ? $termsLink : route('page.show', 'terms-of-service');
 @endphp
 
@@ -18,8 +40,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Registrasi Sekolah - {{ $appName }}</title>
-    <link rel="icon" type="image/x-icon"
-        href="{{ !empty($central_branding['app_favicon']) ? asset($central_branding['app_favicon']) : asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ $favicon }}">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet" />
@@ -64,7 +85,7 @@
         <div class="hidden lg:flex w-1/2 bg-slate-100 flex-col justify-between p-12 relative overflow-hidden">
             <!-- Dynamic Background Image -->
             <div class="absolute inset-0 z-0">
-                <img src="{{ isset(\App\Models\AppSetting::all()->pluck('value', 'key')['login_cover_image']) ? asset(\App\Models\AppSetting::all()->pluck('value', 'key')['login_cover_image']) : 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop' }}"
+                <img src="{{ $coverImage }}"
                     class="w-full h-full object-cover" alt="Login Cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
             </div>
@@ -72,14 +93,14 @@
             <div class="relative z-10">
                 <div
                     class="size-24 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 border border-white/20 p-4">
-                    <img src="{{ !empty($central_branding['app_logo']) ? asset($central_branding['app_logo']) : asset('adminlte/dist/img/AdminLTELogo.png') }}"
+                    <img src="{{ $logo }}"
                         class="w-full h-full object-contain" alt="App Logo">
                 </div>
                 <h2 class="text-4xl font-bold text-white mb-4 leading-tight">
-                    {{ \App\Models\AppSetting::getSetting('app_name', 'EduArchive') }}
+                    {{ $appName }}
                 </h2>
                 <p class="text-white/80 text-lg max-w-md">
-                    {{ \App\Models\AppSetting::getSetting('app_description', 'Solusi terintegrasi untuk manajemen surat, arsip digital, dan legalisir ijazah yang aman dan efisien.') }}
+                    {{ $appDesc }}
                 </p>
             </div>
 

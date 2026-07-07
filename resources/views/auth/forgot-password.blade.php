@@ -1,13 +1,29 @@
 @php
-    $dinas_logo = \Illuminate\Support\Facades\Cache::get('dinas_app_logo');
-    $logo = $dinas_logo ?? asset('adminlte/dist/img/AdminLTELogo.png');
-    $appName = \App\Models\AppSetting::getSetting('app_name', config('app.name'));
+    use App\Models\AppSetting;
+    use Illuminate\Support\Facades\Cache;
+    use Stancl\Tenancy\Database\TenantScope;
+
+    // Helper to get setting with Global Fallback
+    $getSetting = function ($key, $default = null) {
+        return Cache::rememberForever("global_app_setting_{$key}", function () use ($key, $default) {
+            return AppSetting::withoutGlobalScope(TenantScope::class)
+                ->whereNull('tenant_id')
+                ->where('key', $key)
+                ->value('value') ?? $default;
+        });
+    };
+
+    $globalLogo = $getSetting('app_logo', null);
+    $logo = $globalLogo ? asset($globalLogo) : asset('adminlte3/dist/img/AdminLTELogo.png');
+    $appName = $getSetting('app_name', config('app.name'));
+    
+    $favicon = $getSetting('app_favicon', null) ? asset($getSetting('app_favicon', null)) : asset('favicon.ico');
 
     // Legal Links Logic
-    $privacyLink = \App\Models\AppSetting::getSetting('link_privacy');
+    $privacyLink = $getSetting('link_privacy', null);
     $privacyLink = ($privacyLink && $privacyLink !== '#') ? $privacyLink : route('page.show', 'privacy-policy');
 
-    $termsLink = \App\Models\AppSetting::getSetting('link_terms');
+    $termsLink = $getSetting('link_terms', null);
     $termsLink = ($termsLink && $termsLink !== '#') ? $termsLink : route('page.show', 'terms-of-service');
 @endphp
 
@@ -18,8 +34,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Lupa Password - {{ $appName }}</title>
-    <link rel="icon" type="image/x-icon"
-        href="{{ !empty($central_branding['app_favicon']) ? asset($central_branding['app_favicon']) : asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ $favicon }}">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet" />

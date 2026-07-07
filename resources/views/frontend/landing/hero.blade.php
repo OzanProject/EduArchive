@@ -6,7 +6,7 @@
         <span class="material-symbols-outlined text-sm">verified</span>
         {{ $settings['landing_hero_tagline'] ?? 'Dipercaya oleh 50+ Dinas Pendidikan' }}
       </div>
-      <h1 class="text-5xl md:text-6xl font-black leading-[1.1] tracking-tight text-[#0d121b]">
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.1] tracking-tight text-[#0d121b]">
         {{ $settings['landing_hero_title_1'] ?? 'Solusi Modern' }} <span
           class="text-primary">{{ $settings['landing_hero_title_highlight'] ?? 'Arsip Digital' }}</span>
         {{ $settings['landing_hero_title_2'] ?? 'Pendidikan' }}
@@ -42,7 +42,7 @@
 
         <!-- Floating Badge 1 -->
         <div
-          class="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 animate-bounce"
+          class="absolute -bottom-6 left-0 md:-left-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 animate-bounce"
           style="animation-duration: 3s;">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
@@ -56,7 +56,7 @@
         </div>
 
         <!-- Floating Badge 2 -->
-        <div class="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 animate-bounce"
+        <div class="absolute -top-6 right-0 md:-right-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 animate-bounce"
           style="animation-duration: 4s;">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">

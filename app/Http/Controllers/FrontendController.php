@@ -68,7 +68,14 @@ class FrontendController extends Controller
     $profileProgress  = $this->getProfileProgressData($tenants);
     $documentProgress = $this->getDocumentProgressData($tenants);
 
-    return view('frontend.index', compact('settings', 'logo', 'favicon', 'schoolProgress', 'profileProgress', 'documentProgress', 'districts', 'selectedDistrict', 'selectedNpsn'));
+    $partnerTenants = \App\Models\Tenant::where('status_aktif', 1)
+        ->whereNotNull('logo')
+        ->where('logo', '!=', '')
+        ->inRandomOrder()
+        ->limit(6)
+        ->get();
+
+    return view('frontend.index', compact('settings', 'logo', 'favicon', 'schoolProgress', 'profileProgress', 'documentProgress', 'districts', 'selectedDistrict', 'selectedNpsn', 'partnerTenants'));
   }
 
   public function progress(Request $request)
