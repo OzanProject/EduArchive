@@ -62,7 +62,7 @@
                   <label class="custom-file-label" for="file_path">Pilih file (PDF/JPG/PNG)</label>
                 </div>
               </div>
-              <small class="text-muted">Format: PDF, JPG, JPEG, PNG. Max: 50MB.</small>
+              <small class="text-muted">Format: PDF, JPG, JPEG, PNG. Max: 2MB.</small>
               @error('file_path') <span class="d-block text-danger mt-1">{{ $message }}</span> @enderror
             </div>
 

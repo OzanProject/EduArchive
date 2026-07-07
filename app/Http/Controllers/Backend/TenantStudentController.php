@@ -245,6 +245,27 @@ class TenantStudentController extends Controller
         return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil dinaikkan ke kelas ' . $targetClassroom->nama_kelas]);
     }
 
+    public function bulkPromoteRombel(Request $request)
+    {
+        $request->validate([
+            'source_classroom_id' => 'required|exists:classrooms,id',
+            'target_classroom_id' => 'required|exists:classrooms,id|different:source_classroom_id',
+        ]);
+
+        $targetClassroom = \App\Models\Classroom::findOrFail($request->target_classroom_id);
+
+        DB::transaction(function () use ($request, $targetClassroom) {
+            \App\Models\Student::where('classroom_id', $request->source_classroom_id)
+                ->where('status_kelulusan', 'Aktif')
+                ->update([
+                    'classroom_id' => $targetClassroom->id,
+                    'kelas' => $targetClassroom->nama_kelas,
+                ]);
+        });
+
+        return redirect()->back()->with('success', 'Seluruh siswa dari rombel asal berhasil dinaikkan ke kelas ' . $targetClassroom->nama_kelas);
+    }
+
     public function bulkGraduate(Request $request)
     {
         $request->validate([
@@ -262,5 +283,26 @@ class TenantStudentController extends Controller
 
         return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil diluluskan.']);
 
+    }
+
+    public function bulkGraduateRombel(Request $request)
+    {
+        $request->validate([
+            'source_classroom_id' => 'required|exists:classrooms,id',
+            'graduation_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
+        ]);
+
+        $sourceClassroom = \App\Models\Classroom::findOrFail($request->source_classroom_id);
+
+        DB::transaction(function () use ($request) {
+            \App\Models\Student::where('classroom_id', $request->source_classroom_id)
+                ->where('status_kelulusan', 'Aktif')
+                ->update([
+                    'status_kelulusan' => 'Lulus',
+                    'tahun_lulus' => $request->graduation_year,
+                ]);
+        });
+
+        return redirect()->back()->with('success', 'Seluruh siswa dari kelas ' . $sourceClassroom->nama_kelas . ' berhasil diluluskan.');
     }
 }

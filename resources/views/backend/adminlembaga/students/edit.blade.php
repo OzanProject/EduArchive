@@ -26,6 +26,7 @@
             <h3 class="card-title"><i class="fas fa-user-edit mr-1"></i> Data Pribadi & Akademik</h3>
           </div>
           <div class="card-body">
+            <h5 class="text-primary mb-3 border-bottom pb-2"><i class="fas fa-info-circle mr-2"></i>Informasi Dasar</h5>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
@@ -54,67 +55,11 @@
             </div>
 
             <div class="row">
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>NISN</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                    </div>
-                    <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror"
-                      value="{{ old('nisn', $student->nisn) }}" placeholder="NISN">
-                  </div>
-                  @error('nisn') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>NIK</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                    </div>
-                    <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
-                      value="{{ old('nik', $student->nik) }}" placeholder="NIK">
-                  </div>
-                  @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>No. HP</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                    </div>
-                    <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror"
-                      value="{{ old('no_hp', $student->no_hp) }}" placeholder="08xxx">
-                  </div>
-                  @error('no_hp') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>No. Seri Ijazah</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-certificate"></i></span>
-                    </div>
-                    <input type="text" name="no_seri_ijazah"
-                      class="form-control @error('no_seri_ijazah') is-invalid @enderror"
-                      value="{{ old('no_seri_ijazah', $student->no_seri_ijazah) }}" placeholder="Nomor Seri Ijazah">
-                  </div>
-                  @error('no_seri_ijazah') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label>Tempat Lahir</label>
                   <input type="text" name="birth_place" class="form-control"
-                    value="{{ old('birth_place', $student->birth_place) }}">
+                    value="{{ old('birth_place', $student->birth_place) }}" placeholder="Kota Kelahiran">
                 </div>
               </div>
               <div class="col-md-6">
@@ -131,10 +76,76 @@
               </div>
             </div>
 
+            <h5 class="text-primary mb-3 mt-4 border-bottom pb-2"><i class="fas fa-id-card mr-2"></i>Identitas & Kontak</h5>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label>Kelas {{ $student->status_kelulusan == 'Lulus' ? '(Riwayat)' : '' }}</label>
+                  <label>NISN</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                    </div>
+                    <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror"
+                      value="{{ old('nisn', $student->nisn) }}" placeholder="Nomor Induk Siswa Nasional">
+                  </div>
+                  @error('nisn') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>NIK</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-fingerprint"></i></span>
+                    </div>
+                    <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
+                      value="{{ old('nik', $student->nik) }}" placeholder="Nomor Induk Kependudukan">
+                  </div>
+                  @error('nik') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>No. HP</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                    </div>
+                    <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror"
+                      value="{{ old('no_hp', $student->no_hp) }}" placeholder="Contoh: 08123456789">
+                  </div>
+                  @error('no_hp') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>No. Seri Ijazah (Opsional)</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-certificate"></i></span>
+                    </div>
+                    <input type="text" name="no_seri_ijazah"
+                      class="form-control @error('no_seri_ijazah') is-invalid @enderror"
+                      value="{{ old('no_seri_ijazah', $student->no_seri_ijazah) }}" placeholder="Nomor Seri Ijazah Sebelumnya">
+                  </div>
+                  @error('no_seri_ijazah') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Alamat Lengkap</label>
+              <textarea name="address" class="form-control" rows="2" placeholder="Alamat tempat tinggal lengkap...">{{ old('address', $student->address) }}</textarea>
+            </div>
+
+            <h5 class="text-primary mb-3 mt-4 border-bottom pb-2"><i class="fas fa-graduation-cap mr-2"></i>Data Akademik & Keluarga</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Kelas {{ $student->status_kelulusan == 'Lulus' ? '(Riwayat)' : 'Saat Ini' }}</label>
                   <select name="classroom_id" class="form-control select2 @error('classroom_id') is-invalid @enderror"
                     style="width: 100%;" {{ $student->status_kelulusan == 'Lulus' ? 'disabled' : '' }}>
                     <option value="">-- Pilih Kelas --</option>
@@ -160,7 +171,7 @@
                   @else
                     <label>Tahun Masuk</label>
                     <input type="number" name="year_in" class="form-control"
-                      value="{{ old('year_in', $student->year_in) }}">
+                      value="{{ old('year_in', $student->year_in) }}" placeholder="Contoh: 2024">
                   @endif
                 </div>
               </div>
@@ -170,8 +181,13 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label>Nama Orang Tua / Wali</label>
-                  <input type="text" name="parent_name" class="form-control"
-                    value="{{ old('parent_name', $student->parent_name) }}">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-users"></i></span>
+                    </div>
+                    <input type="text" name="parent_name" class="form-control"
+                      value="{{ old('parent_name', $student->parent_name) }}" placeholder="Nama Ayah / Ibu / Wali">
+                  </div>
                 </div>
               </div>
               <!-- Status Kelulusan (Only in Edit) -->
@@ -191,11 +207,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="form-group">
-              <label>Alamat Lengkap</label>
-              <textarea name="address" class="form-control" rows="3">{{ old('address', $student->address) }}</textarea>
             </div>
           </div>
         </div>

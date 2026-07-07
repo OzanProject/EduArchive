@@ -24,6 +24,13 @@
                   <option value="100" {{ (isset($perPage) && $perPage == 100) ? 'selected' : '' }}>100 Baris</option>
                 </select>
               </div>
+              <div class="input-group input-group-sm mr-2">
+                <select name="filter_status" class="form-control" onchange="document.getElementById('searchForm').submit()">
+                  <option value="">Semua Status</option>
+                  <option value="1" {{ request('filter_status') === '1' ? 'selected' : '' }}>Aktif</option>
+                  <option value="0" {{ request('filter_status') === '0' ? 'selected' : '' }}>Belum Diverifikasi</option>
+                </select>
+              </div>
               <div class="input-group input-group-sm" style="width: 200px;">
                 <input type="text" name="table_search" class="form-control float-right" placeholder="Cari Sekolah..."
                   value="{{ request('table_search') }}">

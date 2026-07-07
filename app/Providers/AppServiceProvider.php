@@ -67,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
                     // Force connection to central database (usually 'mysql')
                     return \Illuminate\Support\Facades\DB::connection('mysql')
                         ->table('app_settings')
-                        ->whereIn('key', ['app_logo', 'app_favicon'])
+                        ->whereIn('key', ['app_logo', 'app_favicon', 'batas_waktu_pengerjaan'])
                         ->pluck('value', 'key');
                 } catch (\Exception $e) {
                     return [];

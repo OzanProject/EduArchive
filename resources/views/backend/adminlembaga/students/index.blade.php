@@ -17,25 +17,33 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ $pageTitle ?? 'Daftar Siswa' }}</h3>
-          <div class="card-tools">
+          <div class="card-tools d-flex flex-wrap justify-content-end" style="gap: 5px; row-gap: 5px;">
             <button class="btn btn-danger btn-sm d-none" id="btn-bulk-delete" onclick="bulkDelete()">
               <i class="fas fa-trash"></i> Hapus Masal
             </button>
-            <button class="btn btn-info btn-sm d-none ml-1" id="btn-bulk-print" onclick="bulkPrint()">
+            <button class="btn btn-info btn-sm d-none" id="btn-bulk-print" onclick="bulkPrint()">
               <i class="fas fa-print"></i> Cetak Masal
             </button>
-            <button class="btn btn-warning btn-sm d-none ml-1" id="btn-bulk-promote" data-toggle="modal"
+            <button class="btn btn-warning btn-sm d-none" id="btn-bulk-promote" data-toggle="modal"
               data-target="#promoteModal">
-              <i class="fas fa-level-up-alt"></i> Naik Kelas
+              <i class="fas fa-level-up-alt"></i> Naik Kelas (Terpilih)
             </button>
-            <button class="btn btn-secondary btn-sm d-none ml-1" id="btn-bulk-graduate" data-toggle="modal"
+            <button class="btn btn-warning btn-sm" data-toggle="modal"
+              data-target="#promoteRombelModal">
+              <i class="fas fa-layer-group"></i> Naik Kelas (Rombel)
+            </button>
+            <button class="btn btn-secondary btn-sm d-none" id="btn-bulk-graduate" data-toggle="modal"
               data-target="#graduateModal">
-              <i class="fas fa-user-graduate"></i> Luluskan
+              <i class="fas fa-user-graduate"></i> Luluskan (Terpilih)
             </button>
-            <a href="{{ route($prefix . 'students.create') }}" class="btn btn-primary btn-sm ml-2">
+            <button class="btn btn-secondary btn-sm" data-toggle="modal"
+              data-target="#graduateRombelModal">
+              <i class="fas fa-graduation-cap"></i> Luluskan (Rombel)
+            </button>
+            <a href="{{ route($prefix . 'students.create') }}" class="btn btn-primary btn-sm">
               <i class="fas fa-plus"></i> Tambah Baru
             </a>
-            <button type="button" class="btn btn-success btn-sm ml-2" data-toggle="modal" data-target="#importModal">
+            <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#importModal">
               <i class="fas fa-file-excel"></i> Import Excel
             </button>
           </div>
@@ -237,6 +245,48 @@
     </div>
   </div>
 
+  <!-- Modal Promote Rombel -->
+  <div class="modal fade" id="promoteRombelModal" tabindex="-1" role="dialog" aria-labelledby="promoteRombelModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form action="{{ route($prefix . 'students.bulkPromoteRombel') }}" method="POST">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="promoteRombelModalLabel">Naik Kelas Masal (Per Rombel)</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Pindahkan <strong>semua siswa aktif</strong> dari satu kelas ke kelas lainnya secara langsung:</p>
+            <div class="form-group">
+              <label>Kelas Asal</label>
+              <select name="source_classroom_id" class="form-control select2" style="width: 100%;" required>
+                <option value="">-- Pilih Kelas Asal --</option>
+                @foreach($classroomsList as $classroom)
+                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Kelas Tujuan</label>
+              <select name="target_classroom_id" class="form-control select2" style="width: 100%;" required>
+                <option value="">-- Pilih Kelas Tujuan --</option>
+                @foreach($classroomsList as $classroom)
+                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
+                @endforeach
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin memindahkan seluruh siswa di kelas asal ke kelas tujuan?')">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Graduate -->
   <div class="modal fade" id="graduateModal" tabindex="-1" role="dialog" aria-labelledby="graduateModalLabel"
     aria-hidden="true">
@@ -261,6 +311,43 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
             <button type="button" class="btn btn-primary" onclick="submitGraduate()">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Graduate Rombel -->
+  <div class="modal fade" id="graduateRombelModal" tabindex="-1" role="dialog" aria-labelledby="graduateRombelModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form action="{{ route($prefix . 'students.bulkGraduateRombel') }}" method="POST">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="graduateRombelModalLabel">Luluskan Siswa Masal (Per Rombel)</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Luluskan <strong>semua siswa aktif</strong> dalam satu kelas sekaligus:</p>
+            <div class="form-group">
+              <label>Kelas yang Diluluskan</label>
+              <select name="source_classroom_id" class="form-control select2" style="width: 100%;" required>
+                <option value="">-- Pilih Kelas --</option>
+                @foreach($classroomsList as $classroom)
+                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tahun Lulus</label>
+              <input type="number" name="graduation_year" class="form-control" value="{{ date('Y') }}" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin meluluskan seluruh siswa di kelas ini?')">Simpan</button>
           </div>
         </form>
       </div>

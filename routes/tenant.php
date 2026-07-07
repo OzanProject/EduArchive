@@ -107,7 +107,9 @@ Route::group([
         Route::post('students/bulk-delete', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkDelete'])->name('students.bulkDestroy');
         Route::get('students/bulk-print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPrint'])->name('students.bulkPrint');
         Route::post('students/bulk-promote', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromote'])->name('students.bulkPromote');
+        Route::post('students/bulk-promote-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromoteRombel'])->name('students.bulkPromoteRombel');
         Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
+        Route::post('students/bulk-graduate-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduateRombel'])->name('students.bulkGraduateRombel');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
         Route::resource('infrastructure', \App\Http\Controllers\Backend\InfrastructureController::class);
@@ -138,6 +140,7 @@ Route::group([
         Route::post('dapodik/save', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'saveSettings'])->name('dapodik.save');
         Route::post('dapodik/test', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'testConnection'])->name('dapodik.test');
         Route::post('dapodik/pull', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'pullData'])->name('dapodik.pull');
+        Route::post('dapodik/process-queue', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'processQueue'])->name('dapodik.processQueue');
         Route::get('dapodik/progress', [\App\Http\Controllers\Backend\DapodikIntegrationController::class, 'checkProgress'])->name('dapodik.progress');
 
 
@@ -153,7 +156,9 @@ Route::group([
         Route::post('students/bulk-delete', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkDelete'])->name('students.bulkDestroy');
         Route::get('students/bulk-print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPrint'])->name('students.bulkPrint');
         Route::post('students/bulk-promote', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromote'])->name('students.bulkPromote');
+        Route::post('students/bulk-promote-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromoteRombel'])->name('students.bulkPromoteRombel');
         Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
+        Route::post('students/bulk-graduate-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduateRombel'])->name('students.bulkGraduateRombel');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
 

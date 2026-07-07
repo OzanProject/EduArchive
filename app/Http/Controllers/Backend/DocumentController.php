@@ -14,7 +14,7 @@ class DocumentController extends Controller
     {
         $query = \App\Models\Document::with(['student', 'uploader'])->latest();
 
-        $status = $request->get('status', 'Aktif');
+        $status = $request->input('status', 'Aktif');
 
         // Filter based on Student Status
         $query->whereHas('student', function ($q) use ($status, $request) {
@@ -49,8 +49,8 @@ class DocumentController extends Controller
         // Fetch document types from Central DB
         $documentTypes = \App\Models\DocumentType::where('is_active', true)->orderBy('name')->get();
 
-        $selectedStudentId = $request->get('student_id');
-        $selectedType = $request->get('type');
+        $selectedStudentId = $request->input('student_id');
+        $selectedType = $request->input('type');
 
         return view('backend.adminlembaga.documents.create', compact('students', 'documentTypes', 'selectedStudentId', 'selectedType'));
     }
@@ -60,7 +60,7 @@ class DocumentController extends Controller
         $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
             'document_type' => 'required|string',
-            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png|max:51200', // 50MB
+            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // 2MB
             'keterangan' => 'nullable|string',
         ]);
 
@@ -108,7 +108,7 @@ class DocumentController extends Controller
             abort(404, 'File not found');
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->response($document->file_path);
+        return response()->file(\Illuminate\Support\Facades\Storage::disk('public')->path($document->file_path));
     }
 
     /**
@@ -131,7 +131,7 @@ class DocumentController extends Controller
 
         $validated = $request->validate([
             'document_type' => 'required|string',
-            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:51200',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'keterangan' => 'nullable|string',
         ]);
 

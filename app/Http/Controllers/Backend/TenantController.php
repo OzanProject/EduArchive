@@ -23,8 +23,14 @@ class TenantController extends Controller
 
         if ($request->has('table_search') && $request->table_search != '') {
             $search = $request->table_search;
-            $query->where('npsn', 'like', "%{$search}%")
-                ->orWhere('nama_sekolah', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('npsn', 'like', "%{$search}%")
+                  ->orWhere('nama_sekolah', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('filter_status')) {
+            $query->where('status_aktif', $request->input('filter_status'));
         }
 
         $perPage = $request->input('per_page', 10);

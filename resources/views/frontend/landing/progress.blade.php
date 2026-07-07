@@ -7,6 +7,22 @@
       <p class="text-slate-500 mt-3 max-w-2xl mx-auto text-sm">
         Pantau kelengkapan data setiap lembaga secara real-time dalam tiga aspek penting.
       </p>
+
+      @if(!empty($central_branding['batas_waktu_pengerjaan']))
+        @php
+          $deadline = \Carbon\Carbon::parse($central_branding['batas_waktu_pengerjaan'])->locale('id');
+          $isPast = $deadline->isPast();
+        @endphp
+        <div class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg {{ $isPast ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-200' }}">
+          <i class="fas fa-calendar-alt"></i>
+          <span class="text-sm font-medium">Batas Waktu Pengisian: <strong>{{ $deadline->translatedFormat('l, d F Y - H:i') }} WIB</strong></span>
+          @if($isPast)
+            <span class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-red-600 text-white rounded uppercase tracking-wider">Waktu Habis</span>
+          @else
+            <span class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-yellow-500 text-white rounded uppercase tracking-wider">Segera Selesaikan</span>
+          @endif
+        </div>
+      @endif
     </div>
 
     {{-- Filter Kecamatan & NPSN --}}

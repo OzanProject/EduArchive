@@ -223,6 +223,16 @@
                 <i class="fas fa-cloud-download-alt"></i> Tarik Data dari Dapodik Sekarang
               </button>
             </form>
+
+            <hr>
+            
+            <form action="{{ route('adminlembaga.dapodik.processQueue') }}" method="POST" onsubmit="return confirm('Sistem akan mengeksekusi antrean yang masih menyangkut di latar belakang. Lanjutkan?')">
+              @csrf
+              <button type="submit" class="btn btn-warning btn-block">
+                <i class="fas fa-cogs"></i> Jalankan Sinkronisasi (Paksa / Manual)
+              </button>
+              <small class="text-muted d-block text-center mt-1">Gunakan tombol ini jika status sinkronisasi terus menyangkut di "Menunggu Antrean".</small>
+            </form>
           @endif
         </div>
       </div>

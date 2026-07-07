@@ -118,4 +118,16 @@ class DapodikIntegrationController extends Controller
 
         return response()->json($progress);
     }
+
+    public function processQueue()
+    {
+        try {
+            // Run queue worker with stop-when-empty so it doesn't run forever
+            \Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
+            
+            return redirect()->back()->with('success', 'Antrean sinkronisasi Dapodik berhasil diproses!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memproses antrean: ' . $e->getMessage());
+        }
+    }
 }

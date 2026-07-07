@@ -85,6 +85,24 @@
 @endsection
 
 @section('content')
+  @if(!empty($central_branding['batas_waktu_pengerjaan']))
+    @php
+      $deadline = \Carbon\Carbon::parse($central_branding['batas_waktu_pengerjaan'])->locale('id');
+      $isPast = $deadline->isPast();
+    @endphp
+    <div class="bg-{{ $isPast ? 'danger' : 'warning' }} text-{{ $isPast ? 'white' : 'dark' }} text-center py-2 px-3 shadow-sm position-relative" style="z-index: 1000;">
+      <div class="container">
+        <i class="fas fa-calendar-alt me-2"></i>
+        <strong>Perhatian!</strong> Batas waktu pengerjaan pengisian data adalah <strong>{{ $deadline->translatedFormat('l, d F Y - H:i') }} WIB</strong>.
+        @if($isPast)
+          <span class="badge bg-white text-danger ms-2 border border-danger">Waktu Habis</span>
+        @else
+          <span class="badge bg-dark text-warning ms-2">Segera Selesaikan</span>
+        @endif
+      </div>
+    </div>
+  @endif
+
   <!-- Hero Section -->
   <section class="hero-section text-center text-lg-start">
     <div class="container">

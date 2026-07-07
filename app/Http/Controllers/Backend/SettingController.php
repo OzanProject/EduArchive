@@ -88,6 +88,7 @@ class SettingController extends Controller
     Cache::forget('app_settings_global');
     Cache::forget('dinas_app_logo');
     Cache::forget('dinas_app_favicon');
+    Cache::forget('central_branding');
 
     // Also clear individual keys just in case other parts use them
     if ($request->has('app_timezone')) {

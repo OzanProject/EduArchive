@@ -62,6 +62,13 @@
                     value="{{ $settings['app_support_phone'] ?? '' }}" placeholder="6281234567890">
                 </div>
 
+                <div class="form-group">
+                  <label for="batas_waktu_pengerjaan">Batas Waktu Pengerjaan (Ditampilkan ke Tenant)</label>
+                  <input type="datetime-local" name="batas_waktu_pengerjaan" class="form-control" id="batas_waktu_pengerjaan"
+                    value="{{ $settings['batas_waktu_pengerjaan'] ?? '' }}">
+                  <small class="text-muted">Kosongkan jika tidak ada batas waktu.</small>
+                </div>
+
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
