@@ -96,6 +96,7 @@ class RegisteredUserController extends Controller
             ));
         } catch (\Exception $e) {
             // Silently ignore mail errors during registration so user can still login
+            \Illuminate\Support\Facades\Log::error('Register Email Failed: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
         }
 
         return redirect($loginUrl)->with('status', 'Pendaftaran berhasil! Akun Sekolah Anda sedang menunggu verifikasi dan persetujuan dari pihak ' . config('app.name') . ' sebelum dapat digunakan.');
