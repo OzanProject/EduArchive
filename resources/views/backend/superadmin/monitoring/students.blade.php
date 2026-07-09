@@ -44,6 +44,16 @@
                   </div>
                 @endif
 
+                {{-- Filter Jumlah Baris --}}
+                <div class="input-group input-group-sm mr-2">
+                  <select name="per_page" class="form-control" onchange="this.form.submit()">
+                    <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 Baris</option>
+                    <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 Baris</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 Baris</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 Baris</option>
+                  </select>
+                </div>
+
                 {{-- Filter Usia --}}
                 <div class="input-group input-group-sm mr-2">
                   <select name="age_filter" class="form-control" onchange="this.form.submit()">

@@ -18,6 +18,7 @@ class MonitoringController extends Controller
   {
     $category = $request->input('category', 'students'); // students or graduates
     $age_filter = $request->input('age_filter');
+    $per_page = $request->input('per_page', 10);
     $query = Tenant::query();
 
     if ($request->has('table_search') && $request->table_search != '') {
@@ -26,7 +27,7 @@ class MonitoringController extends Controller
         ->orWhere([['nama_sekolah', 'like', "%{$search}%"]]);
     }
 
-    $tenants = $query->paginate(10);
+    $tenants = $query->paginate($per_page);
     $statusFilter = $category === 'graduates' ? 'lulus' : 'aktif';
 
     foreach ($tenants as $tenant) {
@@ -45,7 +46,7 @@ class MonitoringController extends Controller
         });
     }
 
-    return view('backend.superadmin.monitoring.index', compact('tenants', 'category', 'age_filter'));
+    return view('backend.superadmin.monitoring.index', compact('tenants', 'category', 'age_filter', 'per_page'));
   }
 
   public function showSchool(Request $request, $id)
@@ -54,8 +55,9 @@ class MonitoringController extends Controller
 
     $status = $request->input('status', 'aktif');
     $year = $request->input('year');
+    $per_page = $request->input('per_page', 15);
 
-    $students = $tenant->run(function () use ($status, $year, $request) {
+    $students = $tenant->run(function () use ($status, $year, $per_page, $request) {
 
       $query = Student::query();
 
@@ -88,7 +90,7 @@ class MonitoringController extends Controller
         $query->where([['birth_date', '<=', $cutoff]]);
       }
 
-      return $query->latest()->paginate(15);
+      return $query->latest()->paginate($per_page);
     });
 
     // Fix paginator URL — tenant->run() doesn't know the real HTTP path
@@ -105,7 +107,8 @@ class MonitoringController extends Controller
     return view('backend.superadmin.monitoring.students', compact(
       'tenant',
       'students',
-      'graduation_years'
+      'graduation_years',
+      'per_page'
     ));
   }
 

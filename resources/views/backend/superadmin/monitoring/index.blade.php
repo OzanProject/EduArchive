@@ -25,6 +25,12 @@
               <form action="{{ route('superadmin.monitoring.index') }}" method="GET" class="m-0">
                 <input type="hidden" name="category" value="{{ $category }}">
                 <div class="input-group input-group-sm" style="max-width: 450px; width: 100%;">
+                  <select name="per_page" class="form-control mr-2" style="max-width: 100px;" onchange="this.form.submit()">
+                    <option value="10" {{ (isset($per_page) && $per_page == 10) ? 'selected' : '' }}>10 Baris</option>
+                    <option value="20" {{ (isset($per_page) && $per_page == 20) ? 'selected' : '' }}>20 Baris</option>
+                    <option value="50" {{ (isset($per_page) && $per_page == 50) ? 'selected' : '' }}>50 Baris</option>
+                    <option value="100" {{ (isset($per_page) && $per_page == 100) ? 'selected' : '' }}>100 Baris</option>
+                  </select>
                   <select name="age_filter" class="form-control mr-2" onchange="this.form.submit()">
                     <option value="">Semua Usia</option>
                     <option value="under_25" {{ $age_filter == 'under_25' ? 'selected' : '' }}>Usia < 25 Tahun</option>
