@@ -80,7 +80,24 @@ class RegisteredUserController extends Controller
 
         // Construct Path Based URL
         $tenantUrl = $protocol . $centralDomain . $port . '/' . $tenant->id;
+        $loginUrl = $tenantUrl . '/login';
 
-        return redirect($tenantUrl . '/login');
+        // Send Email with Raw Password (safe context: only sent to their own email during registration)
+        try {
+            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\SchoolRegisteredMail(
+                $request->name,
+                $request->nama_sekolah,
+                $request->npsn,
+                $request->id,
+                $request->jenjang,
+                $request->email,
+                $request->password, // Raw password
+                $loginUrl
+            ));
+        } catch (\Exception $e) {
+            // Silently ignore mail errors during registration so user can still login
+        }
+
+        return redirect($loginUrl);
     }
 }
