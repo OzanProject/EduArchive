@@ -286,7 +286,7 @@
             resetPassword: "{{ route('password.otp.update') }}"
         };
         const csrfToken = "{{ csrf_token() }}";
-        let currentEmail = '';
+        let currentWaNumber = '';
 
         function switchMethod(method) {
             const btnEmail = document.getElementById('btnEmail');
@@ -309,18 +309,18 @@
                 btnEmail.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all";
                 formEmail.classList.add('hidden');
                 formWhatsapp.classList.remove('hidden');
-                pageDesc.innerText = "Dapatkan kode OTP melalui WhatsApp untuk mereset kata sandi Anda dengan cepat.";
+                pageDesc.innerText = "Dapatkan kode OTP melalui WhatsApp untuk memulihkan kata sandi Anda dengan cepat dan aman.";
                 methodIcon.innerText = "chat";
                 methodIcon.parentElement.className = "size-16 rounded-full bg-green-100 flex items-center justify-center text-green-600";
             }
         }
 
         async function requestOtp() {
-            const email = document.getElementById('wa_email').value;
+            const waNumber = document.getElementById('wa_number').value;
             const errorEl = document.getElementById('otpError');
 
-            if (!email) {
-                errorEl.innerText = "Email wajib diisi.";
+            if (!waNumber) {
+                errorEl.innerText = "Nomor WhatsApp wajib diisi.";
                 errorEl.classList.remove('hidden');
                 return;
             }
@@ -330,21 +330,21 @@
                 const res = await fetch(routes.sendOtp, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ wa_number: waNumber })
                 });
                 const data = await res.json();
 
                 if (res.ok) {
-                    currentEmail = email;
+                    currentWaNumber = waNumber;
                     document.getElementById('stepRequestOtp').classList.add('hidden');
                     document.getElementById('stepVerifyOtp').classList.remove('hidden');
                     alert(data.message);
                 } else {
-                    errorEl.innerText = data.message || "Terjadi kesalahan.";
+                    errorEl.innerText = data.message || "Terjadi kesalahan saat memproses permintaan Anda.";
                     errorEl.classList.remove('hidden');
                 }
             } catch (e) {
-                errorEl.innerText = "Gagal menghubungi server.";
+                errorEl.innerText = "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
                 errorEl.classList.remove('hidden');
             } finally {
                 toggleLoading(false);
@@ -356,7 +356,7 @@
             const errorEl = document.getElementById('verifyError');
 
             if (!otp || otp.length !== 6) {
-                errorEl.innerText = "Masukkan 6 digit kode OTP.";
+                errorEl.innerText = "Silakan masukkan 6 digit kode OTP dengan benar.";
                 errorEl.classList.remove('hidden');
                 return;
             }
@@ -366,7 +366,7 @@
                 const res = await fetch(routes.verifyOtp, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                    body: JSON.stringify({ email: currentEmail, otp })
+                    body: JSON.stringify({ wa_number: currentWaNumber, otp })
                 });
                 const data = await res.json();
 
@@ -374,11 +374,11 @@
                     document.getElementById('stepVerifyOtp').classList.add('hidden');
                     document.getElementById('stepResetPassword').classList.remove('hidden');
                 } else {
-                    errorEl.innerText = data.message || "OTP Salah.";
+                    errorEl.innerText = data.message || "Kode OTP tidak sesuai atau sudah kedaluwarsa.";
                     errorEl.classList.remove('hidden');
                 }
             } catch (e) {
-                errorEl.innerText = "Gagal verifikasi.";
+                errorEl.innerText = "Gagal memverifikasi kode OTP. Silakan coba lagi.";
                 errorEl.classList.remove('hidden');
             } finally {
                 toggleLoading(false);
@@ -388,17 +388,17 @@
         async function resetPassword() {
             const password = document.getElementById('newPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
-            const otp = document.getElementById('otpInput').value; // Need OTP for validation
+            const otp = document.getElementById('otpInput').value;
             const errorEl = document.getElementById('resetError');
 
             if (password.length < 8) {
-                errorEl.innerText = "Password minimal 8 karakter.";
+                errorEl.innerText = "Kata sandi baru minimal harus terdiri dari 8 karakter.";
                 errorEl.classList.remove('hidden');
                 return;
             }
 
             if (password !== confirm) {
-                errorEl.innerText = "Konfirmasi password tidak cocok.";
+                errorEl.innerText = "Konfirmasi kata sandi tidak cocok. Silakan periksa kembali.";
                 errorEl.classList.remove('hidden');
                 return;
             }
@@ -408,19 +408,19 @@
                 const res = await fetch(routes.resetPassword, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                    body: JSON.stringify({ email: currentEmail, otp, password, password_confirmation: confirm })
+                    body: JSON.stringify({ wa_number: currentWaNumber, otp, password, password_confirmation: confirm })
                 });
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert('Password berhasil direset! Silakan login.');
+                    alert('Kata sandi Anda berhasil diperbarui! Anda akan diarahkan ke halaman login.');
                     window.location.href = "{{ route('login') }}";
                 } else {
-                    errorEl.innerText = data.message || "Gagal reset password.";
+                    errorEl.innerText = data.message || "Gagal memperbarui kata sandi. Sesi Anda mungkin telah kedaluwarsa.";
                     errorEl.classList.remove('hidden');
                 }
             } catch (e) {
-                errorEl.innerText = "Gagal menghubungi server.";
+                errorEl.innerText = "Tidak dapat terhubung ke server. Silakan coba beberapa saat lagi.";
                 errorEl.classList.remove('hidden');
             } finally {
                 toggleLoading(false);
