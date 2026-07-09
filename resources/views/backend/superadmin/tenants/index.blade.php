@@ -12,27 +12,23 @@
   <div class="row">
     <div class="col-12">
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Daftar Sekolah Terdaftar</h3>
-          <div class="card-tools d-flex">
-            <form action="{{ route('superadmin.tenants.index') }}" method="GET" class="form-inline mr-2" id="searchForm">
-              <div class="input-group input-group-sm mr-2">
-                <select name="per_page" class="form-control" onchange="document.getElementById('searchForm').submit()">
-                  <option value="10" {{ (isset($perPage) && $perPage == 10) ? 'selected' : '' }}>10 Baris</option>
-                  <option value="20" {{ (isset($perPage) && $perPage == 20) ? 'selected' : '' }}>20 Baris</option>
-                  <option value="50" {{ (isset($perPage) && $perPage == 50) ? 'selected' : '' }}>50 Baris</option>
-                  <option value="100" {{ (isset($perPage) && $perPage == 100) ? 'selected' : '' }}>100 Baris</option>
-                </select>
-              </div>
-              <div class="input-group input-group-sm mr-2">
-                <select name="filter_status" class="form-control" onchange="document.getElementById('searchForm').submit()">
-                  <option value="">Semua Status</option>
-                  <option value="1" {{ request('filter_status') === '1' ? 'selected' : '' }}>Aktif</option>
-                  <option value="0" {{ request('filter_status') === '0' ? 'selected' : '' }}>Belum Diverifikasi</option>
-                </select>
-              </div>
-              <div class="input-group input-group-sm" style="width: 200px;">
-                <input type="text" name="table_search" class="form-control float-right" placeholder="Cari Sekolah..."
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
+          <h3 class="card-title mb-3 mb-lg-0 font-weight-bold">Daftar Sekolah Terdaftar</h3>
+          <div class="d-flex flex-column flex-lg-row">
+            <form action="{{ route('superadmin.tenants.index') }}" method="GET" class="d-flex flex-column flex-lg-row mb-2 mb-lg-0 mr-lg-2" id="searchForm">
+              <select name="per_page" class="form-control form-control-sm mb-2 mb-lg-0 mr-lg-2" onchange="document.getElementById('searchForm').submit()">
+                <option value="10" {{ (isset($perPage) && $perPage == 10) ? 'selected' : '' }}>10 Baris</option>
+                <option value="20" {{ (isset($perPage) && $perPage == 20) ? 'selected' : '' }}>20 Baris</option>
+                <option value="50" {{ (isset($perPage) && $perPage == 50) ? 'selected' : '' }}>50 Baris</option>
+                <option value="100" {{ (isset($perPage) && $perPage == 100) ? 'selected' : '' }}>100 Baris</option>
+              </select>
+              <select name="filter_status" class="form-control form-control-sm mb-2 mb-lg-0 mr-lg-2" onchange="document.getElementById('searchForm').submit()">
+                <option value="">Semua Status</option>
+                <option value="1" {{ request('filter_status') === '1' ? 'selected' : '' }}>Aktif</option>
+                <option value="0" {{ request('filter_status') === '0' ? 'selected' : '' }}>Belum Diverifikasi</option>
+              </select>
+              <div class="input-group input-group-sm mb-2 mb-lg-0 mr-lg-2">
+                <input type="text" name="table_search" class="form-control" placeholder="Cari Sekolah..."
                   value="{{ request('table_search') }}">
                 <div class="input-group-append">
                   <button type="submit" class="btn btn-default">
@@ -41,7 +37,7 @@
                 </div>
               </div>
             </form>
-            <a href="{{ route('superadmin.tenants.create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('superadmin.tenants.create') }}" class="btn btn-primary btn-sm text-nowrap">
               <i class="fas fa-plus"></i> Tambah Sekolah
             </a>
           </div>
@@ -50,14 +46,14 @@
         <div class="card-body">
           <form action="{{ route('superadmin.tenants.bulk_action') }}" method="POST" id="bulkActionForm">
             @csrf
-            <div class="mb-3 d-flex align-items-center">
-              <select name="action" class="form-control form-control-sm mr-2" style="width: 200px;" required>
+            <div class="mb-3 d-flex flex-column flex-sm-row align-items-sm-center">
+              <select name="action" class="form-control form-control-sm mb-2 mb-sm-0 mr-sm-2" style="width: auto; min-width: 200px;" required>
                 <option value="">-- Pilih Aksi Massal --</option>
                 <option value="activate">Aktifkan Terpilih</option>
                 <option value="suspend">Suspend Terpilih</option>
                 <option value="delete">Hapus Permanen Terpilih</option>
               </select>
-              <button type="submit" class="btn btn-primary btn-sm"
+              <button type="submit" class="btn btn-dark btn-sm text-nowrap"
                 onclick="return confirm('Apakah Anda yakin ingin melakukan aksi massal ini?')">Terapkan</button>
             </div>
           </form>
