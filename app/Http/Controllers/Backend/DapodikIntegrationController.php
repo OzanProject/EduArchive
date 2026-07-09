@@ -47,6 +47,7 @@ class DapodikIntegrationController extends Controller
         try {
             // Using standard Dapodik endpoint test
             $response = Http::withToken($tenant->dapodik_key)
+                ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
                 ->timeout(10)
                 ->get($tenant->dapodik_url . '/WebService/getPengguna', [
                     'npsn' => $tenant->npsn

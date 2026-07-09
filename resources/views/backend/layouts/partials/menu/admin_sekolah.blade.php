@@ -22,27 +22,27 @@
             </a>
           </li>
 
-          <li class="nav-header">DATA MASTER</li>
+          <li class="nav-header">PENGATURAN SISTEM</li>
 
           <li class="nav-item">
-            <a href="{{ route('adminlembaga.classrooms.index') }}"
-              class="nav-link {{ Request::routeIs('adminlembaga.classrooms.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-chalkboard-teacher"></i>
-              <p>Data Kelas</p>
+            <a href="{{ route('adminlembaga.settings.profile') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-id-badge text-info"></i>
+              <p>Profil Publik</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{ route('adminlembaga.teachers.index') }}"
-              class="nav-link {{ Request::routeIs('adminlembaga.teachers.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-user-tie"></i>
-              <p>Guru & Tendik</p>
+            <a href="{{ route('adminlembaga.settings.index', tenant('id')) }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.settings.*') && !request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>Pengaturan Sekolah</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{ route('adminlembaga.users.index') }}"
-              class="nav-link {{ Request::routeIs('adminlembaga.users.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-users-cog"></i>
-              <p>Operator Sekolah</p>
+            <a href="{{ route('adminlembaga.api_tokens.index', tenant('id')) }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.api_tokens.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-project-diagram"></i>
+              <p>Web Service API</p>
             </a>
           </li>
 
@@ -82,6 +82,31 @@
             </a>
           </li>
 
+          <li class="nav-header">DATA MASTER</li>
+
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.classrooms.index') }}"
+              class="nav-link {{ Request::routeIs('adminlembaga.classrooms.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-chalkboard-teacher"></i>
+              <p>Data Kelas</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.teachers.index') }}"
+              class="nav-link {{ Request::routeIs('adminlembaga.teachers.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-user-tie"></i>
+              <p>Guru & Tendik</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('adminlembaga.users.index') }}"
+              class="nav-link {{ Request::routeIs('adminlembaga.users.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-users-cog"></i>
+              <p>Operator Sekolah</p>
+            </a>
+          </li>
+
+
           <li class="nav-header">SARANA & ADMINISTRASI</li>
 
           <li class="nav-item">
@@ -113,29 +138,6 @@
             </a>
           </li>
 
-          <li class="nav-header">PENGATURAN SISTEM</li>
-
-          <li class="nav-item">
-            <a href="{{ route('adminlembaga.settings.index', tenant('id')) }}"
-              class="nav-link {{ request()->routeIs('adminlembaga.settings.*') && !request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-cogs"></i>
-              <p>Pengaturan Sekolah</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{{ route('adminlembaga.settings.profile') }}"
-              class="nav-link {{ request()->routeIs('adminlembaga.settings.profile') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-id-badge text-info"></i>
-              <p>Profil Publik</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{{ route('adminlembaga.api_tokens.index', tenant('id')) }}"
-              class="nav-link {{ request()->routeIs('adminlembaga.api_tokens.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-project-diagram"></i>
-              <p>Web Service API</p>
-            </a>
-          </li>
 
           <li class="nav-header">BANTUAN</li>
 

@@ -69,6 +69,7 @@ class SyncDapodikJob implements ShouldQueue
     private function syncStudents()
     {
         $response = Http::withToken($this->tenant->dapodik_key)
+            ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
             ->timeout(120)
             ->get($this->tenant->dapodik_url . '/WebService/getPesertaDidik', [
                 'npsn' => $this->tenant->npsn
@@ -90,8 +91,8 @@ class SyncDapodikJob implements ShouldQueue
         $this->updateProgress(5, 'processing', "Menemukan $total siswa. Memulai sinkronisasi...");
 
         // Ambil semua data siswa existing di memori agar hemat query (N+1 free)
-        $existingStudents = Student::select('id', 'nisn', 'peserta_didik_id')->get()->keyBy(function($item) {
-            return $item->nisn ?: $item->peserta_didik_id; // Prefer NISN, fallback to ID
+        $existingStudents = Student::select('id', 'nisn', 'nama')->get()->keyBy(function($item) {
+            return $item->nisn ?: $item->nama; // Prefer NISN, fallback to Nama
         });
 
         $inserts = [];
@@ -101,8 +102,8 @@ class SyncDapodikJob implements ShouldQueue
 
         foreach ($rows as $index => $row) {
             $nisn = $row['nisn'] ?? null;
-            $pesertaDidikId = $row['peserta_didik_id'] ?? uniqid();
-            $identifier = $nisn ?: $pesertaDidikId;
+            $nama = $row['nama'] ?? 'Fulan';
+            $identifier = $nisn ?: $nama;
 
             if ($existingStudents->has($identifier)) {
                 if ($this->mode === 'skip') {
@@ -123,12 +124,12 @@ class SyncDapodikJob implements ShouldQueue
                 $inserts[] = [
                     'tenant_id' => $this->tenant->id,
                     'nisn' => $nisn,
-                    'peserta_didik_id' => $pesertaDidikId, // If field exists, but let's just stick to what was there
-                    'nama' => $row['nama'] ?? 'Fulan',
+                    'nik' => $row['nik'] ?? null,
+                    'nama' => $nama,
                     'gender' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : 'L',
                     'birth_place' => $row['tempat_lahir'] ?? null,
                     'birth_date' => $row['tanggal_lahir'] ?? null,
-                    'status_kelulusan' => 'Belum Lulus',
+                    'status_kelulusan' => 'aktif',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -138,13 +139,7 @@ class SyncDapodikJob implements ShouldQueue
             // Execute insert per 200 rows and update progress
             if (count($inserts) >= 200 || $index == $total - 1) {
                 if (count($inserts) > 0) {
-                    // Hapus kolom peserta_didik_id jika tidak ada di migration
-                    $cleanInserts = array_map(function($item) {
-                        unset($item['peserta_didik_id']);
-                        return $item;
-                    }, $inserts);
-                    
-                    Student::insert($cleanInserts);
+                    Student::insert($inserts);
                     $inserts = [];
                 }
                 
@@ -159,8 +154,9 @@ class SyncDapodikJob implements ShouldQueue
     private function syncTeachers()
     {
         $response = Http::withToken($this->tenant->dapodik_key)
+            ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
             ->timeout(120)
-            ->get($this->tenant->dapodik_url . '/WebService/getGuru', [
+            ->get($this->tenant->dapodik_url . '/WebService/getGtk', [
                 'npsn' => $this->tenant->npsn
             ]);
 
@@ -231,6 +227,7 @@ class SyncDapodikJob implements ShouldQueue
     private function syncClassrooms()
     {
         $response = Http::withToken($this->tenant->dapodik_key)
+            ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
             ->timeout(120)
             ->get($this->tenant->dapodik_url . '/WebService/getRombonganBelajar', [
                 'npsn' => $this->tenant->npsn
@@ -251,7 +248,7 @@ class SyncDapodikJob implements ShouldQueue
 
         $this->updateProgress(5, 'processing', "Menemukan $total rombel. Memulai sinkronisasi...");
 
-        $existingClassrooms = Classroom::select('id', 'nama_kelas')->get()->keyBy('nama_kelas');
+        $existingClassrooms = Classroom::select('id', 'nama_kelas', 'tingkat', 'jurusan', 'wali_kelas_id', 'tahun_ajaran')->get()->keyBy('nama_kelas');
 
         $inserts = [];
         $countInsert = 0;
@@ -262,12 +259,54 @@ class SyncDapodikJob implements ShouldQueue
             $name = $row['nama'] ?? null;
             if (!$name) continue;
 
+            $tingkat = $row['tingkat_pendidikan_id'] ?? null;
+            $jurusan = $row['jurusan_id_str'] ?? ($row['kurikulum_id_str'] ?? null);
+            
+            // Format semester_id (e.g. 20231 -> 2023/2024)
+            $tahun_ajaran = null;
+            if (isset($row['semester_id']) && strlen($row['semester_id']) >= 4) {
+                $year = substr($row['semester_id'], 0, 4);
+                $tahun_ajaran = $year . '/' . ($year + 1);
+            }
+
+            // Try to map wali kelas if ptk_id is present
+            // Note: Since we saved nip/nik/ptk_id into 'nip' during teacher sync, 
+            // it might be hard to perfectly match by ptk_id if they had a real NIP. 
+            // But we'll try to match by name or NIP as best effort.
+            $wali_kelas_id = null;
+            if (isset($row['ptk_id'])) {
+                // If the teacher was synced, their name in Dapodik is in $row['ptk_id_str'] or we can just skip it if too complex.
+                // Usually web service returns ptk_id
+                $teacher = Teacher::where('nip', $row['ptk_id'])->first();
+                if (!$teacher && isset($row['ptk_id_str'])) {
+                    $teacher = Teacher::where('nama_lengkap', $row['ptk_id_str'])->first();
+                }
+                if ($teacher) {
+                    $wali_kelas_id = $teacher->id;
+                }
+            }
+
             if ($existingClassrooms->has($name)) {
-                $countSkip++;
+                if ($this->mode === 'overwrite') {
+                    $classroom = $existingClassrooms->get($name);
+                    Classroom::where('id', $classroom->id)->update([
+                        'tingkat' => $tingkat ?: $classroom->tingkat,
+                        'jurusan' => $jurusan ?: $classroom->jurusan,
+                        'wali_kelas_id' => $wali_kelas_id ?: $classroom->wali_kelas_id,
+                        'tahun_ajaran' => $tahun_ajaran ?: $classroom->tahun_ajaran,
+                    ]);
+                    $countUpdate++;
+                } else {
+                    $countSkip++;
+                }
             } else {
                 $inserts[] = [
                     'tenant_id' => $this->tenant->id,
                     'nama_kelas' => $name,
+                    'tingkat' => $tingkat,
+                    'jurusan' => $jurusan,
+                    'wali_kelas_id' => $wali_kelas_id,
+                    'tahun_ajaran' => $tahun_ajaran,
                     'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -275,6 +314,7 @@ class SyncDapodikJob implements ShouldQueue
                 $countInsert++;
             }
 
+            // Flush inserts in batches
             if (count($inserts) >= 50 || $index == $total - 1) {
                 if (count($inserts) > 0) {
                     Classroom::insert($inserts);
