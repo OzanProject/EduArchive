@@ -112,7 +112,7 @@
             style="width: 32px; height: 32px; object-fit: cover;">
         @else
           <img
-            src="{{ !empty($app_settings['app_logo']) ? $app_settings['app_logo'] : asset('adminlte/dist/img/user2-160x160.jpg') }}"
+            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
             class="user-image img-circle elevation-1" alt="User Image" style="width: 32px; height: 32px;">
         @endif
         <span class="d-none d-md-inline font-weight-bold ml-2 text-dark">{{ $user->name }}</span>
@@ -130,7 +130,7 @@
                 style="width: 48px; height: 48px; object-fit: cover;">
             @else
               <img
-                src="{{ !empty($app_settings['app_logo']) ? $app_settings['app_logo'] : asset('adminlte/dist/img/user2-160x160.jpg') }}"
+                src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
                 class="img-circle elevation-1 mr-3" alt="User Image" style="width: 48px; height: 48px;">
             @endif
             <div>

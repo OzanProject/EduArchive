@@ -61,8 +61,13 @@ class SuperAdminController extends Controller
         // School Level Distribution
         $school_levels = $tenants->groupBy('jenjang')->map->count();
 
-        // Convert bytes to MB
-        $storage_usage = number_format($stats['total_size_bytes'] / 1048576, 2) . ' MB';
+        // Convert bytes to MB or GB
+        $bytes = $stats['total_size_bytes'];
+        if ($bytes >= 1073741824) {
+            $storage_usage = number_format($bytes / 1073741824, 2) . ' GB';
+        } else {
+            $storage_usage = number_format($bytes / 1048576, 2) . ' MB';
+        }
 
         $data = [
             'total_sekolah' => $tenants->count(),

@@ -67,7 +67,7 @@
       <div class="col-lg-3 col-6">
         <div class="small-box bg-danger">
           <div class="inner">
-            <h3>{{ $data['storage_usage'] }}</h3>
+            <h3 class="text-truncate" title="{{ $data['storage_usage'] }}">{{ $data['storage_usage'] }}</h3>
             <p>Penggunaan Storage</p>
           </div>
           <div class="icon">
