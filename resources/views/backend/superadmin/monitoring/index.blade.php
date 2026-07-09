@@ -47,9 +47,12 @@
           <table class="table table-hover text-nowrap">
             <thead>
               <tr>
+                <th style="width: 50px;">No.</th>
                 <th>NPSN</th>
                 <th>Nama Sekolah</th>
-                <th>Jenjang</th>
+                <th>Total {{ $category == 'graduates' ? 'Lulusan' : 'Siswa' }}</th>
+                <th>L</th>
+                <th>P</th>
                 <th>Status</th>
                 <th>Aksi</th>
               </tr>
@@ -57,9 +60,15 @@
             <tbody>
               @forelse($tenants as $tenant)
                 <tr>
+                  <td>{{ $loop->iteration + $tenants->firstItem() - 1 }}</td>
                   <td>{{ $tenant->npsn }}</td>
-                  <td>{{ $tenant->nama_sekolah }}</td>
-                  <td>{{ $tenant->jenjang }}</td>
+                  <td style="white-space: normal; min-width: 200px;">
+                    <strong>{{ $tenant->nama_sekolah }}</strong><br>
+                    <small class="text-muted">{{ $tenant->jenjang }}</small>
+                  </td>
+                  <td class="font-weight-bold">{{ $tenant->stats_total ?? 0 }}</td>
+                  <td class="text-info">{{ $tenant->stats_l ?? 0 }}</td>
+                  <td class="text-pink" style="color: #e83e8c;">{{ $tenant->stats_p ?? 0 }}</td>
                   <td>
                     @if($tenant->status_aktif)
                       <span class="badge badge-success">Aktif</span>
@@ -82,7 +91,7 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="5" class="text-center">Tidak ada data sekolah.</td>
+                  <td colspan="8" class="text-center py-4">Tidak ada data sekolah.</td>
                 </tr>
               @endforelse
             </tbody>

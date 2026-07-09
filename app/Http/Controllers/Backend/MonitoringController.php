@@ -27,6 +27,24 @@ class MonitoringController extends Controller
     }
 
     $tenants = $query->paginate(10);
+    $statusFilter = $category === 'graduates' ? 'lulus' : 'aktif';
+
+    foreach ($tenants as $tenant) {
+        $tenant->run(function () use ($tenant, $statusFilter, $age_filter) {
+            $query = Student::where('status_kelulusan', $statusFilter);
+            
+            if ($age_filter == 'under_25') {
+                $query->whereRaw('TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) < 25');
+            } elseif ($age_filter == 'over_25') {
+                $query->whereRaw('TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) >= 25');
+            }
+
+            $tenant->stats_total = (clone $query)->count();
+            $tenant->stats_l = (clone $query)->where('gender', 'L')->count();
+            $tenant->stats_p = (clone $query)->where('gender', 'P')->count();
+        });
+    }
+
     return view('backend.superadmin.monitoring.index', compact('tenants', 'category', 'age_filter'));
   }
 
