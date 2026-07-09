@@ -18,6 +18,9 @@ Berikut adalah rincian data pendaftaran yang telah Anda simpan:
 
 *Catatan: Password di atas tidak dienkripsi dalam email ini khusus untuk pencatatan Anda. Di dalam sistem, password Anda tetap terenkripsi dan aman.*
 
+> **Status Akun: Menunggu Verifikasi**
+> Akun sekolah Anda saat ini sedang dalam status menunggu persetujuan dari Dinas / Super Admin. Anda baru dapat masuk ke sistem setelah akun diaktifkan.
+
 <x-mail::button :url="$loginUrl">
 Masuk ke Portal Sekolah
 </x-mail::button>

@@ -189,6 +189,15 @@
                 </div>
 
                 <!-- Alerts -->
+                @if (session('status'))
+                    <div class="mb-6 p-4 bg-green-50 text-green-700 rounded-xl text-sm border border-green-100 flex items-start gap-3">
+                        <span class="material-symbols-outlined text-lg mt-0.5">check_circle</span>
+                        <div>
+                            <span class="font-bold block mb-1">Pemberitahuan</span>
+                            {{ session('status') }}
+                        </div>
+                    </div>
+                @endif
                 <div id="alert_central_school"
                     class="mb-6 p-4 bg-blue-50 text-blue-700 rounded-xl text-sm hidden border border-blue-100 flex items-start gap-3">
                     <span class="material-symbols-outlined text-lg mt-0.5">info</span>

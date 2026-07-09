@@ -98,6 +98,6 @@ class RegisteredUserController extends Controller
             // Silently ignore mail errors during registration so user can still login
         }
 
-        return redirect($loginUrl);
+        return redirect($loginUrl)->with('status', 'Pendaftaran berhasil! Akun Sekolah Anda sedang menunggu verifikasi dan persetujuan oleh Super Admin sebelum dapat digunakan.');
     }
 }
