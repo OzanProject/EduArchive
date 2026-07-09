@@ -114,7 +114,7 @@
             <div class="card-header">
               <h3 class="card-title">Test Koneksi SMTP</h3>
             </div>
-            <form action="{{ route('smtp.test') }}" method="POST">
+            <form action="{{ route('superadmin.settings.smtp.test') }}" method="POST">
               @csrf
               <div class="card-body">
                 <p class="text-muted text-sm">Pastikan Anda telah <b>menyimpan</b> pengaturan SMTP di atas sebelum melakukan pengetesan.</p>
