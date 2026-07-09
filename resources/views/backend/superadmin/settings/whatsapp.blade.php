@@ -99,6 +99,28 @@
             </form>
           </div>
         </div>
+        
+        <div class="col-md-12 mt-4">
+          <div class="card card-outline card-info">
+            <div class="card-header">
+              <h3 class="card-title">Test Koneksi WhatsApp</h3>
+            </div>
+            <form action="{{ route('superadmin.settings.whatsapp.test') }}" method="POST">
+              @csrf
+              <div class="card-body">
+                <p>Kirim pesan WhatsApp percobaan untuk memastikan pengaturan API berfungsi dengan baik. Pastikan Anda sudah menyimpan pengaturan di atas sebelum melakukan testing.</p>
+                <div class="form-group">
+                  <label>Nomor WhatsApp Tujuan</label>
+                  <input type="text" name="test_phone" class="form-control" placeholder="08123456789" required>
+                  <small class="text-muted">Awali dengan 08 atau 62 (contoh: 08123456789).</small>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-info"><i class="fas fa-paper-plane"></i> Kirim Pesan Percobaan</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </section>

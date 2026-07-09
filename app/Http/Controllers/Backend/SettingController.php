@@ -60,6 +60,26 @@ class SettingController extends Controller
       }
   }
 
+  public function testWhatsapp(Request $request)
+  {
+      $request->validate([
+          'test_phone' => 'required|string',
+      ]);
+
+      try {
+          $waService = new \App\Services\WhatsAppService();
+          $success = $waService->send($request->test_phone, "Ini adalah pesan percobaan dari sistem " . config('app.name') . ". Koneksi WhatsApp API berfungsi dengan baik!");
+
+          if ($success) {
+              return back()->with('success', 'Pesan percobaan berhasil dikirim ke ' . $request->test_phone . '. Koneksi WhatsApp berjalan dengan baik!');
+          } else {
+              return back()->with('error', 'Gagal mengirim pesan percobaan. Pastikan pengaturan provider/token WhatsApp sudah DISIMPAN terlebih dahulu dan aktif.');
+          }
+      } catch (\Exception $e) {
+          return back()->with('error', 'Gagal mengirim pesan percobaan WhatsApp. Error: ' . $e->getMessage());
+      }
+  }
+
   public function update(Request $request)
   {
     // Define file keys to exclude from general text update

@@ -79,15 +79,57 @@ class WhatsAppService
 
   protected function sendWablas($phone, $message)
   {
-    // Placeholder for Wablas implementation
-    Log::warning("WhatsApp Wablas provider not fully implemented yet.");
-    return false;
+    $token = AppSetting::getSetting('wa_wablas_token', '');
+    $domain = AppSetting::getSetting('wa_wablas_domain', '');
+
+    if (empty($token) || empty($domain)) {
+      Log::error("WhatsApp Wablas Token or Domain is missing.");
+      return false;
+    }
+
+    try {
+      $response = Http::withHeaders([
+        'Authorization' => $token,
+      ])->post(rtrim($domain, '/') . '/api/send-message', [
+        'phone' => $phone,
+        'message' => $message,
+      ]);
+
+      return $response->successful();
+    } catch (\Exception $e) {
+      Log::error("WhatsApp Wablas Error: " . $e->getMessage());
+      return false;
+    }
   }
 
   protected function sendTwilio($phone, $message)
   {
-    // Placeholder for Twilio
-    Log::warning("WhatsApp Twilio provider not fully implemented yet.");
-    return false;
+    $sid = AppSetting::getSetting('wa_twilio_sid', '');
+    $token = AppSetting::getSetting('wa_twilio_token', '');
+    $from = AppSetting::getSetting('wa_twilio_from', '');
+
+    if (empty($sid) || empty($token) || empty($from)) {
+      Log::error("WhatsApp Twilio credentials missing.");
+      return false;
+    }
+
+    // Twilio requires format "whatsapp:+1234567890"
+    $to = 'whatsapp:+' . $phone;
+    $from = 'whatsapp:' . $from;
+
+    try {
+      $response = Http::withBasicAuth($sid, $token)
+        ->asForm()
+        ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", [
+          'From' => $from,
+          'To' => $to,
+          'Body' => $message,
+        ]);
+
+      return $response->successful();
+    } catch (\Exception $e) {
+      Log::error("WhatsApp Twilio Error: " . $e->getMessage());
+      return false;
+    }
   }
 }
