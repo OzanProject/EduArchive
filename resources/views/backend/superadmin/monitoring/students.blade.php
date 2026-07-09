@@ -14,16 +14,16 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <div class="d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Daftar {{ request('status') == 'lulus' ? 'Alumni' : 'Siswa Aktif' }} di
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center" style="gap: 10px;">
+            <h3 class="card-title mb-2 mb-md-0">Daftar {{ request('status') == 'lulus' ? 'Alumni' : 'Siswa Aktif' }} di
               {{ $tenant->nama_sekolah }}
             </h3>
-            <div class="card-tools d-flex">
+            <div class="card-tools d-flex flex-wrap align-items-center" style="gap: 10px;">
               <form action="{{ route('superadmin.monitoring.school', $tenant->id) }}" method="GET"
-                class="form-inline mr-2">
+                class="d-flex flex-wrap align-items-center m-0" style="gap: 10px;">
                 <input type="hidden" name="status" value="{{ request('status', 'aktif') }}">
 
-                <div class="input-group input-group-sm mr-2" style="width: 200px;">
+                <div class="input-group input-group-sm" style="width: 200px;">
                   <input type="text" name="table_search" class="form-control float-right" placeholder="Cari Siswa..."
                     value="{{ request('table_search') }}">
                   <div class="input-group-append">
@@ -34,7 +34,7 @@
                 </div>
 
                 @if(request('status') == 'lulus')
-                  <div class="input-group input-group-sm mr-2">
+                  <div class="input-group input-group-sm">
                     <select name="year" class="form-control" onchange="this.form.submit()">
                       <option value="">Semua Tahun</option>
                       @foreach($graduation_years as $y)
@@ -45,7 +45,7 @@
                 @endif
 
                 {{-- Filter Jumlah Baris --}}
-                <div class="input-group input-group-sm mr-2">
+                <div class="input-group input-group-sm" style="max-width: 100px;">
                   <select name="per_page" class="form-control" onchange="this.form.submit()">
                     <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 Baris</option>
                     <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 Baris</option>
@@ -55,7 +55,7 @@
                 </div>
 
                 {{-- Filter Usia --}}
-                <div class="input-group input-group-sm mr-2">
+                <div class="input-group input-group-sm">
                   <select name="age_filter" class="form-control" onchange="this.form.submit()">
                     <option value="">Semua Usia</option>
                     <option value="under_25" {{ request('age_filter') == 'under_25' ? 'selected' : '' }}>Usia &lt; 25 Tahun</option>
@@ -64,17 +64,16 @@
                 </div>
               </form>
 
-              <div class="btn-group btn-group-sm mr-2">
+              <div class="d-flex" style="gap: 5px;">
                 <a href="{{ route('superadmin.monitoring.print_recap', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
-                  target="_blank" class="btn btn-warning btn-sm">
-                  <i class="fas fa-print"></i> Cetak Rekap
+                  target="_blank" class="btn btn-warning btn-sm d-flex align-items-center">
+                  <i class="fas fa-print mr-1"></i> Cetak Rekap
+                </a>
+                <a href="{{ route('superadmin.monitoring.index', ['category' => request('status') == 'lulus' ? 'graduates' : 'students']) }}"
+                  class="btn btn-secondary btn-sm d-flex align-items-center">
+                  <i class="fas fa-arrow-left mr-1"></i> Kembali
                 </a>
               </div>
-
-              <a href="{{ route('superadmin.monitoring.index', ['category' => request('status') == 'lulus' ? 'graduates' : 'students']) }}"
-                class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> Kembali
-              </a>
             </div>
           </div>
         </div>
