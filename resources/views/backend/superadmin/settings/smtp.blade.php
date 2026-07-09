@@ -109,6 +109,27 @@
               </div>
             </form>
           </div>
+
+          <div class="card card-outline card-success mt-4">
+            <div class="card-header">
+              <h3 class="card-title">Test Koneksi SMTP</h3>
+            </div>
+            <form action="{{ route('smtp.test') }}" method="POST">
+              @csrf
+              <div class="card-body">
+                <p class="text-muted text-sm">Pastikan Anda telah <b>menyimpan</b> pengaturan SMTP di atas sebelum melakukan pengetesan.</p>
+                <div class="form-group mb-0">
+                  <label>Email Tujuan Test</label>
+                  <input type="email" name="test_email" class="form-control" placeholder="admin@contoh.com" required>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-paper-plane mr-1"></i> Kirim Email Percobaan
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

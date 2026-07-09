@@ -45,6 +45,24 @@ class SettingController extends Controller
     return view('backend.superadmin.settings.whatsapp', compact('settings'));
   }
 
+  public function testSmtp(Request $request)
+  {
+      $request->validate([
+          'test_email' => 'required|email',
+      ]);
+
+      try {
+          \Illuminate\Support\Facades\Mail::raw('Selamat! Ini adalah email percobaan untuk menguji pengaturan SMTP di EduArchive. Jika Anda menerima email ini, berarti koneksi SMTP telah berhasil dan terintegrasi dengan baik.', function ($message) use ($request) {
+              $message->to($request->test_email)
+                      ->subject('Test Koneksi SMTP EduArchive Berhasil');
+          });
+
+          return back()->with('success', 'Email percobaan berhasil dikirim ke ' . $request->test_email . '. Koneksi SMTP berjalan dengan baik!');
+      } catch (\Exception $e) {
+          return back()->with('error', 'Gagal mengirim email percobaan. Pastikan pengaturan SMTP sudah DISIMPAN terlebih dahulu dengan benar. Error: ' . $e->getMessage());
+      }
+  }
+
   public function update(Request $request)
   {
     // Define file keys to exclude from general text update
