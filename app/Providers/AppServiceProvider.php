@@ -21,6 +21,37 @@ class AppServiceProvider extends ServiceProvider
     {
         // Use Bootstrap 4 pagination to match AdminLTE theme
         \Illuminate\Pagination\Paginator::useBootstrapFour();
+
+        // Load Global Settings for Config Overrides (Timezone, Mail)
+        try {
+            $global_settings = \Illuminate\Support\Facades\Cache::remember('app_settings_global', 3600, function () {
+                if (!\Illuminate\Support\Facades\Schema::hasTable('app_settings')) return [];
+                return \App\Models\AppSetting::all()->pluck('value', 'key')->toArray();
+            });
+
+            // Set Timezone dynamically
+            if (isset($global_settings['app_timezone'])) {
+                config(['app.timezone' => $global_settings['app_timezone']]);
+                date_default_timezone_set($global_settings['app_timezone']);
+            }
+
+            // Set Mail Config dynamically
+            if (isset($global_settings['mail_driver']) && $global_settings['mail_driver'] == 'smtp' && !empty($global_settings['mail_host'])) {
+                config([
+                    'mail.default' => 'smtp',
+                    'mail.mailers.smtp.host' => $global_settings['mail_host'],
+                    'mail.mailers.smtp.port' => $global_settings['mail_port'] ?? 587,
+                    'mail.mailers.smtp.encryption' => $global_settings['mail_encryption'] ?? 'tls',
+                    'mail.mailers.smtp.username' => $global_settings['mail_username'] ?? null,
+                    'mail.mailers.smtp.password' => $global_settings['mail_password'] ?? null,
+                    'mail.from.address' => $global_settings['mail_from_address'] ?? config('mail.from.address'),
+                    'mail.from.name' => $global_settings['mail_from_name'] ?? config('mail.from.name'),
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Ignore if DB not ready
+        }
+
         // Share app settings via View Composer to support Tenancy/DB switching
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
             try {
@@ -38,25 +69,7 @@ class AppServiceProvider extends ServiceProvider
 
                 $view->with('app_settings', $app_settings);
 
-                // Set Timezone dynamically
-                if (isset($app_settings['app_timezone'])) {
-                    config(['app.timezone' => $app_settings['app_timezone']]);
-                    date_default_timezone_set($app_settings['app_timezone']);
-                }
-
-                // Set Mail Config dynamically
-                if (isset($app_settings['mail_driver']) && $app_settings['mail_driver'] == 'smtp' && !empty($app_settings['mail_host'])) {
-                    config([
-                        'mail.default' => 'smtp',
-                        'mail.mailers.smtp.host' => $app_settings['mail_host'],
-                        'mail.mailers.smtp.port' => $app_settings['mail_port'] ?? 587,
-                        'mail.mailers.smtp.encryption' => $app_settings['mail_encryption'] ?? 'tls',
-                        'mail.mailers.smtp.username' => $app_settings['mail_username'] ?? null,
-                        'mail.mailers.smtp.password' => $app_settings['mail_password'] ?? null,
-                        'mail.from.address' => $app_settings['mail_from_address'] ?? config('mail.from.address'),
-                        'mail.from.name' => $app_settings['mail_from_name'] ?? config('mail.from.name'),
-                    ]);
-                }
+                $view->with('app_settings', $app_settings);
             } catch (\Exception $e) {
                 $view->with('app_settings', []);
             }
