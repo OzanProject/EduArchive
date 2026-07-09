@@ -15,15 +15,16 @@ class StudentTemplateExport implements FromCollection, WithHeadings, WithStyles,
     // Example Data
     return collect([
       [
-        'Budi Santoso',
-        'L', // Gender
-        '0054321', // NISN
-        '3501012005050001', // NIK
-        'VII-A',
-        '2010-05-20',
-        'Jakarta',
-        'Jl. Merdeka No. 1',
-        'Sutrisno'
+        'Budi Santoso', // nama_lengkap
+        'L', // jenis_kelamin
+        '0054321', // nisn
+        '3501012005050001', // nik
+        'VII-A', // kelas
+        '2010-05-20', // tanggal_lahir
+        'Jakarta', // tempat_lahir
+        'Jl. Merdeka No. 1', // alamat
+        'Sutrisno', // nama_orang_tua
+        '08123456789', // no_hp
       ]
     ]);
   }

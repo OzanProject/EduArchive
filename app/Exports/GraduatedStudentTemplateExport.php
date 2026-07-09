@@ -14,14 +14,16 @@ class GraduatedStudentTemplateExport implements FromCollection, WithHeadings, Wi
   {
     return collect([
       [
-        'Budi Santoso',
+        'Budi Santoso', // nama_lengkap
+        'L', // jenis_kelamin
         '0054321', // NISN
         '3501012005050001', // NIK
         'VII-A', // Kelas Terakhir
-        '2010-05-20',
-        'Jakarta',
-        'Jl. Merdeka No. 1',
-        'Sutrisno',
+        '2010-05-20', // tanggal_lahir
+        'Jakarta', // tempat_lahir
+        'Jl. Merdeka No. 1', // alamat
+        'Sutrisno', // nama_orang_tua
+        '08123456789', // no_hp
         '2024' // Tahun Lulus
       ]
     ]);
@@ -31,6 +33,7 @@ class GraduatedStudentTemplateExport implements FromCollection, WithHeadings, Wi
   {
     return [
       'nama_lengkap',
+      'jenis_kelamin',
       'nisn',
       'nik',
       'kelas_terakhir',
