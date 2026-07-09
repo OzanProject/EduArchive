@@ -60,7 +60,7 @@ class AuthenticatedSessionController extends Controller
 
         // Check if Tenant is Active
         if (tenant() && !tenant()->status_aktif) {
-            return $this->logoutAndRedirectError($request, 'Akun sekolah Anda belum diaktifkan oleh Super Admin. Harap tunggu persetujuan.');
+            return $this->logoutAndRedirectError($request, 'Akun sekolah Anda belum diaktifkan oleh pihak ' . config('app.name') . '. Harap tunggu persetujuan.');
         }
 
         if ($user->hasRole('superadmin')) {
