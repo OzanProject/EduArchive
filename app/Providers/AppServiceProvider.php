@@ -29,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
                 return \App\Models\AppSetting::all()->pluck('value', 'key')->toArray();
             });
 
+            // Set App Name dynamically
+            if (isset($global_settings['app_name'])) {
+                config(['app.name' => $global_settings['app_name']]);
+            }
+
             // Set Timezone dynamically
             if (isset($global_settings['app_timezone'])) {
                 config(['app.timezone' => $global_settings['app_timezone']]);

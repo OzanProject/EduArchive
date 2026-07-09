@@ -52,10 +52,7 @@ class SettingController extends Controller
       ]);
 
       try {
-          \Illuminate\Support\Facades\Mail::raw('Selamat! Ini adalah email percobaan untuk menguji pengaturan SMTP di EduArchive. Jika Anda menerima email ini, berarti koneksi SMTP telah berhasil dan terintegrasi dengan baik.', function ($message) use ($request) {
-              $message->to($request->test_email)
-                      ->subject('Test Koneksi SMTP EduArchive Berhasil');
-          });
+          \Illuminate\Support\Facades\Mail::to($request->test_email)->send(new \App\Mail\TestSmtpMail());
 
           return back()->with('success', 'Email percobaan berhasil dikirim ke ' . $request->test_email . '. Koneksi SMTP berjalan dengan baik!');
       } catch (\Exception $e) {
