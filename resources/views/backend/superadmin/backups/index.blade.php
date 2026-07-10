@@ -105,30 +105,40 @@
         ? 'Membuat full backup (Database + File) mungkin membutuhkan waktu beberapa menit. Lanjutkan?' 
         : 'Membuat backup database. Lanjutkan?';
         
-      if (confirm(msg)) {
-        // Change button states to loading
-        const buttons = document.querySelectorAll('#backup-form button');
-        buttons.forEach(btn => {
-            btn.disabled = true;
-            if (btn.value === type) {
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-            }
-        });
-        
-        // Actually submit the form
-        setTimeout(() => {
-            const form = document.getElementById('backup-form');
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'type';
-            hiddenInput.value = type;
-            form.appendChild(hiddenInput);
-            form.submit();
-        }, 100);
-        return false; // Prevent default since we submit manually above
-      }
-      return false;
+      Swal.fire({
+          title: 'Konfirmasi',
+          text: msg,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, Lanjutkan!',
+          cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Change button states to loading
+          const buttons = document.querySelectorAll('#backup-form button');
+          buttons.forEach(btn => {
+              btn.disabled = true;
+              if (btn.value === type) {
+                  const originalHtml = btn.innerHTML;
+                  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+              }
+          });
+          
+          // Actually submit the form
+          setTimeout(() => {
+              const form = document.getElementById('backup-form');
+              const hiddenInput = document.createElement('input');
+              hiddenInput.type = 'hidden';
+              hiddenInput.name = 'type';
+              hiddenInput.value = type;
+              form.appendChild(hiddenInput);
+              form.submit();
+          }, 100);
+        }
+      });
+      return false; // Prevent default since we submit manually inside Swal callback
     }
   </script>
 @endpush

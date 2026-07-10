@@ -409,24 +409,35 @@
       }
 
       function bulkDelete() {
-        if (!confirm('Yakin ingin menghapus data yang dipilih?')) return;
+        Swal.fire({
+          title: 'Konfirmasi',
+          text: 'Yakin ingin menghapus data yang dipilih?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, Lanjutkan!',
+          cancelButtonText: 'Batal'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            var ids = [];
+            $('.checkItem:checked').each(function () {
+              ids.push($(this).val());
+            });
 
-        var ids = [];
-        $('.checkItem:checked').each(function () {
-          ids.push($(this).val());
+            // Use a strict form submission for DELETE
+            var form = $('#bulk-action-form');
+            form.attr('action', '{{ route($prefix . "students.bulkDestroy") }}');
+            form.empty(); // clear previous inputs
+            form.append('@csrf'); // append CSRF again
+
+            $.each(ids, function (index, value) {
+              form.append('<input type="hidden" name="ids[]" value="' + value + '">');
+            });
+
+            form.submit();
+          }
         });
-
-        // Use a strict form submission for DELETE
-        var form = $('#bulk-action-form');
-        form.attr('action', '{{ route($prefix . "students.bulkDestroy") }}');
-        form.empty(); // clear previous inputs
-        form.append('@csrf'); // append CSRF again
-
-        $.each(ids, function (index, value) {
-          form.append('<input type="hidden" name="ids[]" value="' + value + '">');
-        });
-
-        form.submit();
       }
 
       function bulkPrint() {
@@ -508,26 +519,37 @@
       }
 
       function bulkCancelGraduate() {
-        if (!confirm('Yakin ingin membatalkan kelulusan data yang dipilih? Mereka akan dikembalikan menjadi Siswa Aktif.')) return;
+        Swal.fire({
+          title: 'Konfirmasi',
+          text: 'Yakin ingin membatalkan kelulusan data yang dipilih? Mereka akan dikembalikan menjadi Siswa Aktif.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, Lanjutkan!',
+          cancelButtonText: 'Batal'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            var ids = [];
+            $('.checkItem:checked').each(function () {
+              ids.push($(this).val());
+            });
 
-        var ids = [];
-        $('.checkItem:checked').each(function () {
-          ids.push($(this).val());
+            if (ids.length === 0) return;
+
+            // Use a strict form submission for Bulk Cancel Graduate
+            var form = $('#bulk-action-form');
+            form.attr('action', '{{ route($prefix . "students.bulkCancelGraduate") }}');
+            form.empty(); // clear previous inputs
+            form.append('@csrf'); // append CSRF again
+
+            $.each(ids, function (index, value) {
+              form.append('<input type="hidden" name="ids[]" value="' + value + '">');
+            });
+
+            form.submit();
+          }
         });
-
-        if (ids.length === 0) return;
-
-        // Use a strict form submission for Bulk Cancel Graduate
-        var form = $('#bulk-action-form');
-        form.attr('action', '{{ route($prefix . "students.bulkCancelGraduate") }}');
-        form.empty(); // clear previous inputs
-        form.append('@csrf'); // append CSRF again
-
-        $.each(ids, function (index, value) {
-          form.append('<input type="hidden" name="ids[]" value="' + value + '">');
-        });
-
-        form.submit();
       }
     </script>
   @endpush

@@ -79,6 +79,76 @@
   <script src="{{ asset('adminlte3/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <!-- AdminLTE App -->
   <script src="{{ asset('adminlte3/dist/js/adminlte.min.js') }}"></script>
+  
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Global Confirm Interceptor
+    $(document).ready(function() {
+        // Intercept onclick="return confirm('...')"
+        $('[onclick*="return confirm"]').each(function() {
+            var $el = $(this);
+            var str = $el.attr('onclick');
+            var match = str.match(/confirm\(['"](.*?)['"]\)/);
+            if (match) {
+                var msg = match[1];
+                $el.removeAttr('onclick');
+                $el.on('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: msg,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if ($el.is('button[type="submit"]') || $el.is('input[type="submit"]')) {
+                                $el.closest('form').submit();
+                            } else if ($el.is('a')) {
+                                window.location.href = $el.attr('href');
+                            } else if ($el.closest('form').length > 0) {
+                                $el.closest('form').submit();
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        // Intercept onsubmit="return confirm('...')"
+        $('form[onsubmit*="return confirm"]').each(function() {
+            var $form = $(this);
+            var str = $form.attr('onsubmit');
+            var match = str.match(/confirm\(['"](.*?)['"]\)/);
+            if (match) {
+                var msg = match[1];
+                $form.removeAttr('onsubmit');
+                $form.on('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: msg,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $form[0].submit();
+                        }
+                    });
+                });
+            }
+        });
+    });
+  </script>
+  
   @stack('scripts')
 </body>
 

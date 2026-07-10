@@ -291,17 +291,26 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      if (!confirm('Proses sinkronisasi akan berjalan di latar belakang. Lanjutkan?')) return;
+      Swal.fire({
+        title: 'Konfirmasi',
+        text: 'Proses sinkronisasi akan berjalan di latar belakang. Lanjutkan?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const formData = new FormData(form);
+          const url = form.getAttribute('action');
+          const dataType = formData.get('data_type');
 
-      const formData = new FormData(form);
-      const url = form.getAttribute('action');
-      const dataType = formData.get('data_type');
-
-      // UI Update
-      btnSubmit.setAttribute('disabled', 'disabled');
-      btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memulai Antrean...';
-      progressContainer.classList.remove('d-none');
-      updateBar(0, 'Menunggu antrean...', 'bg-success', true);
+          // UI Update
+          btnSubmit.setAttribute('disabled', 'disabled');
+          btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memulai Antrean...';
+          progressContainer.classList.remove('d-none');
+          updateBar(0, 'Menunggu antrean...', 'bg-success', true);
 
       fetch(url, {
         method: 'POST',
@@ -323,6 +332,9 @@
       .catch(err => {
         showError('Terjadi kesalahan server saat mencoba memulai sinkronisasi.');
       });
+
+        } // End of if (result.isConfirmed)
+      }); // End of Swal.then
     });
 
     function startPolling(dataType) {

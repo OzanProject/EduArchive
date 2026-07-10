@@ -1,49 +1,83 @@
 @if (session('success'))
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <i class="fas fa-check-circle mr-1"></i> {{ session('success') }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: '{{ session("success") }}',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+  });
+</script>
 @endif
 
 @if (session('error'))
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <i class="fas fa-exclamation-circle mr-1"></i> {{ session('error') }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: '{{ session("error") }}',
+      showConfirmButton: false,
+      timer: 5000,
+      timerProgressBar: true
+    });
+  });
+</script>
 @endif
 
 @if (session('warning'))
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <i class="fas fa-exclamation-triangle mr-1"></i> {{ session('warning') }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: '{{ session("warning") }}',
+      showConfirmButton: false,
+      timer: 4000,
+      timerProgressBar: true
+    });
+  });
+</script>
 @endif
 
 @if (session('info'))
-  <div class="alert alert-info alert-dismissible fade show" role="alert">
-    <i class="fas fa-info-circle mr-1"></i> {{ session('info') }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'info',
+      title: '{{ session("info") }}',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+  });
+</script>
 @endif
 
 @if ($errors->any())
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <i class="fas fa-ban mr-1"></i> Terdapat kesalahan pada inputan Anda:
-    <ul class="mb-0 mt-1 pl-3">
-      @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let errorList = '<ul>';
+    @foreach ($errors->all() as $error)
+      errorList += '<li class="text-left">{{ $error }}</li>';
+    @endforeach
+    errorList += '</ul>';
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Terdapat Kesalahan!',
+      html: errorList,
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Tutup'
+    });
+  });
+</script>
 @endif

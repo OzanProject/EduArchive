@@ -135,12 +135,23 @@
     });
 
     function deleteSingleLog(id) {
-      if (confirm('Yakin ingin menghapus log ini?')) {
-        const form = $('#delete-single-form');
-        let url = '{{ route("superadmin.monitoring.audit_logs.destroy", "ID_PLACEHOLDER") }}';
-        form.attr('action', url.replace('ID_PLACEHOLDER', id));
-        form.submit();
-      }
+      Swal.fire({
+          title: 'Konfirmasi',
+          text: 'Yakin ingin menghapus log ini?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, Hapus!',
+          cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const form = $('#delete-single-form');
+          let url = '{{ route("superadmin.monitoring.audit_logs.destroy", "ID_PLACEHOLDER") }}';
+          form.attr('action', url.replace('ID_PLACEHOLDER', id));
+          form.submit();
+        }
+      });
     }
   </script>
 @endpush
