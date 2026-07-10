@@ -24,6 +24,7 @@
             <button class="btn btn-info btn-sm d-none" id="btn-bulk-print" onclick="bulkPrint()">
               <i class="fas fa-print"></i> Cetak Masal
             </button>
+            @if($status == 'Aktif')
             <button class="btn btn-warning btn-sm d-none" id="btn-bulk-promote" data-toggle="modal"
               data-target="#promoteModal">
               <i class="fas fa-level-up-alt"></i> Naik Kelas (Terpilih)
@@ -40,6 +41,11 @@
               data-target="#graduateRombelModal">
               <i class="fas fa-graduation-cap"></i> Luluskan (Rombel)
             </button>
+            @elseif($status == 'Lulus')
+            <button class="btn btn-warning btn-sm d-none" id="btn-bulk-cancel-graduate" onclick="bulkCancelGraduate()">
+              <i class="fas fa-undo"></i> Batalkan Lulus (Terpilih)
+            </button>
+            @endif
             <a href="{{ route($prefix . 'students.create') }}" class="btn btn-primary btn-sm">
               <i class="fas fa-plus"></i> Tambah Baru
             </a>
@@ -179,6 +185,16 @@
                       title="Edit">
                       <i class="fas fa-edit"></i>
                     </a>
+                    @if($status == 'Lulus')
+                    <form action="{{ route($prefix . 'students.cancelGraduate', $student->id) }}" method="POST"
+                      style="display:inline-block;">
+                      @csrf
+                      <button type="submit" class="btn btn-secondary btn-sm" title="Batalkan Kelulusan"
+                        onclick="return confirm('Yakin ingin membatalkan kelulusan siswa ini dan mengembalikannya menjadi siswa aktif?')">
+                        <i class="fas fa-undo"></i>
+                      </button>
+                    </form>
+                    @endif
                     <form action="{{ route($prefix . 'students.destroy', $student->id) }}" method="POST"
                       style="display:inline-block;">
                       @csrf
@@ -374,13 +390,21 @@
         if ($('.checkItem:checked').length > 0) {
           $('#btn-bulk-delete').removeClass('d-none');
           $('#btn-bulk-print').removeClass('d-none');
+          @if($status == 'Aktif')
           $('#btn-bulk-promote').removeClass('d-none');
           $('#btn-bulk-graduate').removeClass('d-none');
+          @elseif($status == 'Lulus')
+          $('#btn-bulk-cancel-graduate').removeClass('d-none');
+          @endif
         } else {
           $('#btn-bulk-delete').addClass('d-none');
           $('#btn-bulk-print').addClass('d-none');
+          @if($status == 'Aktif')
           $('#btn-bulk-promote').addClass('d-none');
           $('#btn-bulk-graduate').addClass('d-none');
+          @elseif($status == 'Lulus')
+          $('#btn-bulk-cancel-graduate').addClass('d-none');
+          @endif
         }
       }
 
@@ -481,6 +505,29 @@
             alert('Error: ' + xhr.responseText);
           }
         });
+      }
+
+      function bulkCancelGraduate() {
+        if (!confirm('Yakin ingin membatalkan kelulusan data yang dipilih? Mereka akan dikembalikan menjadi Siswa Aktif.')) return;
+
+        var ids = [];
+        $('.checkItem:checked').each(function () {
+          ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        // Use a strict form submission for Bulk Cancel Graduate
+        var form = $('#bulk-action-form');
+        form.attr('action', '{{ route($prefix . "students.bulkCancelGraduate") }}');
+        form.empty(); // clear previous inputs
+        form.append('@csrf'); // append CSRF again
+
+        $.each(ids, function (index, value) {
+          form.append('<input type="hidden" name="ids[]" value="' + value + '">');
+        });
+
+        form.submit();
       }
     </script>
   @endpush

@@ -109,7 +109,9 @@ Route::group([
         Route::post('students/bulk-promote', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromote'])->name('students.bulkPromote');
         Route::post('students/bulk-promote-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromoteRombel'])->name('students.bulkPromoteRombel');
         Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
+        Route::post('students/bulk-cancel-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkCancelGraduate'])->name('students.bulkCancelGraduate');
         Route::post('students/bulk-graduate-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduateRombel'])->name('students.bulkGraduateRombel');
+        Route::post('students/{student}/cancel-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'cancelGraduate'])->name('students.cancelGraduate');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
         Route::resource('infrastructure', \App\Http\Controllers\Backend\InfrastructureController::class);
@@ -158,7 +160,9 @@ Route::group([
         Route::post('students/bulk-promote', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromote'])->name('students.bulkPromote');
         Route::post('students/bulk-promote-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkPromoteRombel'])->name('students.bulkPromoteRombel');
         Route::post('students/bulk-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduate'])->name('students.bulkGraduate');
+        Route::post('students/bulk-cancel-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkCancelGraduate'])->name('students.bulkCancelGraduate');
         Route::post('students/bulk-graduate-rombel', [\App\Http\Controllers\Backend\TenantStudentController::class, 'bulkGraduateRombel'])->name('students.bulkGraduateRombel');
+        Route::post('students/{student}/cancel-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'cancelGraduate'])->name('students.cancelGraduate');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
 

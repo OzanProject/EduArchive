@@ -305,4 +305,37 @@ class TenantStudentController extends Controller
 
         return redirect()->back()->with('success', 'Seluruh siswa dari kelas ' . $sourceClassroom->nama_kelas . ' berhasil diluluskan.');
     }
+
+    public function cancelGraduate(string $id)
+    {
+        $student = \App\Models\Student::findOrFail($id);
+        $student->update([
+            'status_kelulusan' => 'Aktif',
+            'tahun_lulus' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'Status kelulusan berhasil dibatalkan. Data dikembalikan menjadi Siswa Aktif.');
+    }
+
+    public function bulkCancelGraduate(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:students,id',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            \App\Models\Student::whereIn('id', $request->ids)->update([
+                'status_kelulusan' => 'Aktif',
+                'tahun_lulus' => null,
+            ]);
+        });
+
+        // if it's an ajax request, return json, else redirect
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil dibatalkan status kelulusannya.']);
+        }
+        
+        return redirect()->back()->with('success', count($request->ids) . ' siswa berhasil dibatalkan status kelulusannya.');
+    }
 }
