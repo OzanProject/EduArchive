@@ -234,12 +234,24 @@ class TenantStudentController extends Controller
         ]);
 
         $targetClassroom = \App\Models\Classroom::findOrFail($request->target_classroom_id);
+        $students = \App\Models\Student::whereIn('id', $request->ids)->with('classroom')->get();
 
-        DB::transaction(function () use ($request, $targetClassroom) {
-            \App\Models\Student::whereIn('id', $request->ids)->update([
-                'classroom_id' => $targetClassroom->id,
-                'kelas' => $targetClassroom->nama_kelas,
-            ]);
+        // Validation for Tingkat (Grade level)
+        foreach ($students as $student) {
+            if ($student->classroom && $student->classroom->tingkat && $targetClassroom->tingkat) {
+                if ((int)$targetClassroom->tingkat <= (int)$student->classroom->tingkat) {
+                    return response()->json(['success' => false, 'message' => 'Gagal: ' . $student->nama . ' saat ini berada di Tingkat ' . $student->classroom->tingkat . ' dan tidak bisa dinaikkan ke Tingkat ' . $targetClassroom->tingkat . '. Target harus tingkat lebih tinggi.']);
+                }
+            }
+        }
+
+        DB::transaction(function () use ($students, $targetClassroom) {
+            foreach ($students as $student) {
+                $student->update([
+                    'classroom_id' => $targetClassroom->id,
+                    'kelas' => $targetClassroom->nama_kelas,
+                ]);
+            }
         });
 
         return response()->json(['success' => true, 'message' => count($request->ids) . ' siswa berhasil dinaikkan ke kelas ' . $targetClassroom->nama_kelas]);
@@ -252,7 +264,15 @@ class TenantStudentController extends Controller
             'target_classroom_id' => 'required|exists:classrooms,id|different:source_classroom_id',
         ]);
 
+        $sourceClassroom = \App\Models\Classroom::findOrFail($request->source_classroom_id);
         $targetClassroom = \App\Models\Classroom::findOrFail($request->target_classroom_id);
+
+        // Validation for Tingkat (Grade level)
+        if ($sourceClassroom->tingkat && $targetClassroom->tingkat) {
+            if ((int)$targetClassroom->tingkat <= (int)$sourceClassroom->tingkat) {
+                return redirect()->back()->with('error', 'Proses dibatalkan! Kelas tujuan (Tingkat ' . $targetClassroom->tingkat . ') harus lebih tinggi dari kelas asal (Tingkat ' . $sourceClassroom->tingkat . ').');
+            }
+        }
 
         DB::transaction(function () use ($request, $targetClassroom) {
             \App\Models\Student::where('classroom_id', $request->source_classroom_id)

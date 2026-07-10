@@ -245,7 +245,7 @@
               <select name="target_classroom_id" class="form-control select2" style="width: 100%;" required>
                 <option value="">-- Pilih Kelas --</option>
                 @foreach($classroomsList as $classroom)
-                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})
+                  <option value="{{ $classroom->id }}" data-tingkat="{{ (int)$classroom->tingkat }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})
                   </option>
                 @endforeach
               </select>
@@ -277,19 +277,19 @@
             <p>Pindahkan <strong>semua siswa aktif</strong> dari satu kelas ke kelas lainnya secara langsung:</p>
             <div class="form-group">
               <label>Kelas Asal</label>
-              <select name="source_classroom_id" class="form-control select2" style="width: 100%;" required>
-                <option value="">-- Pilih Kelas Asal --</option>
+              <select name="source_classroom_id" id="source_classroom_id" class="form-control select2" style="width: 100%;" required>
+                <option value="" data-tingkat="0">-- Pilih Kelas Asal --</option>
                 @foreach($classroomsList as $classroom)
-                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
+                  <option value="{{ $classroom->id }}" data-tingkat="{{ (int)$classroom->tingkat }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
                 @endforeach
               </select>
             </div>
             <div class="form-group">
               <label>Kelas Tujuan</label>
-              <select name="target_classroom_id" class="form-control select2" style="width: 100%;" required>
-                <option value="">-- Pilih Kelas Tujuan --</option>
+              <select name="target_classroom_id" id="target_classroom_id" class="form-control select2" style="width: 100%;" required>
+                <option value="" data-tingkat="0">-- Pilih Kelas Tujuan --</option>
                 @foreach($classroomsList as $classroom)
-                  <option value="{{ $classroom->id }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
+                  <option value="{{ $classroom->id }}" data-tingkat="{{ (int)$classroom->tingkat }}">{{ $classroom->nama_kelas }} ({{ $classroom->tahun_ajaran }})</option>
                 @endforeach
               </select>
             </div>
@@ -551,6 +551,30 @@
           }
         });
       }
+
+      // Logic for Naik Kelas Rombel - Disable lower grades
+      $(document).ready(function() {
+          $('#source_classroom_id').on('change', function() {
+              var sourceTingkat = parseInt($(this).find(':selected').data('tingkat')) || 0;
+              
+              $('#target_classroom_id option').each(function() {
+                  var targetTingkat = parseInt($(this).data('tingkat')) || 0;
+                  
+                  if ($(this).val() === "") {
+                      $(this).prop('disabled', false); // Always allow default
+                  } else if (targetTingkat <= sourceTingkat && sourceTingkat > 0) {
+                      $(this).prop('disabled', true);
+                  } else {
+                      $(this).prop('disabled', false);
+                  }
+              });
+
+              // If currently selected target is now disabled, reset the target
+              if ($('#target_classroom_id').find(':selected').prop('disabled')) {
+                  $('#target_classroom_id').val('').trigger('change');
+              }
+          });
+      });
     </script>
   @endpush
 @endsection
