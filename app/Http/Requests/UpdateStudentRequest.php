@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateStudentRequest extends FormRequest
 {
@@ -23,8 +24,16 @@ class UpdateStudentRequest extends FormRequest
             'gender' => 'required|in:L,P',
             'no_hp' => 'nullable|string|max:20',
             'classroom_id' => 'nullable|exists:classrooms,id',
-            'nik' => 'nullable|string|unique:students,nik,' . $id,
-            'nisn' => 'nullable|string|unique:students,nisn,' . $id,
+            'nik' => [
+                'nullable',
+                'string',
+                Rule::unique('students', 'nik')->ignore($id)->where('status_kelulusan', 'Aktif')
+            ],
+            'nisn' => [
+                'nullable',
+                'string',
+                Rule::unique('students', 'nisn')->ignore($id)->where('status_kelulusan', 'Aktif')
+            ],
             'no_seri_ijazah' => 'nullable|string|max:255',
             'status_kelulusan' => 'nullable|in:Aktif,Lulus,Pindah,DO',
             'foto_profil' => 'nullable|image|max:2048',

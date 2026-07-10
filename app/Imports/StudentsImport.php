@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class StudentsImport implements ToModel, WithHeadingRow, WithValidation
 {
@@ -76,8 +77,14 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
     return [
       'nama_lengkap' => 'required',
       'jenis_kelamin' => 'required', // Gender is required
-      'nisn' => 'nullable|unique:students,nisn',
-      'nik' => 'nullable|unique:students,nik',
+      'nisn' => [
+        'nullable',
+        Rule::unique('students', 'nisn')->where('status_kelulusan', 'Aktif')
+      ],
+      'nik' => [
+        'nullable',
+        Rule::unique('students', 'nik')->where('status_kelulusan', 'Aktif')
+      ],
     ];
   }
 }
