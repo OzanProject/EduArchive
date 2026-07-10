@@ -15,16 +15,14 @@
         <div class="card-header">
           <h3 class="card-title"><i class="fas fa-database"></i> Daftar Backup</h3>
           <div class="card-tools">
-            <form action="{{ route('superadmin.backups.create') }}" method="POST" class="d-inline" id="backup-form">
+            <form action="{{ route('superadmin.backups.create') }}" method="POST" class="d-flex align-items-center" id="backup-form" style="gap: 10px;">
               @csrf
-              <div class="btn-group">
-                <button type="submit" name="type" value="db" class="btn btn-sm btn-primary" onclick="return confirmBackup('db')">
-                  <i class="fas fa-database"></i> Backup Database Saja
-                </button>
-                <button type="submit" name="type" value="full" class="btn btn-sm btn-success" onclick="return confirmBackup('full')">
-                  <i class="fas fa-archive"></i> Backup Full (DB + File)
-                </button>
-              </div>
+              <button type="submit" name="type" value="db" class="btn btn-sm btn-primary shadow-sm" style="border-radius: 6px;" onclick="return confirmBackup('db')">
+                <i class="fas fa-database mr-1"></i> Backup DB
+              </button>
+              <button type="submit" name="type" value="full" class="btn btn-sm btn-success shadow-sm" style="border-radius: 6px;" onclick="return confirmBackup('full')">
+                <i class="fas fa-archive mr-1"></i> Backup Full
+              </button>
             </form>
           </div>
         </div>

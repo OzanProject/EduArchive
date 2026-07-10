@@ -5,7 +5,7 @@
       toast: true,
       position: 'top-end',
       icon: 'success',
-      title: '{{ session("success") }}',
+      title: '{!! addslashes(session("success")) !!}',
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true
@@ -18,13 +18,15 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     Swal.fire({
-      toast: true,
-      position: 'top-end',
       icon: 'error',
-      title: '{{ session("error") }}',
-      showConfirmButton: false,
-      timer: 5000,
-      timerProgressBar: true
+      title: 'Oops! Terjadi Kesalahan',
+      text: '{!! addslashes(session("error")) !!}',
+      confirmButtonColor: '#3b82f6',
+      confirmButtonText: 'Mengerti',
+      customClass: {
+        confirmButton: 'btn btn-primary px-4 py-2'
+      },
+      buttonsStyling: false
     });
   });
 </script>
@@ -37,7 +39,7 @@
       toast: true,
       position: 'top-end',
       icon: 'warning',
-      title: '{{ session("warning") }}',
+      title: '{!! addslashes(session("warning")) !!}',
       showConfirmButton: false,
       timer: 4000,
       timerProgressBar: true
@@ -53,7 +55,7 @@
       toast: true,
       position: 'top-end',
       icon: 'info',
-      title: '{{ session("info") }}',
+      title: '{!! addslashes(session("info")) !!}',
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true
@@ -65,18 +67,22 @@
 @if ($errors->any())
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    let errorList = '<ul>';
+    let errorList = '<ul class="text-left" style="list-style-type: disc; padding-left: 20px;">';
     @foreach ($errors->all() as $error)
-      errorList += '<li class="text-left">{{ $error }}</li>';
+      errorList += '<li class="mb-1">{!! addslashes($error) !!}</li>';
     @endforeach
     errorList += '</ul>';
 
     Swal.fire({
       icon: 'error',
-      title: 'Terdapat Kesalahan!',
+      title: 'Validasi Gagal!',
       html: errorList,
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Tutup'
+      confirmButtonColor: '#3b82f6',
+      confirmButtonText: 'Perbaiki',
+      customClass: {
+        confirmButton: 'btn btn-primary px-4 py-2'
+      },
+      buttonsStyling: false
     });
   });
 </script>
