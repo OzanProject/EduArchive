@@ -77,17 +77,17 @@
           <form action="{{ route('superadmin.backups.restore') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirm('SANGAT PENTING: Apakah Anda benar-benar yakin ingin me-restore database ini? Data saat ini akan tertimpa permanen!');">
             @csrf
             <div class="form-group">
-              <label for="sql_file">Upload File Database (.sql)</label>
+              <label for="sql_file">Upload File Backup (.zip atau .sql)</label>
               <div class="input-group">
                 <div class="custom-file">
-                  <input type="file" class="custom-file-input" id="sql_file" name="sql_file" accept=".sql" required>
-                  <label class="custom-file-label" for="sql_file">Pilih file .sql</label>
+                  <input type="file" class="custom-file-input" id="sql_file" name="sql_file" accept=".sql,.zip,application/zip" required>
+                  <label class="custom-file-label" for="sql_file">Pilih file .zip atau .sql</label>
                 </div>
                 <div class="input-group-append">
                   <button type="submit" class="btn btn-warning"><i class="fas fa-history"></i> Proses Restore</button>
                 </div>
               </div>
-              <small class="form-text text-muted">Ekstrak file zip backup Anda terlebih dahulu, lalu upload file <code>.sql</code> yang ada di dalam folder <code>db-dumps</code>.</small>
+              <small class="form-text text-muted">Anda bisa langsung mengupload file <strong>.zip</strong> hasil download backup dari tabel di atas, atau mengupload file <code>.sql</code> secara manual.</small>
             </div>
           </form>
         </div>

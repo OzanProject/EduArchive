@@ -87,17 +87,45 @@ class BackupController extends Controller
     public function restore(Request $request)
     {
         $request->validate([
-            'sql_file' => 'required|file|mimetypes:text/plain,application/sql|max:102400', // max 100MB
+            'sql_file' => 'required|file|mimetypes:text/plain,application/sql,application/zip,application/x-zip-compressed|max:102400', // max 100MB
         ]);
 
         try {
             $file = $request->file('sql_file');
-            $sqlContent = file_get_contents($file->getRealPath());
+            $extension = $file->getClientOriginalExtension();
+            $sqlContent = '';
 
+            if ($extension === 'zip') {
+                $zip = new \ZipArchive;
+                if ($zip->open($file->getRealPath()) === true) {
+                    $foundSql = false;
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+                        $filename = $zip->getNameIndex($i);
+                        // Find any .sql file, typically inside db-dumps/
+                        if (substr($filename, -4) === '.sql') {
+                            $sqlContent = $zip->getFromIndex($i);
+                            $foundSql = true;
+                            break;
+                        }
+                    }
+                    $zip->close();
+                    
+                    if (!$foundSql) {
+                        return back()->with('error', 'Gagal melakukan restore: Tidak ada file .sql yang ditemukan di dalam ZIP.');
+                    }
+                } else {
+                    return back()->with('error', 'Gagal melakukan restore: File ZIP tidak dapat dibuka.');
+                }
+            } else {
+                // If it's already a .sql file
+                $sqlContent = file_get_contents($file->getRealPath());
+            }
+
+            // Execute the raw SQL
             \Illuminate\Support\Facades\DB::unprepared($sqlContent);
 
             Log::info("Database successfully restored by Superadmin.");
-            return back()->with('success', 'Database berhasil di-restore dari file SQL.');
+            return back()->with('success', 'Database berhasil di-restore dengan aman.');
         } catch (\Exception $e) {
             Log::error("Database Restore Error: " . $e->getMessage());
             return back()->with('error', 'Gagal melakukan restore database: ' . $e->getMessage());
