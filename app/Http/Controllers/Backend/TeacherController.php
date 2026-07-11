@@ -43,41 +43,13 @@ class TeacherController extends Controller
         return view('backend.adminlembaga.teachers.create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\StoreTeacherRequest $request)
     {
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'nip' => [
-                'nullable',
-                'string',
-                \Illuminate\Validation\Rule::unique('teachers')->where(function ($query) {
-                    return $query->where('tenant_id', tenant('id'));
-                }),
-            ],
-            'nuptk' => [
-                'nullable',
-                'string',
-                \Illuminate\Validation\Rule::unique('teachers')->where(function ($query) {
-                    return $query->where('tenant_id', tenant('id'));
-                }),
-            ],
-            'jenis_kelamin' => 'required|in:L,P',
-            'email' => 'nullable|email',
-            'status_kepegawaian' => 'required',
-            'foto' => 'nullable|image|max:2048',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('foto')) {
             $validated['foto'] = $request->file('foto')->store('teachers', 'public');
         }
-
-        // Add other non-validated but allowed fields
-        $validated['gelar_depan'] = $request->gelar_depan;
-        $validated['gelar_belakang'] = $request->gelar_belakang;
-        $validated['tempat_lahir'] = $request->tempat_lahir;
-        $validated['tanggal_lahir'] = $request->tanggal_lahir;
-        $validated['alamat'] = $request->alamat;
-        $validated['no_hp'] = $request->no_hp;
 
         // Create
         \App\Models\Teacher::create($validated);
@@ -91,31 +63,10 @@ class TeacherController extends Controller
         return view('backend.adminlembaga.teachers.edit', compact('teacher'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(\App\Http\Requests\UpdateTeacherRequest $request, string $id)
     {
         $teacher = \App\Models\Teacher::findOrFail($id);
-
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'nip' => [
-                'nullable',
-                'string',
-                \Illuminate\Validation\Rule::unique('teachers')->ignore($id)->where(function ($query) {
-                    return $query->where('tenant_id', tenant('id'));
-                }),
-            ],
-            'nuptk' => [
-                'nullable',
-                'string',
-                \Illuminate\Validation\Rule::unique('teachers')->ignore($id)->where(function ($query) {
-                    return $query->where('tenant_id', tenant('id'));
-                }),
-            ],
-            'jenis_kelamin' => 'required|in:L,P',
-            'email' => 'nullable|email',
-            'status_kepegawaian' => 'required',
-            'foto' => 'nullable|image|max:2048',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('foto')) {
             // Delete old photo if exists
@@ -124,14 +75,6 @@ class TeacherController extends Controller
             }
             $validated['foto'] = $request->file('foto')->store('teachers', 'public');
         }
-
-        // Add other non-validated but allowed fields
-        $validated['gelar_depan'] = $request->gelar_depan;
-        $validated['gelar_belakang'] = $request->gelar_belakang;
-        $validated['tempat_lahir'] = $request->tempat_lahir;
-        $validated['tanggal_lahir'] = $request->tanggal_lahir;
-        $validated['alamat'] = $request->alamat;
-        $validated['no_hp'] = $request->no_hp;
 
         // Update
         $teacher->update($validated);
