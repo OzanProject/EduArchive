@@ -6,11 +6,10 @@ use App\Models\Teacher;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Illuminate\Support\Str;
 
-class TeachersImport implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts, WithChunkReading
+class TeachersImport implements ToModel, WithHeadingRow, WithValidation, WithChunkReading
 {
   /**
    * @param array $row
@@ -86,11 +85,6 @@ class TeachersImport implements ToModel, WithHeadingRow, WithValidation, WithBat
       'email.unique' => 'Email :input sudah terdaftar di sistem.',
       'nip.unique' => 'NIP :input sudah terdaftar di sistem.',
     ];
-  }
-
-  public function batchSize(): int
-  {
-    return 100;
   }
 
   public function chunkSize(): int

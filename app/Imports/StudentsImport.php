@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
-class StudentsImport implements ToModel, WithHeadingRow, WithValidation, \Maatwebsite\Excel\Concerns\WithBatchInserts, \Maatwebsite\Excel\Concerns\WithChunkReading
+class StudentsImport implements ToModel, WithHeadingRow, WithValidation, \Maatwebsite\Excel\Concerns\WithChunkReading
 {
   protected $status;
 
@@ -105,11 +105,6 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, \Maatwe
       'nisn.unique' => 'NISN :input sudah terdaftar untuk siswa aktif.',
       'nik.unique' => 'NIK :input sudah terdaftar untuk siswa aktif.',
     ];
-  }
-
-  public function batchSize(): int
-  {
-    return 100;
   }
 
   public function chunkSize(): int
