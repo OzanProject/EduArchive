@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
-class StudentsImport implements ToModel, WithHeadingRow, WithValidation
+class StudentsImport implements ToModel, WithHeadingRow, WithValidation, \Maatwebsite\Excel\Concerns\WithBatchInserts, \Maatwebsite\Excel\Concerns\WithChunkReading
 {
   protected $status;
 
@@ -46,8 +46,8 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
     return new Student([
       'nama' => $row['nama_lengkap'],
       'gender' => $this->parseGender($row['jenis_kelamin'] ?? null), // Parse Gender
-      'nisn' => $row['nisn'] ?? null,
-      'nik' => $row['nik'] ?? null,
+      'nisn' => $this->parseNullableString($row['nisn'] ?? null),
+      'nik' => $this->parseNullableString($row['nik'] ?? null),
       'classroom_id' => $classroom ? $classroom->id : null,
       'kelas' => $classroom ? $classroom->nama_kelas : ($row['kelas'] ?? null),
       'birth_place' => $row['tempat_lahir'] ?? null,
@@ -60,14 +60,21 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
     ]);
   }
 
+  private function parseNullableString($val)
+  {
+    if (empty($val)) return null;
+    $val = trim($val);
+    return $val === '-' ? null : $val;
+  }
+
   private function parseGender($value)
   {
     if (!$value)
       return null;
     $val = strtoupper(trim($value));
-    if (in_array($val, ['L', 'LAKI-LAKI', 'LAKI LAKI', 'PRIA']))
+    if (in_array($val, ['L', 'LAKI-LAKI', 'LAKI LAKI', 'PRIA', 'MALE']))
       return 'L';
-    if (in_array($val, ['P', 'PEREMPUAN', 'WOMAN', 'WANITA']))
+    if (in_array($val, ['P', 'PEREMPUAN', 'WOMAN', 'WANITA', 'FEMALE']))
       return 'P';
     return null;
   }
@@ -75,16 +82,38 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
   public function rules(): array
   {
     return [
-      'nama_lengkap' => 'required',
+      'nama_lengkap' => 'required|string|max:255',
       'jenis_kelamin' => 'required', // Gender is required
       'nisn' => [
         'nullable',
+        'string',
         Rule::unique('students', 'nisn')->where('status_kelulusan', 'Aktif')
       ],
       'nik' => [
         'nullable',
+        'string',
         Rule::unique('students', 'nik')->where('status_kelulusan', 'Aktif')
       ],
     ];
+  }
+
+  public function customValidationMessages()
+  {
+    return [
+      'nama_lengkap.required' => 'Nama lengkap wajib diisi pada file Excel.',
+      'jenis_kelamin.required' => 'Jenis kelamin wajib diisi pada file Excel.',
+      'nisn.unique' => 'NISN :input sudah terdaftar untuk siswa aktif.',
+      'nik.unique' => 'NIK :input sudah terdaftar untuk siswa aktif.',
+    ];
+  }
+
+  public function batchSize(): int
+  {
+    return 100;
+  }
+
+  public function chunkSize(): int
+  {
+    return 100;
   }
 }
