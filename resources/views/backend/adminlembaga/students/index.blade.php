@@ -52,6 +52,9 @@
             <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#importModal">
               <i class="fas fa-file-excel"></i> Import Excel
             </button>
+            <a href="{{ route($prefix . 'rekap_dokumen.print', array_merge(request()->query(), ['status' => $status])) }}" target="_blank" class="btn btn-info btn-sm">
+              <i class="fas fa-print"></i> Cetak Rekap
+            </a>
           </div>
         </div>
         <!-- /.card-header -->

@@ -473,10 +473,26 @@ class TenantStudentController extends Controller
             ->orderBy('name')
             ->get();
 
-        $students = \App\Models\Student::with('documents')
-            ->where('status_kelulusan', $status)
-            ->orderByRaw('nama ASC')
-            ->get();
+        $query = \App\Models\Student::with('documents')
+            ->where('status_kelulusan', $status);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nisn', 'like', "%{$search}%")
+                    ->orWhere('nama', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status == 'Lulus' && $request->filled('tahun_lulus')) {
+            $query->where('tahun_lulus', $request->tahun_lulus);
+        }
+
+        if ($request->filled('kelas')) {
+            $query->where('kelas', $request->kelas);
+        }
+
+        $students = $query->orderByRaw('nama ASC')->get();
 
         $students->each(function ($student) use ($docTypes) {
             $approvedTypes = $student->documents
