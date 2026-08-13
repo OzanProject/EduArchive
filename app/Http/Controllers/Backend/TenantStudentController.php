@@ -358,4 +358,152 @@ class TenantStudentController extends Controller
         
         return redirect()->back()->with('success', count($request->ids) . ' siswa berhasil dibatalkan status kelulusannya.');
     }
+
+    /**
+     * Rekap Kelengkapan Dokumen — Admin Lembaga
+     */
+    public function rekapDokumen(Request $request)
+    {
+        $status    = $request->input('status', 'Aktif');
+        $kelasFilter = $request->input('kelas');
+        $docFilter = $request->input('doc_filter'); // 'lengkap' | 'belum' | ''
+        $search    = $request->input('search');
+        $perPage   = $request->input('per_page', 20);
+
+        if ($status !== 'Lulus') {
+            $status = 'Aktif';
+        }
+
+        // Ambil DocumentType yang required & active (dari DB pusat)
+        $docTypes = \App\Models\DocumentType::where('is_required', true)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $query = \App\Models\Student::with('documents')
+            ->where('status_kelulusan', $status);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%");
+            });
+        }
+
+        if ($kelasFilter) {
+            $query->where('kelas', $kelasFilter);
+        }
+
+        // Ambil semua tanpa paginasi dulu untuk filter doc_filter
+        $allStudents = $query->orderByRaw('nama ASC')->get();
+
+        // Hitung kelengkapan per siswa
+        $allStudents->each(function ($student) use ($docTypes) {
+            $approvedTypes = $student->documents
+                ->where('validation_status', 'approved')
+                ->pluck('document_type')
+                ->toArray();
+
+            // Build array locally first — direct index-assignment on Eloquent magic
+            // properties fails in PHP 8.3 (indirect modification of overloaded property).
+            $docStatusMap = [];
+            $filled = 0;
+            foreach ($docTypes as $dt) {
+                $has = in_array($dt->name, $approvedTypes);
+                $docStatusMap[$dt->name] = $has;
+                if ($has) $filled++;
+            }
+            $total = $docTypes->count();
+
+            $student->doc_status  = $docStatusMap;
+            $student->doc_filled  = $filled;
+            $student->doc_total   = $total;
+            $student->doc_percent = $total > 0 ? round(($filled / $total) * 100) : 100;
+        });
+
+        // Filter lengkap/belum setelah hitung
+        if ($docFilter === 'lengkap') {
+            $allStudents = $allStudents->filter(fn($s) => $s->doc_percent >= 100);
+        } elseif ($docFilter === 'belum') {
+            $allStudents = $allStudents->filter(fn($s) => $s->doc_percent < 100);
+        }
+
+        // Summary
+        $totalSiswa   = $allStudents->count();
+        $totalLengkap = $allStudents->filter(fn($s) => $s->doc_percent >= 100)->count();
+        $totalBelum   = $totalSiswa - $totalLengkap;
+        $avgPercent   = $totalSiswa > 0 ? round($allStudents->avg('doc_percent')) : 0;
+
+        // Manual paginate
+        $page       = $request->input('page', 1);
+        $paginated  = new \Illuminate\Pagination\LengthAwarePaginator(
+            $allStudents->forPage($page, $perPage)->values(),
+            $allStudents->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        // Daftar kelas untuk filter
+        $kelasList = \App\Models\Student::where('status_kelulusan', $status)
+            ->distinct()
+            ->orderByRaw('kelas ASC')
+            ->pluck('kelas')
+            ->filter()
+            ->values();
+
+        return view('backend.adminlembaga.documents.rekap', compact(
+            'paginated', 'docTypes', 'status', 'kelasFilter', 'docFilter', 'search',
+            'perPage', 'kelasList', 'totalSiswa', 'totalLengkap', 'totalBelum', 'avgPercent'
+        ));
+    }
+
+    /**
+     * Print Rekap Dokumen — Admin Lembaga
+     */
+    public function rekapDokumenPrint(Request $request)
+    {
+        $status = $request->input('status', 'Aktif');
+        if ($status !== 'Lulus') {
+            $status = 'Aktif';
+        }
+
+        $docTypes = \App\Models\DocumentType::where('is_required', true)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $students = \App\Models\Student::with('documents')
+            ->where('status_kelulusan', $status)
+            ->orderByRaw('nama ASC')
+            ->get();
+
+        $students->each(function ($student) use ($docTypes) {
+            $approvedTypes = $student->documents
+                ->where('validation_status', 'approved')
+                ->pluck('document_type')
+                ->toArray();
+
+            $docStatusMap = [];
+            $filled = 0;
+            foreach ($docTypes as $dt) {
+                $has = in_array($dt->name, $approvedTypes);
+                $docStatusMap[$dt->name] = $has;
+                if ($has) $filled++;
+            }
+            $total = $docTypes->count();
+
+            $student->doc_status  = $docStatusMap;
+            $student->doc_filled  = $filled;
+            $student->doc_total   = $total;
+            $student->doc_percent = $total > 0 ? round(($filled / $total) * 100) : 100;
+        });
+
+        $printSettings = $this->getPrintSettings();
+
+        return view('backend.adminlembaga.documents.rekap_print', compact(
+            'students', 'docTypes', 'status', 'printSettings'
+        ));
+    }
 }
+

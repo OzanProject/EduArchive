@@ -120,6 +120,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
+            Route::post('/{tenant_id}/student/{id}/move', [MonitoringController::class, 'moveStudent'])->name('student.move');
+            Route::delete('/{tenant_id}/student/{id}', [MonitoringController::class, 'deleteStudent'])->name('student.delete');
             Route::get('/{tenant_id}/student/{id}/document/{document_id}/view', [MonitoringController::class, 'viewDocument'])->name('view_document');
 
             // Document Validation

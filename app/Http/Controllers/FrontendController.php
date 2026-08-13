@@ -75,7 +75,10 @@ class FrontendController extends Controller
         ->limit(6)
         ->get();
 
-    return view('frontend.index', compact('settings', 'logo', 'favicon', 'schoolProgress', 'profileProgress', 'documentProgress', 'districts', 'selectedDistrict', 'selectedNpsn', 'partnerTenants'));
+    // Statistik global siswa aktif & lulusan
+    $studentStats = $this->getStudentStats();
+
+    return view('frontend.index', compact('settings', 'logo', 'favicon', 'schoolProgress', 'profileProgress', 'documentProgress', 'districts', 'selectedDistrict', 'selectedNpsn', 'partnerTenants', 'studentStats'));
   }
 
   public function progress(Request $request)
@@ -127,38 +130,64 @@ class FrontendController extends Controller
 
   private function getSchoolProgressData($tenants): array
   {
-    $progress = [];
+    $progressAktif = [];
+    $progressLulus = [];
 
     foreach ($tenants as $tenant) {
-      // Single-database multi-tenancy: query by tenant_id directly
-      $total = \DB::table('students')
+      // ---- AKTIF ----
+      $totalAktif = \DB::table('students')
         ->where('tenant_id', $tenant->id)
+        ->whereRaw("LOWER(status_kelulusan) = 'aktif'")
         ->count();
 
-      $completed = \DB::table('students')
+      $nisnAktif = \DB::table('students')
         ->where('tenant_id', $tenant->id)
+        ->whereRaw("LOWER(status_kelulusan) = 'aktif'")
         ->whereNotNull('nisn')
         ->where('nisn', '!=', '')
         ->count();
 
-      $sisa = max(0, $total - $completed);
-      $pct  = $total > 0 ? round(($completed / $total) * 100) : 0;
-
-      $progress[] = [
+      $progressAktif[] = [
         'nama_sekolah' => $tenant->nama_sekolah ?? $tenant->id,
         'npsn'         => $tenant->npsn ?? '-',
         'jenjang'      => $tenant->jenjang ?? '-',
-        'pct'          => $pct,
-        'total'        => $total,
-        'sent'         => $completed,
-        'sisa'         => $sisa,
+        'pct'          => $totalAktif > 0 ? round(($nisnAktif / $totalAktif) * 100) : 0,
+        'total'        => $totalAktif,
+        'sent'         => $nisnAktif,
+        'sisa'         => max(0, $totalAktif - $nisnAktif),
+      ];
+
+      // ---- LULUS ----
+      $totalLulus = \DB::table('students')
+        ->where('tenant_id', $tenant->id)
+        ->whereRaw("LOWER(status_kelulusan) = 'lulus'")
+        ->count();
+
+      $nisnLulus = \DB::table('students')
+        ->where('tenant_id', $tenant->id)
+        ->whereRaw("LOWER(status_kelulusan) = 'lulus'")
+        ->whereNotNull('nisn')
+        ->where('nisn', '!=', '')
+        ->count();
+
+      $progressLulus[] = [
+        'nama_sekolah' => $tenant->nama_sekolah ?? $tenant->id,
+        'npsn'         => $tenant->npsn ?? '-',
+        'jenjang'      => $tenant->jenjang ?? '-',
+        'pct'          => $totalLulus > 0 ? round(($nisnLulus / $totalLulus) * 100) : 0,
+        'total'        => $totalLulus,
+        'sent'         => $nisnLulus,
+        'sisa'         => max(0, $totalLulus - $nisnLulus),
       ];
     }
 
-    // Urutkan dari yang progresnya tertinggi
-    usort($progress, fn($a, $b) => $b['pct'] <=> $a['pct']);
+    usort($progressAktif, fn($a, $b) => $b['pct'] <=> $a['pct']);
+    usort($progressLulus, fn($a, $b) => $b['pct'] <=> $a['pct']);
 
-    return $progress;
+    return [
+      'aktif' => $progressAktif,
+      'lulus' => $progressLulus,
+    ];
   }
 
   private function getProfileProgressData($tenants): array
@@ -296,6 +325,23 @@ class FrontendController extends Controller
   {
     $data = $this->getCommonData();
     return view('frontend.security', $data);
+  }
+
+  private function getStudentStats(): array
+  {
+    return \Illuminate\Support\Facades\Cache::remember('frontend_student_stats', 3600, function () {
+      $totalAktif  = \DB::table('students')->whereRaw("LOWER(status_kelulusan) = 'aktif'")->count();
+      $totalLulus  = \DB::table('students')->whereRaw("LOWER(status_kelulusan) = 'lulus'")->count();
+      $totalSiswa  = \DB::table('students')->count();
+      $totalSekolah = \DB::table('tenants')->where('status_aktif', 1)->count();
+
+      return [
+        'total_aktif'   => $totalAktif,
+        'total_lulus'   => $totalLulus,
+        'total_siswa'   => $totalSiswa,
+        'total_sekolah' => $totalSekolah,
+      ];
+    });
   }
 
   private function getCommonData()

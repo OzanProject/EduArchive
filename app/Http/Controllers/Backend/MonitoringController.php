@@ -104,11 +104,14 @@ class MonitoringController extends Controller
         ->pluck('tahun_lulus');
     });
 
+    $all_tenants = Tenant::where('id', '!=', $id)->orderBy('nama_sekolah')->get();
+
     return view('backend.superadmin.monitoring.students', compact(
       'tenant',
       'students',
       'graduation_years',
-      'per_page'
+      'per_page',
+      'all_tenants'
     ));
   }
 
@@ -187,6 +190,76 @@ class MonitoringController extends Controller
       'missing_docs',
       'logs'
     ));
+  }
+
+  public function moveStudent(Request $request, $tenant_id, $id)
+  {
+    $request->validate([
+      'target_tenant_id' => 'required|exists:tenants,id'
+    ]);
+
+    $sourceTenant = Tenant::findOrFail($tenant_id);
+    $targetTenant = Tenant::findOrFail($request->target_tenant_id);
+
+    if ($sourceTenant->id == $targetTenant->id) {
+      return back()->with('error', 'Lembaga tujuan sama dengan lembaga asal.');
+    }
+
+    $sourceTenant->run(function () use ($id, $targetTenant, $sourceTenant) {
+      $student = Student::findOrFail($id);
+      
+      \DB::table('documents')->where('student_id', $id)->update(['tenant_id' => $targetTenant->id]);
+      \DB::table('graduations')->where('student_id', $id)->update(['tenant_id' => $targetTenant->id]);
+      \DB::table('students')->where('id', $id)->update(['tenant_id' => $targetTenant->id, 'classroom_id' => null]);
+
+      $this->logAction(
+        $sourceTenant->id,
+        $student->id,
+        'MOVE',
+        Student::class,
+        $student->id,
+        [
+          'student_name' => $student->nama,
+          'target_tenant' => $targetTenant->nama_sekolah
+        ]
+      );
+    });
+
+    return back()->with('success', 'Siswa berhasil dipindahkan.');
+  }
+
+  public function deleteStudent(Request $request, $tenant_id, $id)
+  {
+    $tenant = Tenant::findOrFail($tenant_id);
+
+    $tenant->run(function () use ($id, $tenant) {
+      $student = Student::findOrFail($id);
+      
+      $documents = Document::where('student_id', $id)->get();
+      foreach ($documents as $doc) {
+        if (Storage::disk('public')->exists($doc->file_path)) {
+          Storage::disk('public')->delete($doc->file_path);
+        }
+        $doc->delete();
+      }
+      
+      \DB::table('graduations')->where('student_id', $id)->delete();
+      
+      $this->logAction(
+        $tenant->id,
+        $student->id,
+        'DELETE',
+        Student::class,
+        $student->id,
+        [
+          'student_name' => $student->nama
+        ]
+      );
+      
+      $student->delete();
+    });
+
+    return back()->with('success', 'Siswa berhasil dihapus.');
   }
 
   public function viewDocument($tenant_id, $student_id, $document_id)

@@ -95,6 +95,9 @@ class SyncDapodikJob implements ShouldQueue
             return $item->nisn ?: $item->nama; // Prefer NISN, fallback to Nama
         });
 
+        // Ambil semua data rombel existing untuk memetakan classroom_id
+        $existingClassrooms = Classroom::select('id', 'nama_kelas')->get()->keyBy('nama_kelas');
+
         $inserts = [];
         $countInsert = 0;
         $countUpdate = 0;
@@ -104,6 +107,13 @@ class SyncDapodikJob implements ShouldQueue
             $nisn = $row['nisn'] ?? null;
             $nama = $row['nama'] ?? 'Fulan';
             $identifier = $nisn ?: $nama;
+
+            // Mapping Rombel
+            $namaRombel = $row['nama_rombel'] ?? null;
+            $classroomId = null;
+            if ($namaRombel && $existingClassrooms->has($namaRombel)) {
+                $classroomId = $existingClassrooms->get($namaRombel)->id;
+            }
 
             if ($existingStudents->has($identifier)) {
                 if ($this->mode === 'skip') {
@@ -116,6 +126,8 @@ class SyncDapodikJob implements ShouldQueue
                         'gender' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : $student->gender,
                         'birth_place' => $row['tempat_lahir'] ?? null,
                         'birth_date' => $row['tanggal_lahir'] ?? null,
+                        'kelas' => $namaRombel,
+                        'classroom_id' => $classroomId,
                     ]);
                     $countUpdate++;
                 }
@@ -129,6 +141,8 @@ class SyncDapodikJob implements ShouldQueue
                     'gender' => isset($row['jenis_kelamin']) ? ($row['jenis_kelamin'] == 'L' ? 'L' : 'P') : 'L',
                     'birth_place' => $row['tempat_lahir'] ?? null,
                     'birth_date' => $row['tanggal_lahir'] ?? null,
+                    'kelas' => $namaRombel,
+                    'classroom_id' => $classroomId,
                     'status_kelulusan' => 'aktif',
                     'created_at' => now(),
                     'updated_at' => now(),

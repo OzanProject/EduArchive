@@ -114,7 +114,13 @@ Route::group([
         Route::post('students/{student}/cancel-graduate', [\App\Http\Controllers\Backend\TenantStudentController::class, 'cancelGraduate'])->name('students.cancelGraduate');
         Route::get('students/{student}/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'print'])->name('students.print');
         Route::resource('students', \App\Http\Controllers\Backend\TenantStudentController::class);
+
+        // Rekap Dokumen
+        Route::get('rekap-dokumen', [\App\Http\Controllers\Backend\TenantStudentController::class, 'rekapDokumen'])->name('rekap_dokumen');
+        Route::get('rekap-dokumen/print', [\App\Http\Controllers\Backend\TenantStudentController::class, 'rekapDokumenPrint'])->name('rekap_dokumen.print');
+
         Route::resource('infrastructure', \App\Http\Controllers\Backend\InfrastructureController::class);
+
         Route::resource('learning-activities', \App\Http\Controllers\Backend\LearningActivityController::class);
         Route::resource('integrity-pacts', \App\Http\Controllers\Backend\IntegrityPactController::class);
         Route::resource('documents', \App\Http\Controllers\Backend\DocumentController::class);

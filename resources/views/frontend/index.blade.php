@@ -3,6 +3,7 @@
 @section('content')
 
   @include('frontend.landing.hero')
+  @include('frontend.landing.student-stats')
   @include('frontend.landing.trusted-by')
   @include('frontend.landing.progress')
   @include('frontend.landing.features')

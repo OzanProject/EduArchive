@@ -75,6 +75,13 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="{{ route('adminlembaga.rekap_dokumen') }}"
+              class="nav-link {{ request()->routeIs('adminlembaga.rekap_dokumen*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-clipboard-list text-primary"></i>
+              <p>Rekap Dokumen</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{ route('adminlembaga.pip.index') }}"
               class="nav-link {{ request()->routeIs('adminlembaga.pip.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-hand-holding-usd text-warning"></i>
@@ -83,6 +90,7 @@
           </li>
 
           <li class="nav-header">DATA MASTER</li>
+
 
           <li class="nav-item">
             <a href="{{ route('adminlembaga.classrooms.index') }}"
