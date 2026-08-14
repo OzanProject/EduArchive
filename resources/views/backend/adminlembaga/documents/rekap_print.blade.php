@@ -226,43 +226,48 @@
   <table>
     <thead>
       <tr>
-        <th style="width:28px;">No</th>
-        <th class="text-left" style="width:90px;">NISN</th>
-        <th class="text-left">Nama Siswa</th>
-        <th style="width:70px;">Kelas</th>
-        @foreach($docTypes as $dt)
-          <th style="max-width: 60px; font-size: 8px; white-space: normal;">{{ $dt->name }}</th>
-        @endforeach
-        <th style="width:60px;">Lengkap</th>
-        <th style="width:38px;">%</th>
+        <th width="5%">No</th>
+        <th width="15%">NISN</th>
+        <th width="22%" style="text-align: left;">Nama Siswa</th>
+        <th width="15%">Tgl. Lahir / Usia</th>
+        <th width="12%">No. HP</th>
+        <th width="11%">{{ $status == 'Lulus' ? 'Tahun Lulus' : 'Kelas' }}</th>
+        <th width="20%">Status Dokumen</th>
       </tr>
     </thead>
     <tbody>
       @forelse($students as $student)
-        @php
-          $pct = $student->doc_percent;
-          $pctClass = $pct >= 100 ? 'pct-full' : ($pct >= 50 ? 'pct-mid' : 'pct-low');
-        @endphp
         <tr>
-          <td style="text-align:center; color:#9ca3af;">{{ $loop->iteration }}</td>
-          <td>{{ $student->nisn }}</td>
-          <td>{{ $student->nama }}</td>
-          <td style="text-align:center;">{{ $student->kelas ?? '-' }}</td>
-          @foreach($docTypes as $dt)
-            @if($student->doc_status[$dt->name] ?? false)
-              <td class="check">✓</td>
+          <td style="text-align: center; color: #9ca3af;">{{ $loop->iteration }}</td>
+          <td style="text-align: center;">{{ $student->nisn ?? '-' }}</td>
+          <td><strong>{{ $student->nama }}</strong></td>
+          <td style="text-align: center;">
+            @if($student->birth_date)
+              {{ \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') }}<br>
+              <small style="color: #6b7280;">({{ \Carbon\Carbon::parse($student->birth_date)->age }} thn)</small>
             @else
-              <td class="cross">✗</td>
+              -
             @endif
-          @endforeach
-          <td style="text-align:center; font-size:10px;">
-            {{ $student->doc_filled }}/{{ $student->doc_total }}
           </td>
-          <td class="{{ $pctClass }}" style="text-align:center;">{{ $pct }}%</td>
+          <td style="text-align: center;">{{ $student->no_hp ?? '-' }}</td>
+          <td style="text-align: center;">{{ $status == 'Lulus' ? ($student->tahun_lulus ?? '-') : ($student->kelas ?? '-') }}</td>
+          <td style="text-align: center;">
+            @php
+              $docs_count = $student->documents->count();
+              $approved_count = $student->documents->where('validation_status', 'approved')->count();
+            @endphp
+            @if($docs_count > 0)
+              <span class="{{ $approved_count == $docs_count ? 'pct-full' : 'pct-low' }}" style="font-size: 11px;">
+                {{ $approved_count }} Disetujui dari {{ $docs_count }}
+              </span>
+            @else
+              <span class="pct-low" style="font-size: 11px;">Belum Ada Dokumen</span>
+            @endif
+          </td>
         </tr>
       @empty
         <tr>
-          <td colspan="{{ 5 + $docTypes->count() }}" style="text-align:center; padding: 20px; color: #9ca3af;">
+          <td colspan="7" style="text-align: center; padding: 20px; color: #9ca3af;">
             Tidak ada data siswa.
           </td>
         </tr>
