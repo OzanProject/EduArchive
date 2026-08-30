@@ -59,68 +59,68 @@
       </button>
     </div>
 
-    {{-- ===== TAB 1: NISN / Data Siswa (split aktif & lulus) ===== --}}
+    {{-- ===== TAB 1: NISN / Data Siswa (split usia) ===== --}}
     <div id="tab-nisn" class="tab-content">
 
       {{-- Sub-tab pills --}}
       <div class="flex gap-2 mb-4 justify-center">
-        <button onclick="switchSubTab('subtab-aktif')" id="btn-subtab-aktif"
+        <button onclick="switchSubTab('subtab-under25')" id="btn-subtab-under25"
           class="subtab-btn px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200
                  bg-blue-600 text-white shadow-sm">
-          🎒 Siswa Aktif
+          👦 Usia 25 Kebawah
         </button>
-        <button onclick="switchSubTab('subtab-lulus')" id="btn-subtab-lulus"
+        <button onclick="switchSubTab('subtab-over25')" id="btn-subtab-over25"
           class="subtab-btn px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200
                  bg-slate-100 text-slate-500 hover:text-slate-700">
-          🎓 Alumni / Lulusan
+          👨 Usia 25 Keatas
         </button>
       </div>
 
-      {{-- Sub-tab: Siswa Aktif --}}
-      <div id="subtab-aktif" class="subtab-content">
+      {{-- Sub-tab: Usia 25 Kebawah --}}
+      <div id="subtab-under25" class="subtab-content">
         @php
-          $aktifItems = $schoolProgress['aktif'];
-          $totalSentA = collect($aktifItems)->sum('sent');
-          $totalAllA  = collect($aktifItems)->sum('total');
-          $totalSisaA = collect($aktifItems)->sum('sisa');
-          $avgPctA    = $totalAllA > 0 ? round(($totalSentA / $totalAllA) * 100) : 0;
+          $under25Items = $schoolProgress['under25'] ?? [];
+          $totalSentU = collect($under25Items)->sum('sent');
+          $totalAllU  = collect($under25Items)->sum('total');
+          $totalSisaU = collect($under25Items)->sum('sisa');
+          $avgPctU    = $totalAllU > 0 ? round(($totalSentU / $totalAllU) * 100) : 0;
         @endphp
         @include('frontend.landing._progress_table', [
-          'items'         => $aktifItems,
-          'totalSent'     => $totalSentA,
-          'totalAll'      => $totalAllA,
-          'totalSisa'     => $totalSisaA,
-          'avgPct'        => $avgPctA,
+          'items'         => $under25Items,
+          'totalSent'     => $totalSentU,
+          'totalAll'      => $totalAllU,
+          'totalSisa'     => $totalSisaU,
+          'avgPct'        => $avgPctU,
           'labelSent'     => 'Sudah Ber-NISN',
           'labelSisa'     => 'Belum NISN',
           'labelPct'      => 'Progres NISN',
-          'labelSentCard' => 'Siswa Aktif Ber-NISN',
+          'labelSentCard' => 'Usia 25 Kebawah Ber-NISN',
           'labelSisaCard' => 'Belum Ber-NISN',
-          'noteBar'       => 'Rata-rata kelengkapan NISN — Siswa Aktif seluruh lembaga',
+          'noteBar'       => 'Rata-rata kelengkapan NISN — Usia 25 Kebawah',
         ])
       </div>
 
-      {{-- Sub-tab: Alumni / Lulusan --}}
-      <div id="subtab-lulus" class="subtab-content hidden">
+      {{-- Sub-tab: Usia 25 Keatas --}}
+      <div id="subtab-over25" class="subtab-content hidden">
         @php
-          $lulusItems = $schoolProgress['lulus'];
-          $totalSentL = collect($lulusItems)->sum('sent');
-          $totalAllL  = collect($lulusItems)->sum('total');
-          $totalSisaL = collect($lulusItems)->sum('sisa');
-          $avgPctL    = $totalAllL > 0 ? round(($totalSentL / $totalAllL) * 100) : 0;
+          $over25Items = $schoolProgress['over25'] ?? [];
+          $totalSentO = collect($over25Items)->sum('sent');
+          $totalAllO  = collect($over25Items)->sum('total');
+          $totalSisaO = collect($over25Items)->sum('sisa');
+          $avgPctO    = $totalAllO > 0 ? round(($totalSentO / $totalAllO) * 100) : 0;
         @endphp
         @include('frontend.landing._progress_table', [
-          'items'         => $lulusItems,
-          'totalSent'     => $totalSentL,
-          'totalAll'      => $totalAllL,
-          'totalSisa'     => $totalSisaL,
-          'avgPct'        => $avgPctL,
+          'items'         => $over25Items,
+          'totalSent'     => $totalSentO,
+          'totalAll'      => $totalAllO,
+          'totalSisa'     => $totalSisaO,
+          'avgPct'        => $avgPctO,
           'labelSent'     => 'Sudah Ber-NISN',
           'labelSisa'     => 'Belum NISN',
           'labelPct'      => 'Progres NISN',
-          'labelSentCard' => 'Alumni Ber-NISN',
+          'labelSentCard' => 'Usia 25 Keatas Ber-NISN',
           'labelSisaCard' => 'Belum Ber-NISN',
-          'noteBar'       => 'Rata-rata kelengkapan NISN — Alumni/Lulusan seluruh lembaga',
+          'noteBar'       => 'Rata-rata kelengkapan NISN — Usia 25 Keatas',
         ])
       </div>
 

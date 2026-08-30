@@ -47,6 +47,13 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="{{ route('superadmin.mutations.index') }}"
+              class="nav-link {{ Request::routeIs('superadmin.mutations.*') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-exchange-alt"></i>
+              <p>Mutasi Siswa</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{ route('superadmin.monitoring.infrastructure.index') }}"
               class="nav-link {{ Request::routeIs('superadmin.monitoring.infrastructure.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-tools"></i>

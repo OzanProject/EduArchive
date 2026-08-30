@@ -212,6 +212,14 @@ class MonitoringController extends Controller
       \DB::table('graduations')->where('student_id', $id)->update(['tenant_id' => $targetTenant->id]);
       \DB::table('students')->where('id', $id)->update(['tenant_id' => $targetTenant->id, 'classroom_id' => null]);
 
+      \App\Models\StudentMutation::create([
+          'student_id' => $student->id,
+          'from_tenant_id' => $sourceTenant->id,
+          'to_tenant_id' => $targetTenant->id,
+          'moved_by_user_id' => auth()->id(),
+          'status' => 'moved',
+      ]);
+
       $this->logAction(
         $sourceTenant->id,
         $student->id,
@@ -459,6 +467,116 @@ class MonitoringController extends Controller
     });
 
     return view('backend.superadmin.monitoring.print_recap', compact('tenant', 'data', 'status', 'year', 'age_filter'));
+  }
+
+  public function exportExcel(Request $request, $id)
+  {
+    $tenant = Tenant::findOrFail($id);
+    $status = $request->input('status', 'aktif');
+    $year = $request->input('year');
+    $age_filter = $request->input('age_filter');
+
+    $data = $tenant->run(function () use ($status, $year, $age_filter) {
+      $query = Student::with(['documents' => function($q) {
+          $q->where('validation_status', 'approved');
+      }]);
+
+      if ($status == 'lulus') {
+        $query->where(['status_kelulusan' => 'lulus']);
+        if ($year) {
+          $query->where(['tahun_lulus' => $year]);
+        }
+      } else {
+        $query->where(['status_kelulusan' => 'aktif']);
+      }
+
+      if ($age_filter === 'under_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where([['birth_date', '>', $cutoff]]);
+      } elseif ($age_filter === 'over_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where([['birth_date', '<=', $cutoff]]);
+      }
+
+      return $query->orderByRaw('nama ASC')->get();
+    });
+
+    $required_types = DocumentType::where(['is_required' => true, 'is_active' => true])->pluck('name')->toArray();
+
+    return \Maatwebsite\Excel\Facades\Excel::download(
+        new \App\Exports\SchoolMonitoringExport($tenant, $data, $status, $year, $age_filter, $required_types),
+        'Rekap_Siswa_' . str_replace(' ', '_', $tenant->nama_sekolah) . '_' . date('Y-m-d') . '.xlsx'
+    );
+  }
+
+  public function exportPdf(Request $request, $id)
+  {
+    $tenant = Tenant::findOrFail($id);
+    $status = $request->input('status', 'aktif');
+    $year = $request->input('year');
+    $age_filter = $request->input('age_filter');
+
+    $data = $tenant->run(function () use ($status, $year, $age_filter) {
+      $query = Student::with(['documents' => function($q) {
+          $q->where('validation_status', 'approved');
+      }]);
+
+      if ($status == 'lulus') {
+        $query->where(['status_kelulusan' => 'lulus']);
+        if ($year) {
+          $query->where(['tahun_lulus' => $year]);
+        }
+      } else {
+        $query->where(['status_kelulusan' => 'aktif']);
+      }
+
+      if ($age_filter === 'under_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where([['birth_date', '>', $cutoff]]);
+      } elseif ($age_filter === 'over_25') {
+        $cutoff = now()->subYears(25)->format('Y-m-d');
+        $query->where([['birth_date', '<=', $cutoff]]);
+      }
+
+      return $query->orderByRaw('nama ASC')->get();
+    });
+
+    $required_types = DocumentType::where(['is_required' => true, 'is_active' => true])->pluck('name')->toArray();
+    $totalSiswa = count($data);
+    $sudahVerifikasi = 0;
+    $belumVerifikasi = 0;
+
+    foreach ($data as $student) {
+        $approvedTypes = $student->documents->pluck('document_type')->toArray();
+        $isVerified = true;
+        foreach ($required_types as $req) {
+            if (!in_array($req, $approvedTypes)) {
+                $isVerified = false;
+                break;
+            }
+        }
+        
+        if ($isVerified) {
+            $sudahVerifikasi++;
+            $student->is_verified = true;
+        } else {
+            $belumVerifikasi++;
+            $student->is_verified = false;
+        }
+    }
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('backend.superadmin.monitoring.export_pdf', [
+        'tenant' => $tenant,
+        'data' => $data,
+        'status' => $status,
+        'year' => $year,
+        'age_filter' => $age_filter,
+        'totalSiswa' => $totalSiswa,
+        'sudahVerifikasi' => $sudahVerifikasi,
+        'belumVerifikasi' => $belumVerifikasi,
+    ])->setPaper('a4', 'landscape');
+
+    return $pdf->download('Rekap_Siswa_' . str_replace(' ', '_', $tenant->nama_sekolah) . '_' . date('Y-m-d') . '.pdf');
   }
 
   public function auditLogs()

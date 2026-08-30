@@ -119,6 +119,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
+            Route::get('/{id}/export-excel', [MonitoringController::class, 'exportExcel'])->name('export_excel');
+            Route::get('/{id}/export-pdf', [MonitoringController::class, 'exportPdf'])->name('export_pdf');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
             Route::post('/{tenant_id}/student/{id}/move', [MonitoringController::class, 'moveStudent'])->name('student.move');
             Route::delete('/{tenant_id}/student/{id}', [MonitoringController::class, 'deleteStudent'])->name('student.delete');
@@ -152,6 +154,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/download/{file_name}', [\App\Http\Controllers\Backend\BackupController::class, 'download'])->name('download');
             Route::delete('/{file_name}', [\App\Http\Controllers\Backend\BackupController::class, 'destroy'])->name('destroy');
             Route::post('/restore', [\App\Http\Controllers\Backend\BackupController::class, 'restore'])->name('restore');
+        });
+
+        // Mutations
+        Route::prefix('mutations')->name('mutations.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Backend\SuperAdminMutationController::class, 'index'])->name('index');
+            Route::post('/{id}/return', [\App\Http\Controllers\Backend\SuperAdminMutationController::class, 'returnStudent'])->name('return');
         });
 
         // Role Management (RBAC)

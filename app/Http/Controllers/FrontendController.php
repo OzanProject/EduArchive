@@ -130,63 +130,63 @@ class FrontendController extends Controller
 
   private function getSchoolProgressData($tenants): array
   {
-    $progressAktif = [];
-    $progressLulus = [];
+    $progressUnder = [];
+    $progressOver = [];
 
     foreach ($tenants as $tenant) {
-      // ---- AKTIF ----
-      $totalAktif = \DB::table('students')
+      // ---- USIA 25 KEBAWAH ----
+      $totalUnder = \DB::table('students')
         ->where('tenant_id', $tenant->id)
-        ->whereRaw("LOWER(status_kelulusan) = 'aktif'")
+        ->whereRaw("(TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) <= 25 OR birth_date IS NULL)")
         ->count();
 
-      $nisnAktif = \DB::table('students')
+      $nisnUnder = \DB::table('students')
         ->where('tenant_id', $tenant->id)
-        ->whereRaw("LOWER(status_kelulusan) = 'aktif'")
+        ->whereRaw("(TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) <= 25 OR birth_date IS NULL)")
         ->whereNotNull('nisn')
         ->where('nisn', '!=', '')
         ->count();
 
-      $progressAktif[] = [
+      $progressUnder[] = [
         'nama_sekolah' => $tenant->nama_sekolah ?? $tenant->id,
         'npsn'         => $tenant->npsn ?? '-',
         'jenjang'      => $tenant->jenjang ?? '-',
-        'pct'          => $totalAktif > 0 ? round(($nisnAktif / $totalAktif) * 100) : 0,
-        'total'        => $totalAktif,
-        'sent'         => $nisnAktif,
-        'sisa'         => max(0, $totalAktif - $nisnAktif),
+        'pct'          => $totalUnder > 0 ? round(($nisnUnder / $totalUnder) * 100) : 0,
+        'total'        => $totalUnder,
+        'sent'         => $nisnUnder,
+        'sisa'         => max(0, $totalUnder - $nisnUnder),
       ];
 
-      // ---- LULUS ----
-      $totalLulus = \DB::table('students')
+      // ---- USIA 25 KEATAS ----
+      $totalOver = \DB::table('students')
         ->where('tenant_id', $tenant->id)
-        ->whereRaw("LOWER(status_kelulusan) = 'lulus'")
+        ->whereRaw("TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) > 25")
         ->count();
 
-      $nisnLulus = \DB::table('students')
+      $nisnOver = \DB::table('students')
         ->where('tenant_id', $tenant->id)
-        ->whereRaw("LOWER(status_kelulusan) = 'lulus'")
+        ->whereRaw("TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) > 25")
         ->whereNotNull('nisn')
         ->where('nisn', '!=', '')
         ->count();
 
-      $progressLulus[] = [
+      $progressOver[] = [
         'nama_sekolah' => $tenant->nama_sekolah ?? $tenant->id,
         'npsn'         => $tenant->npsn ?? '-',
         'jenjang'      => $tenant->jenjang ?? '-',
-        'pct'          => $totalLulus > 0 ? round(($nisnLulus / $totalLulus) * 100) : 0,
-        'total'        => $totalLulus,
-        'sent'         => $nisnLulus,
-        'sisa'         => max(0, $totalLulus - $nisnLulus),
+        'pct'          => $totalOver > 0 ? round(($nisnOver / $totalOver) * 100) : 0,
+        'total'        => $totalOver,
+        'sent'         => $nisnOver,
+        'sisa'         => max(0, $totalOver - $nisnOver),
       ];
     }
 
-    usort($progressAktif, fn($a, $b) => $b['pct'] <=> $a['pct']);
-    usort($progressLulus, fn($a, $b) => $b['pct'] <=> $a['pct']);
+    usort($progressUnder, fn($a, $b) => $b['pct'] <=> $a['pct']);
+    usort($progressOver, fn($a, $b) => $b['pct'] <=> $a['pct']);
 
     return [
-      'aktif' => $progressAktif,
-      'lulus' => $progressLulus,
+      'under25' => $progressUnder,
+      'over25'  => $progressOver,
     ];
   }
 

@@ -338,6 +338,14 @@
               </form>
 
               <div class="d-flex" style="gap: 5px;">
+                <a href="{{ route('superadmin.monitoring.export_excel', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
+                  class="btn btn-success btn-sm d-flex align-items-center">
+                  <i class="fas fa-file-excel mr-1"></i> Export Excel
+                </a>
+                <a href="{{ route('superadmin.monitoring.export_pdf', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
+                  class="btn btn-danger btn-sm d-flex align-items-center">
+                  <i class="fas fa-file-pdf mr-1"></i> Cetak PDF
+                </a>
                 <a href="{{ route('superadmin.monitoring.print_recap', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
                   target="_blank" class="btn btn-warning btn-sm d-flex align-items-center">
                   <i class="fas fa-print mr-1"></i> Cetak Rekap
