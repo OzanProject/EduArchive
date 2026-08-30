@@ -117,16 +117,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/integrity-pacts/{id}', [\App\Http\Controllers\Backend\SuperAdminIntegrityPactController::class, 'show'])->name('integrity-pacts.show');
             Route::patch('/integrity-pacts/{id}/status', [\App\Http\Controllers\Backend\SuperAdminIntegrityPactController::class, 'updateStatus'])->name('integrity-pacts.status');
 
+            // Global Monitoring Exports
+            Route::get('/export-all-excel', [MonitoringController::class, 'exportAllExcel'])->name('export_all_excel');
+            Route::get('/export-all-pdf', [MonitoringController::class, 'exportAllPdf'])->name('export_all_pdf');
+
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
             Route::post('/{id}/verify-all', [MonitoringController::class, 'verifyAllDocuments'])->name('verify_all_documents');
+            Route::post('/{id}/cancel-verify-all', [MonitoringController::class, 'cancelVerifyAllDocuments'])->name('cancel_verify_all_documents');
             Route::get('/{id}/export-excel', [MonitoringController::class, 'exportExcel'])->name('export_excel');
             Route::get('/{id}/export-pdf', [MonitoringController::class, 'exportPdf'])->name('export_pdf');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
             Route::post('/{tenant_id}/student/{id}/move', [MonitoringController::class, 'moveStudent'])->name('student.move');
             Route::delete('/{tenant_id}/student/{id}', [MonitoringController::class, 'deleteStudent'])->name('student.delete');
             Route::get('/{tenant_id}/student/{id}/document/{document_id}/view', [MonitoringController::class, 'viewDocument'])->name('view_document');
-
+            Route::post('/{tenant_id}/student/{id}/verify-all', [MonitoringController::class, 'verifyStudentDocuments'])->name('student.verify_all');
+            Route::post('/{tenant_id}/student/{id}/cancel-verify-all', [MonitoringController::class, 'cancelVerifyStudentDocuments'])->name('student.cancel_verify_all');
             // Document Validation
             Route::post('/{tenant_id}/student/{student_id}/document/{document_id}/approve', [MonitoringController::class, 'approveDocument'])->name('document.approve');
             Route::post('/{tenant_id}/student/{student_id}/document/{document_id}/reject', [MonitoringController::class, 'rejectDocument'])->name('document.reject');

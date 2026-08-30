@@ -52,11 +52,12 @@ class SuperAdminReportController extends Controller
     return view('backend.superadmin.reports.index', compact('tenants', 'allTenants'));
   }
 
-  public function show($tenantId)
+  public function show(Request $request, $tenantId)
   {
     if ($tenantId === 'all') {
-      $stats = $this->getComparativeStats();
-      return view('backend.superadmin.reports.compare', compact('stats'));
+      $sort = $request->input('sort', 'nama_asc');
+      $stats = $this->getComparativeStats($sort);
+      return view('backend.superadmin.reports.compare', compact('stats', 'sort'));
     } else {
       $tenant = Tenant::findOrFail($tenantId);
       $stats = $this->getStats($tenant);
@@ -64,10 +65,11 @@ class SuperAdminReportController extends Controller
     }
   }
 
-  public function pdfExport($tenantId)
+  public function pdfExport(Request $request, $tenantId)
   {
     if ($tenantId === 'all') {
-      $stats = $this->getComparativeStats();
+      $sort = $request->input('sort', 'nama_asc');
+      $stats = $this->getComparativeStats($sort);
       $pdf = Pdf::loadView('backend.superadmin.reports.compare_pdf', compact('stats'))
         ->setPaper('a4', 'landscape');
       
@@ -200,7 +202,7 @@ class SuperAdminReportController extends Controller
     return $stats;
   }
 
-  private function getComparativeStats()
+  private function getComparativeStats($sort = 'nama_asc')
   {
     $tenants = Tenant::where('status_aktif', 1)->orderBy('nama_sekolah')->get();
     $tenantScope = \Stancl\Tenancy\Database\TenantScope::class;
@@ -253,7 +255,15 @@ class SuperAdminReportController extends Controller
         ];
     }
     
-    return collect($results);
+    $collection = collect($results);
+    
+    if ($sort === 'students_desc') {
+        return $collection->sortByDesc('active_students')->values();
+    } elseif ($sort === 'students_asc') {
+        return $collection->sortBy('active_students')->values();
+    }
+    
+    return $collection;
   }
 
 }

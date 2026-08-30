@@ -48,6 +48,55 @@ class MonitoringController extends Controller
 
     return view('backend.superadmin.monitoring.index', compact('tenants', 'category', 'age_filter', 'per_page'));
   }
+  private function getTenantsDataForExport(Request $request)
+  {
+    $category = $request->input('category', 'students');
+    $age_filter = $request->input('age_filter');
+    $statusFilter = $category === 'graduates' ? 'lulus' : 'aktif';
+
+    $tenants = Tenant::all();
+
+    foreach ($tenants as $tenant) {
+        $tenant->run(function () use ($tenant, $statusFilter, $age_filter) {
+            $query = Student::where('status_kelulusan', $statusFilter);
+            
+            if ($age_filter == 'under_25') {
+                $query->whereRaw('TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) < 25');
+            } elseif ($age_filter == 'over_25') {
+                $query->whereRaw('TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) >= 25');
+            }
+
+            $tenant->stats_total = (clone $query)->count();
+            $tenant->stats_l = (clone $query)->where('gender', 'L')->count();
+            $tenant->stats_p = (clone $query)->where('gender', 'P')->count();
+        });
+    }
+
+    return $tenants->sortByDesc('stats_total')->values();
+  }
+
+  public function exportAllExcel(Request $request)
+  {
+    $tenants = $this->getTenantsDataForExport($request);
+    $category = $request->input('category', 'students');
+    
+    return \Maatwebsite\Excel\Facades\Excel::download(
+        new \App\Exports\AllTenantsMonitoringExport($tenants, $category),
+        'Rekap_Semua_Lembaga_'.date('YmdHis').'.xlsx'
+    );
+  }
+
+  public function exportAllPdf(Request $request)
+  {
+    $tenants = $this->getTenantsDataForExport($request);
+    $category = $request->input('category', 'students');
+    $age_filter = $request->input('age_filter');
+    
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('backend.superadmin.monitoring.export_all_pdf', compact('tenants', 'category', 'age_filter'))
+            ->setPaper('a4', 'landscape');
+            
+    return $pdf->download('Rekap_Semua_Lembaga_'.date('YmdHis').'.pdf');
+  }
 
   public function showSchool(Request $request, $id)
   {
@@ -59,7 +108,7 @@ class MonitoringController extends Controller
 
     $students = $tenant->run(function () use ($status, $year, $per_page, $request) {
 
-      $query = Student::query();
+      $query = Student::with('documents');
 
       if ($request->filled('table_search')) {
         $search = $request->table_search;
@@ -105,13 +154,16 @@ class MonitoringController extends Controller
     });
 
     $all_tenants = Tenant::where('id', '!=', $id)->orderBy('nama_sekolah')->get();
+    
+    $required_types = DocumentType::where(['is_required' => true, 'is_active' => true])->pluck('name')->toArray();
 
     return view('backend.superadmin.monitoring.students', compact(
       'tenant',
       'students',
       'graduation_years',
       'per_page',
-      'all_tenants'
+      'all_tenants',
+      'required_types'
     ));
   }
 
@@ -411,6 +463,155 @@ class MonitoringController extends Controller
     } catch (\Exception $e) {
       Log::error("Verify All error: " . $e->getMessage());
       return back()->with('error', 'Gagal memverifikasi dokumen secara massal.');
+    }
+  }
+
+  public function cancelVerifyAllDocuments(Request $request, $id)
+  {
+    $status = $request->input('status', 'aktif');
+    $year = $request->input('year');
+    $age_filter = $request->input('age_filter');
+
+    try {
+      $tenant = Tenant::findOrFail($id);
+
+      $tenant->run(function () use ($tenant, $status, $year, $age_filter) {
+        $query = Student::whereHas('documents', function($q) {
+            $q->where('validation_status', 'approved');
+        });
+
+        if ($status == 'lulus') {
+          $query->where(['status_kelulusan' => 'lulus']);
+          if ($year) {
+            $query->where(['tahun_lulus' => $year]);
+          }
+        } else {
+          $query->where(['status_kelulusan' => 'aktif']);
+        }
+
+        if ($age_filter === 'under_25') {
+          $cutoff = now()->subYears(25)->format('Y-m-d');
+          $query->where([['birth_date', '>', $cutoff]]);
+        } elseif ($age_filter === 'over_25') {
+          $cutoff = now()->subYears(25)->format('Y-m-d');
+          $query->where([['birth_date', '<=', $cutoff]]);
+        }
+
+        $studentIds = $query->pluck('id')->toArray();
+
+        if (!empty($studentIds)) {
+            $documents = Document::whereIn('student_id', $studentIds)
+                ->where('validation_status', 'approved')
+                ->get();
+                
+            foreach ($documents as $document) {
+              $document->update([
+                'validation_status' => 'pending',
+                'validated_by' => null,
+                'validated_at' => null,
+                'validation_notes' => 'Verifikasi dibatalkan secara massal oleh Super Admin',
+              ]);
+
+              $this->logAction(
+                $tenant->id,
+                $document->student_id,
+                'CANCEL_APPROVE_MASSAL',
+                Document::class,
+                $document->id,
+                [
+                  'document_name' => $document->document_type,
+                  'status' => 'pending'
+                ]
+              );
+            }
+        }
+      });
+
+      return back()->with('success', 'Verifikasi untuk semua dokumen siswa yang sesuai filter berhasil dibatalkan.');
+
+    } catch (\Exception $e) {
+      Log::error("Cancel Verify All error: " . $e->getMessage());
+      return back()->with('error', 'Gagal membatalkan verifikasi dokumen secara massal.');
+    }
+  }
+
+  public function verifyStudentDocuments(Request $request, $tenant_id, $id)
+  {
+    try {
+      $tenant = Tenant::findOrFail($tenant_id);
+
+      $tenant->run(function () use ($tenant, $id) {
+        $documents = Document::where('student_id', $id)
+            ->where('validation_status', '!=', 'approved')
+            ->get();
+            
+        foreach ($documents as $document) {
+          $document->update([
+            'validation_status' => 'approved',
+            'validated_by' => auth()->id(),
+            'validated_at' => now(),
+            'validation_notes' => 'Disetujui massal oleh Super Admin',
+          ]);
+
+          $this->logAction(
+            $tenant->id,
+            $document->student_id,
+            'APPROVE_MASSAL_STUDENT',
+            Document::class,
+            $document->id,
+            [
+              'document_name' => $document->document_type,
+              'status' => 'approved'
+            ]
+          );
+        }
+      });
+
+      return back()->with('success', 'Semua dokumen milik siswa ini berhasil disetujui.');
+
+    } catch (\Exception $e) {
+      Log::error("Verify Student Documents error: " . $e->getMessage());
+      return back()->with('error', 'Gagal menyetujui dokumen siswa.');
+    }
+  }
+
+  public function cancelVerifyStudentDocuments(Request $request, $tenant_id, $id)
+  {
+    try {
+      $tenant = Tenant::findOrFail($tenant_id);
+
+      $tenant->run(function () use ($tenant, $id) {
+        $documents = Document::where('student_id', $id)
+            ->where('validation_status', 'approved')
+            ->get();
+            
+        foreach ($documents as $document) {
+          $document->update([
+            'validation_status' => 'pending',
+            'validated_by' => null,
+            'validated_at' => null,
+            'validation_notes' => 'Verifikasi dibatalkan oleh Super Admin',
+          ]);
+
+          $this->logAction(
+            $tenant->id,
+            $document->student_id,
+            'CANCEL_APPROVE_MASSAL_STUDENT',
+            Document::class,
+            $document->id,
+            [
+              'document_name' => $document->document_type,
+              'status' => 'pending'
+            ]
+          );
+        }
+      });
+
+      return back()->with('success', 'Verifikasi untuk dokumen siswa ini berhasil dibatalkan.');
+
+    } catch (\Exception $e) {
+      Log::error("Cancel Verify Student Documents error: " . $e->getMessage());
+      return back()->with('error', 'Gagal membatalkan verifikasi dokumen siswa.');
     }
   }
 

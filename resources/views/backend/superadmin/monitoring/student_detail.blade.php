@@ -121,9 +121,25 @@
       <!-- DOCUMENT LIST (Modern) -->
       <!-- DOCUMENT LIST (Modern - Pagination Safe) -->
       <div class="card card-modern mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center border-bottom-0 pb-0">
-          <h5 class="font-weight-bold mb-0">Arsip Dokumen</h5>
-          <span class="badge badge-secondary">{{ $documents->total() }} File</span>
+        <div class="card-header d-flex justify-content-between align-items-center border-bottom-0 pb-2">
+          <div>
+            <h5 class="font-weight-bold mb-0 d-inline-block mr-2">Arsip Dokumen</h5>
+            <span class="badge badge-secondary align-middle">{{ $documents->total() }} File</span>
+          </div>
+          <div class="d-flex" style="gap: 5px;">
+            <form action="{{ route('superadmin.monitoring.student.verify_all', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menyetujui secara massal semua dokumen yang ada milik siswa ini?');">
+              @csrf
+              <button type="submit" class="btn btn-primary btn-sm d-flex align-items-center" title="Verifikasi Semua Dokumen">
+                <i class="fas fa-check-double mr-1"></i> Verifikasi Semua
+              </button>
+            </form>
+            <form action="{{ route('superadmin.monitoring.student.cancel_verify_all', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin membatalkan verifikasi secara massal dokumen milik siswa ini?');">
+              @csrf
+              <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center" title="Batalkan Verifikasi">
+                <i class="fas fa-times-circle mr-1"></i> Batal Verif
+              </button>
+            </form>
+          </div>
         </div>
 
         <div class="card-body pt-2">

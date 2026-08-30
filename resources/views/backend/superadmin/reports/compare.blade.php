@@ -12,11 +12,18 @@
 @section('content')
   <div class="row">
     <!-- Action buttons -->
-    <div class="col-12 mb-3">
-        <a href="{{ route('superadmin.reports.pdf', 'all') }}" class="btn btn-warning float-right ml-2 no-print" target="_blank">
+    <div class="col-12 mb-3 d-flex flex-wrap justify-content-end align-items-center no-print" style="gap: 10px;">
+        <form action="{{ route('superadmin.reports.show', 'all') }}" method="GET" class="m-0">
+            <select name="sort" class="form-control" onchange="this.form.submit()" style="min-width: 220px;">
+                <option value="nama_asc" {{ (isset($sort) && $sort == 'nama_asc') ? 'selected' : '' }}>Urutkan: Nama Sekolah (A-Z)</option>
+                <option value="students_desc" {{ (isset($sort) && $sort == 'students_desc') ? 'selected' : '' }}>Urutkan: Siswa Terbanyak</option>
+                <option value="students_asc" {{ (isset($sort) && $sort == 'students_asc') ? 'selected' : '' }}>Urutkan: Siswa Paling Sedikit</option>
+            </select>
+        </form>
+        <a href="{{ route('superadmin.reports.pdf', ['report' => 'all', 'sort' => isset($sort) ? $sort : 'nama_asc']) }}" class="btn btn-warning" target="_blank">
             <i class="fas fa-file-pdf"></i> Export PDF Komparasi
         </a>
-        <button onclick="window.print()" class="btn btn-primary float-right no-print">
+        <button onclick="window.print()" class="btn btn-primary">
             <i class="fas fa-print"></i> Print Halaman
         </button>
     </div>

@@ -19,6 +19,14 @@
             <h3 class="card-title mb-2 mb-md-0">Pilih Sekolah untuk Monitoring {{ $category == 'graduates' ? 'Lulusan' : 'Siswa' }}
             </h3>
             <div class="card-tools d-flex flex-wrap align-items-center justify-content-md-end" style="gap: 10px;">
+              <div class="d-flex flex-wrap align-items-center" style="gap: 5px;">
+                  <a href="{{ route('superadmin.monitoring.export_all_excel', request()->all()) }}" class="btn btn-success btn-sm">
+                      <i class="fas fa-file-excel mr-1"></i> Export Excel
+                  </a>
+                  <a href="{{ route('superadmin.monitoring.export_all_pdf', request()->all()) }}" class="btn btn-danger btn-sm">
+                      <i class="fas fa-file-pdf mr-1"></i> Cetak PDF
+                  </a>
+              </div>
               <form action="{{ route('superadmin.monitoring.index') }}" method="GET" class="d-flex flex-wrap align-items-center m-0" style="gap: 10px;">
                 <input type="hidden" name="category" value="{{ $category }}">
                 

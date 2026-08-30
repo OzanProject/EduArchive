@@ -344,6 +344,12 @@
                     <i class="fas fa-check-double mr-1"></i> Verifikasi Semua
                   </button>
                 </form>
+                <form action="{{ route('superadmin.monitoring.cancel_verify_all_documents', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin MEMBATALKAN verifikasi massal untuk dokumen siswa yang SESUAI FILTER SAAT INI?');">
+                  @csrf
+                  <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center">
+                    <i class="fas fa-times-circle mr-1"></i> Batal Verif
+                  </button>
+                </form>
                 <a href="{{ route('superadmin.monitoring.export_excel', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
                   class="btn btn-success btn-sm d-flex align-items-center">
                   <i class="fas fa-file-excel mr-1"></i> Export Excel
@@ -372,29 +378,48 @@
                 <th>No</th>
                 <th>NISN</th>
                 <th>Nama Siswa</th>
-                <th>Tgl. Lahir / Usia</th>
-                <th>No. HP</th>
+                <th>L/P</th>
                 <th>Kelas</th>
-                <th>Aksi</th>
+                <th>Tgl Lahir</th>
+                <th>Usia</th>
+                <th>Status Verifikasi</th>
+                <th class="text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
               @forelse($students as $student)
                 <tr>
                   <td>{{ $students->firstItem() + $loop->index }}</td>
-                  <td>{{ $student->nisn }}</td>
+                  <td>{{ $student->nisn ?? '-' }}</td>
                   <td>{{ $student->nama }}</td>
+                  <td>{{ $student->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
+                  <td>{{ $student->kelas ?? '-' }}</td>
+                  <td>{{ $student->birth_date ? \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') : '-' }}</td>
                   <td>
                     @if($student->birth_date)
-                      {{ \Carbon\Carbon::parse($student->birth_date)->format('d/m/Y') }}<br>
-                      <small class="text-muted">{{ \Carbon\Carbon::parse($student->birth_date)->age }} tahun</small>
+                      {{ \Carbon\Carbon::parse($student->birth_date)->age }} tahun
                     @else
                       <span class="text-muted">-</span>
                     @endif
                   </td>
-                  <td>{{ $student->no_hp ?? '-' }}</td>
-                  <td>{{ $student->kelas }}</td>
                   <td>
+                    @php
+                        $approvedTypes = $student->documents->where('validation_status', 'approved')->pluck('document_type')->toArray();
+                        $isVerified = true;
+                        foreach ($required_types as $req) {
+                            if (!in_array($req, $approvedTypes)) {
+                                $isVerified = false;
+                                break;
+                            }
+                        }
+                    @endphp
+                    @if($isVerified)
+                        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Terverifikasi</span>
+                    @else
+                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Belum Verifikasi</span>
+                    @endif
+                  </td>
+                  <td class="text-center">
                     <a href="{{ route('superadmin.monitoring.student', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}"
                       class="btn btn-info btn-sm" title="Detail Siswa & Dokumen">
                       <i class="fas fa-search"></i> Detail
