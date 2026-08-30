@@ -27,13 +27,6 @@ class SuperAdminMutationController extends Controller
             return back()->with('error', 'Siswa sudah dikembalikan ke lembaga asalnya.');
         }
 
-        // Return student
-        $student = Student::find($mutation->student_id);
-        
-        if (!$student) {
-            return back()->with('error', 'Siswa tidak ditemukan.');
-        }
-
         $targetTenant = Tenant::find($mutation->from_tenant_id);
         $sourceTenant = Tenant::find($mutation->to_tenant_id);
 
@@ -41,7 +34,17 @@ class SuperAdminMutationController extends Controller
             return back()->with('error', 'Data lembaga asal/tujuan sudah tidak valid.');
         }
 
-        $sourceTenant->run(function () use ($student, $targetTenant, $sourceTenant, $mutation) {
+        $error = null;
+
+        $sourceTenant->run(function () use ($targetTenant, $sourceTenant, $mutation, &$error) {
+            // Find student inside tenant context
+            $student = Student::find($mutation->student_id);
+            
+            if (!$student) {
+                $error = 'Siswa tidak ditemukan di lembaga tujuan (kemungkinan sudah dihapus atau dipindah lagi).';
+                return;
+            }
+
             \DB::table('documents')->where('student_id', $student->id)->update(['tenant_id' => $targetTenant->id]);
             \DB::table('graduations')->where('student_id', $student->id)->update(['tenant_id' => $targetTenant->id]);
             \DB::table('students')->where('id', $student->id)->update(['tenant_id' => $targetTenant->id, 'classroom_id' => null]);
@@ -65,6 +68,10 @@ class SuperAdminMutationController extends Controller
                 ]
             ]);
         });
+
+        if ($error) {
+            return back()->with('error', $error);
+        }
 
         return back()->with('success', 'Siswa berhasil dikembalikan ke lembaga asalnya.');
     }

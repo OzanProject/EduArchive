@@ -119,6 +119,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Specific Monitoring
             Route::get('/{id}', [MonitoringController::class, 'showSchool'])->name('school');
+            Route::post('/{id}/verify-all', [MonitoringController::class, 'verifyAllDocuments'])->name('verify_all_documents');
             Route::get('/{id}/export-excel', [MonitoringController::class, 'exportExcel'])->name('export_excel');
             Route::get('/{id}/export-pdf', [MonitoringController::class, 'exportPdf'])->name('export_pdf');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');

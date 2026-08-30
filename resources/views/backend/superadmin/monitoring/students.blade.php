@@ -338,6 +338,12 @@
               </form>
 
               <div class="d-flex" style="gap: 5px;">
+                <form action="{{ route('superadmin.monitoring.verify_all_documents', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menyetujui secara massal dokumen siswa yang SESUAI FILTER SAAT INI?');">
+                  @csrf
+                  <button type="submit" class="btn btn-primary btn-sm d-flex align-items-center">
+                    <i class="fas fa-check-double mr-1"></i> Verifikasi Semua
+                  </button>
+                </form>
                 <a href="{{ route('superadmin.monitoring.export_excel', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
                   class="btn btn-success btn-sm d-flex align-items-center">
                   <i class="fas fa-file-excel mr-1"></i> Export Excel

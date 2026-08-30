@@ -345,6 +345,75 @@ class MonitoringController extends Controller
     }
   }
 
+  public function verifyAllDocuments(Request $request, $id)
+  {
+    $status = $request->input('status', 'aktif');
+    $year = $request->input('year');
+    $age_filter = $request->input('age_filter');
+
+    try {
+      $tenant = Tenant::findOrFail($id);
+
+      $tenant->run(function () use ($tenant, $status, $year, $age_filter) {
+        $query = Student::whereHas('documents', function($q) {
+            $q->where('validation_status', '!=', 'approved');
+        });
+
+        if ($status == 'lulus') {
+          $query->where(['status_kelulusan' => 'lulus']);
+          if ($year) {
+            $query->where(['tahun_lulus' => $year]);
+          }
+        } else {
+          $query->where(['status_kelulusan' => 'aktif']);
+        }
+
+        if ($age_filter === 'under_25') {
+          $cutoff = now()->subYears(25)->format('Y-m-d');
+          $query->where([['birth_date', '>', $cutoff]]);
+        } elseif ($age_filter === 'over_25') {
+          $cutoff = now()->subYears(25)->format('Y-m-d');
+          $query->where([['birth_date', '<=', $cutoff]]);
+        }
+
+        $studentIds = $query->pluck('id')->toArray();
+
+        if (!empty($studentIds)) {
+            $documents = Document::whereIn('student_id', $studentIds)
+                ->where('validation_status', '!=', 'approved')
+                ->get();
+                
+            foreach ($documents as $document) {
+              $document->update([
+                'validation_status' => 'approved',
+                'validated_by' => auth()->id(),
+                'validated_at' => now(),
+                'validation_notes' => 'Disetujui massal oleh Super Admin',
+              ]);
+
+              $this->logAction(
+                $tenant->id,
+                $document->student_id,
+                'APPROVE_MASSAL',
+                Document::class,
+                $document->id,
+                [
+                  'document_name' => $document->document_type,
+                  'status' => 'approved'
+                ]
+              );
+            }
+        }
+      });
+
+      return back()->with('success', 'Semua dokumen siswa yang sesuai filter berhasil diverifikasi secara massal.');
+
+    } catch (\Exception $e) {
+      Log::error("Verify All error: " . $e->getMessage());
+      return back()->with('error', 'Gagal memverifikasi dokumen secara massal.');
+    }
+  }
+
   public function rejectDocument(Request $request, $tenant_id, $student_id, $document_id)
   {
     $request->validate([
