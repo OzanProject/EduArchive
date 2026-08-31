@@ -288,14 +288,26 @@
       <div class="card">
         <div class="card-header">
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center" style="gap: 10px;">
-            <h3 class="card-title mb-2 mb-md-0">Daftar {{ request('status') == 'lulus' ? 'Alumni' : 'Siswa Aktif' }} di
-              {{ $tenant->nama_sekolah }}
+            <h3 class="card-title mb-2 mb-md-0">Daftar 
+              @if(request('status') == 'lulus')
+                Alumni
+              @elseif(request('status') == 'keluar')
+                Siswa Mutasi/Keluar
+              @else
+                Siswa Aktif
+              @endif
+              di {{ $tenant->nama_sekolah }}
             </h3>
             <div class="card-tools d-flex flex-wrap align-items-center" style="gap: 10px;">
               <form action="{{ route('superadmin.monitoring.school', $tenant->id) }}" method="GET"
                 class="d-flex flex-wrap align-items-center m-0" style="gap: 10px;">
-                <input type="hidden" name="status" value="{{ request('status', 'aktif') }}">
-
+                <div class="input-group input-group-sm" style="max-width: 140px;">
+                  <select name="status" class="form-control" onchange="this.form.submit()">
+                    <option value="aktif" {{ request('status', 'aktif') == 'aktif' ? 'selected' : '' }}>Siswa Aktif</option>
+                    <option value="lulus" {{ request('status') == 'lulus' ? 'selected' : '' }}>Alumni</option>
+                    <option value="keluar" {{ request('status') == 'keluar' ? 'selected' : '' }}>Mutasi/Keluar</option>
+                  </select>
+                </div>
                 <div class="input-group input-group-sm" style="width: 200px;">
                   <input type="text" name="table_search" class="form-control float-right" placeholder="Cari Siswa..."
                     value="{{ request('table_search') }}">
@@ -350,6 +362,9 @@
                     <i class="fas fa-times-circle mr-1"></i> Batal Verif
                   </button>
                 </form>
+                <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" data-toggle="modal" data-target="#massMoveNoDocsModal" title="Mutasi Massal Siswa Tanpa Dokumen">
+                  <i class="fas fa-truck-moving mr-1"></i> Mutasi 0 Dokumen
+                </button>
                 <a href="{{ route('superadmin.monitoring.export_excel', ['id' => $tenant->id, 'status' => request('status', 'aktif'), 'year' => request('year'), 'age_filter' => request('age_filter')]) }}"
                   class="btn btn-success btn-sm d-flex align-items-center">
                   <i class="fas fa-file-excel mr-1"></i> Export Excel
@@ -427,6 +442,15 @@
                     <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#moveModal{{ $student->id }}" title="Pindah Lembaga">
                       <i class="fas fa-exchange-alt"></i> Pindah
                     </button>
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#incomingMoveModal{{ $student->id }}" title="Mutasi Masuk">
+                      <i class="fas fa-sign-in-alt"></i> Mutasi Masuk
+                    </button>
+                    <form action="{{ route('superadmin.monitoring.student.set_inactive', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status siswa ini menjadi Keluar/Mutasi Tanpa Keterangan?');">
+                      @csrf
+                      <button type="submit" class="btn btn-secondary btn-sm" title="Set Inaktif">
+                        <i class="fas fa-user-times"></i> Set Inaktif
+                      </button>
+                    </form>
                     <form action="{{ route('superadmin.monitoring.student.delete', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus siswa {{ addslashes($student->nama) }} beserta seluruh dokumennya? Tindakan ini tidak dapat dibatalkan.');">
                       @csrf
                       @method('DELETE')
@@ -434,6 +458,57 @@
                         <i class="fas fa-trash"></i> Hapus
                       </button>
                     </form>
+
+                    <!-- Modal Mutasi Masuk -->
+                    <div class="modal fade move-modal" id="incomingMoveModal{{ $student->id }}" tabindex="-1" role="dialog" aria-labelledby="incomingMoveModalLabel{{ $student->id }}" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content move-modal-content">
+                          <form action="{{ route('superadmin.monitoring.student.incoming_move', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}" method="POST">
+                            @csrf
+
+                            {{-- Header --}}
+                            <div class="move-modal-header bg-primary">
+                              <div class="move-modal-header-icon text-primary">
+                                <i class="fas fa-sign-in-alt"></i>
+                              </div>
+                              <h5 class="modal-title font-weight-bold" id="incomingMoveModalLabel{{ $student->id }}">Mutasi Masuk Siswa</h5>
+                              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+
+                            {{-- Body --}}
+                            <div class="modal-body p-4 text-left">
+                              <p class="mb-4 text-muted">
+                                Catat siswa <strong>{{ $student->nama }}</strong> (NISN: {{ $student->nisn ?? '-' }}) sebagai siswa pindahan dari sekolah lain ke lembaga ini.
+                              </p>
+
+                              <div class="form-group">
+                                <label class="font-weight-bold">Asal Sekolah <span class="text-danger">*</span></label>
+                                <select name="from_tenant_id" class="form-control select2bs4" style="width: 100%;" required>
+                                  <option value="">-- Pilih Asal Sekolah --</option>
+                                  @foreach($all_tenants as $t)
+                                    <option value="{{ $t->id }}">{{ $t->nama_sekolah }} (NPSN: {{ $t->npsn }})</option>
+                                  @endforeach
+                                </select>
+                                <small class="text-muted mt-2 d-block">
+                                  <i class="fas fa-info-circle"></i> Memilih sekolah asal akan mencatat riwayat mutasi masuk untuk siswa ini.
+                                </small>
+                              </div>
+                            </div>
+
+                            {{-- Footer --}}
+                            <div class="modal-footer bg-light border-top-0 rounded-bottom">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                              <button type="submit" class="btn btn-primary shadow-sm">
+                                <i class="fas fa-save mr-1"></i> Simpan Mutasi Masuk
+                              </button>
+                            </div>
+
+                          </form>
+                        </div>
+                      </div>
+                    </div>
 
                     <!-- Modal Pindah Lembaga -->
                     <div class="modal fade move-modal" id="moveModal{{ $student->id }}" tabindex="-1" role="dialog" aria-labelledby="moveModalLabel{{ $student->id }}" aria-hidden="true">
@@ -549,6 +624,48 @@
         @endif
       </div>
       <!-- /.card -->
+    </div>
+  </div>
+
+  <!-- Modal Mutasi Massal Tanpa Dokumen -->
+  <div class="modal fade" id="massMoveNoDocsModal" tabindex="-1" role="dialog" aria-labelledby="massMoveNoDocsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <form action="{{ route('superadmin.monitoring.school.mass_move_nodocs', $tenant->id) }}" method="POST">
+          @csrf
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title font-weight-bold" id="massMoveNoDocsModalLabel">
+              <i class="fas fa-truck-moving mr-1"></i> Mutasi Massal (0 Dokumen)
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body p-4 text-left">
+            <p class="mb-4 text-muted">
+              Pindahkan <strong>semua siswa yang sama sekali belum mengunggah dokumen</strong> ke lembaga tujuan (misal: sekolah penampungan/dummy).
+            </p>
+            <div class="form-group">
+              <label class="font-weight-bold">Pilih Lembaga Tujuan <span class="text-danger">*</span></label>
+              <select name="target_tenant_id" class="form-control select2bs4" style="width: 100%;" required>
+                <option value="">-- Pilih Lembaga Tujuan --</option>
+                @foreach($all_tenants as $t)
+                  <option value="{{ $t->id }}">{{ $t->nama_sekolah }} (NPSN: {{ $t->npsn }})</option>
+                @endforeach
+              </select>
+              <small class="text-muted mt-2 d-block">
+                <i class="fas fa-exclamation-triangle text-warning"></i> Tindakan ini tidak dapat dibatalkan secara massal. Pastikan tidak ada siswa baru yang tak sengaja terpindah.
+              </small>
+            </div>
+          </div>
+          <div class="modal-footer bg-light border-top-0 rounded-bottom">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-warning shadow-sm font-weight-bold" onclick="return confirm('PENTING: Apakah Anda yakin memindahkan SEMUA SISWA dengan 0 dokumen di sekolah ini?');">
+              <i class="fas fa-paper-plane mr-1"></i> Pindahkan Sekarang
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 @endsection

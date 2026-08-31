@@ -125,6 +125,8 @@ class MonitoringController extends Controller
         if ($year) {
           $query->where(['tahun_lulus' => $year]);
         }
+      } elseif ($status === 'keluar') {
+        $query->whereIn('status_kelulusan', ['drop_out', 'pindah']);
       } else {
         $query->where(['status_kelulusan' => 'aktif']);
       }
@@ -286,6 +288,120 @@ class MonitoringController extends Controller
     });
 
     return back()->with('success', 'Siswa berhasil dipindahkan.');
+  }
+
+  public function incomingMoveStudent(Request $request, $tenant_id, $id)
+  {
+    $request->validate([
+      'from_tenant_id' => 'required|exists:tenants,id'
+    ]);
+
+    $targetTenant = Tenant::findOrFail($tenant_id);
+    $sourceTenant = Tenant::findOrFail($request->from_tenant_id);
+
+    if ($sourceTenant->id == $targetTenant->id) {
+      return back()->with('error', 'Lembaga asal sama dengan lembaga tujuan.');
+    }
+
+    $targetTenant->run(function () use ($id, $targetTenant, $sourceTenant) {
+      $student = Student::findOrFail($id);
+
+      \App\Models\StudentMutation::create([
+          'student_id' => $student->id,
+          'from_tenant_id' => $sourceTenant->id,
+          'to_tenant_id' => $targetTenant->id,
+          'moved_by_user_id' => auth()->id(),
+          'status' => 'moved',
+      ]);
+
+      $this->logAction(
+        $targetTenant->id,
+        $student->id,
+        'INCOMING_MOVE',
+        Student::class,
+        $student->id,
+        [
+          'student_name' => $student->nama,
+          'source_tenant' => $sourceTenant->nama_sekolah
+        ]
+      );
+    });
+
+    return back()->with('success', 'Riwayat mutasi masuk siswa berhasil dicatat.');
+  }
+
+  public function setInactiveStudent(Request $request, $tenant_id, $id)
+  {
+    $tenant = Tenant::findOrFail($tenant_id);
+
+    $tenant->run(function () use ($id, $tenant) {
+      $student = Student::findOrFail($id);
+      $student->status_kelulusan = 'drop_out';
+      $student->save();
+
+      $this->logAction(
+        $tenant->id,
+        $student->id,
+        'SET_INACTIVE',
+        Student::class,
+        $student->id,
+        [
+          'student_name' => $student->nama,
+          'status' => 'drop_out'
+        ]
+      );
+    });
+
+    return back()->with('success', 'Status siswa berhasil diubah menjadi Mutasi/Keluar (Inaktif).');
+  }
+
+  public function massMoveNoDocs(Request $request, $tenant_id)
+  {
+    $request->validate([
+      'target_tenant_id' => 'required|exists:tenants,id'
+    ]);
+
+    $sourceTenant = Tenant::findOrFail($tenant_id);
+    $targetTenant = Tenant::findOrFail($request->target_tenant_id);
+
+    if ($sourceTenant->id == $targetTenant->id) {
+      return back()->with('error', 'Lembaga asal sama dengan lembaga tujuan.');
+    }
+
+    $movedCount = 0;
+
+    $sourceTenant->run(function () use ($targetTenant, $sourceTenant, &$movedCount) {
+      // Ambil semua siswa aktif yang tidak memiliki dokumen sama sekali
+      $students = Student::doesntHave('documents')->where('status_kelulusan', 'aktif')->get();
+      $movedCount = $students->count();
+
+      foreach ($students as $student) {
+        \DB::table('graduations')->where('student_id', $student->id)->update(['tenant_id' => $targetTenant->id]);
+        \DB::table('students')->where('id', $student->id)->update(['tenant_id' => $targetTenant->id, 'classroom_id' => null]);
+
+        \App\Models\StudentMutation::create([
+            'student_id' => $student->id,
+            'from_tenant_id' => $sourceTenant->id,
+            'to_tenant_id' => $targetTenant->id,
+            'moved_by_user_id' => auth()->id(),
+            'status' => 'moved',
+        ]);
+
+        $this->logAction(
+          $sourceTenant->id,
+          $student->id,
+          'MASS_MOVE_NO_DOCS',
+          Student::class,
+          $student->id,
+          [
+            'student_name' => $student->nama,
+            'target_tenant' => $targetTenant->nama_sekolah
+          ]
+        );
+      }
+    });
+
+    return back()->with('success', "Berhasil memindahkan $movedCount siswa tanpa dokumen ke lembaga tujuan.");
   }
 
   public function deleteStudent(Request $request, $tenant_id, $id)

@@ -129,6 +129,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{id}/export-pdf', [MonitoringController::class, 'exportPdf'])->name('export_pdf');
             Route::get('/{tenant_id}/student/{id}', [MonitoringController::class, 'showStudent'])->name('student');
             Route::post('/{tenant_id}/student/{id}/move', [MonitoringController::class, 'moveStudent'])->name('student.move');
+            Route::post('/{tenant_id}/student/{id}/incoming-move', [MonitoringController::class, 'incomingMoveStudent'])->name('student.incoming_move');
+            Route::post('/{tenant_id}/student/{id}/set-inactive', [MonitoringController::class, 'setInactiveStudent'])->name('student.set_inactive');
+            Route::post('/{tenant_id}/mass-move-nodocs', [MonitoringController::class, 'massMoveNoDocs'])->name('school.mass_move_nodocs');
             Route::delete('/{tenant_id}/student/{id}', [MonitoringController::class, 'deleteStudent'])->name('student.delete');
             Route::get('/{tenant_id}/student/{id}/document/{document_id}/view', [MonitoringController::class, 'viewDocument'])->name('view_document');
             Route::post('/{tenant_id}/student/{id}/verify-all', [MonitoringController::class, 'verifyStudentDocuments'])->name('student.verify_all');
