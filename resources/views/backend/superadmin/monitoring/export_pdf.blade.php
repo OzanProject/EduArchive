@@ -68,13 +68,16 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th width="5%">No</th>
-                <th width="15%">NISN</th>
-                <th width="25%">Nama Siswa</th>
-                <th width="15%">Tgl. Lahir</th>
-                <th width="10%">Usia</th>
-                <th width="10%">Kelas</th>
-                <th width="20%">Status Verifikasi</th>
+                <th>No</th>
+                <th>NISN</th>
+                <th>Nama Siswa</th>
+                <th>Tgl. Lahir</th>
+                <th>Usia</th>
+                <th>Kelas</th>
+                <th>Status Verifikasi</th>
+                @foreach($docTypes as $type)
+                <th>{{ $type->name }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
@@ -93,6 +96,18 @@
                         <span class="text-danger">Belum Verifikasi</span>
                     @endif
                 </td>
+                @foreach($docTypes as $type)
+                @php
+                    $hasDoc = $student->documents->contains('document_type', $type->name);
+                @endphp
+                <td class="text-center">
+                    @if($hasDoc)
+                        <span class="text-success">✔</span>
+                    @else
+                        <span class="text-danger">✘</span>
+                    @endif
+                </td>
+                @endforeach
             </tr>
             @endforeach
         </tbody>

@@ -398,6 +398,9 @@
                 <th>Tgl Lahir</th>
                 <th>Usia</th>
                 <th>Status Verifikasi</th>
+                @foreach($docTypes as $type)
+                  <th class="text-center">{{ $type->name }}</th>
+                @endforeach
                 <th class="text-center">Aksi</th>
               </tr>
             </thead>
@@ -429,11 +432,23 @@
                         }
                     @endphp
                     @if($isVerified)
-                        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Terverifikasi</span>
+                      <span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle mr-1"></i> Terverifikasi</span>
                     @else
-                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Belum Verifikasi</span>
+                      <span class="badge badge-danger px-3 py-2"><i class="fas fa-times-circle mr-1"></i> Belum Lengkap</span>
                     @endif
                   </td>
+                  @foreach($docTypes as $type)
+                    @php
+                        $hasDoc = $student->documents->where('validation_status', 'approved')->contains('document_type', $type->name);
+                    @endphp
+                    <td class="text-center">
+                      @if($hasDoc)
+                        <span class="text-success" title="Sudah Upload" data-toggle="tooltip"><i class="fas fa-check"></i></span>
+                      @else
+                        <span class="text-danger" title="Belum Upload" data-toggle="tooltip"><i class="fas fa-times"></i></span>
+                      @endif
+                    </td>
+                  @endforeach
                   <td class="text-center">
                     <a href="{{ route('superadmin.monitoring.student', ['tenant_id' => $tenant->id, 'id' => $student->id]) }}"
                       class="btn btn-info btn-sm" title="Detail Siswa & Dokumen">

@@ -51,6 +51,8 @@ class SchoolMonitoringExport implements FromView, ShouldAutoSize
             }
         }
 
+        $docTypes = \App\Models\DocumentType::where('is_active', true)->get();
+
         return view('backend.superadmin.monitoring.export_excel', [
             'tenant' => $this->tenant,
             'data' => $this->data,
@@ -60,6 +62,7 @@ class SchoolMonitoringExport implements FromView, ShouldAutoSize
             'totalSiswa' => $totalSiswa,
             'sudahVerifikasi' => $sudahVerifikasi,
             'belumVerifikasi' => $belumVerifikasi,
+            'docTypes' => $docTypes,
         ]);
     }
 }

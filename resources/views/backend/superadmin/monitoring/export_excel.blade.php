@@ -37,7 +37,7 @@
         <td colspan="5">: {{ $belumVerifikasi }} Siswa</td>
     </tr>
     <tr>
-        <td colspan="7"></td>
+        <th colspan="{{ 7 + count($docTypes) }}"></th>
     </tr>
     <tr>
         <th style="background-color: #f2f2f2; border: 1px solid #000; text-align: center;"><b>No</b></th>
@@ -47,6 +47,9 @@
         <th style="background-color: #f2f2f2; border: 1px solid #000; text-align: center;"><b>Usia</b></th>
         <th style="background-color: #f2f2f2; border: 1px solid #000; text-align: center;"><b>Kelas</b></th>
         <th style="background-color: #f2f2f2; border: 1px solid #000; text-align: center;"><b>Status Verifikasi</b></th>
+        @foreach($docTypes as $type)
+        <th style="background-color: #f2f2f2; border: 1px solid #000; text-align: center;"><b>{{ $type->name }}</b></th>
+        @endforeach
     </tr>
     @foreach($data as $index => $student)
     <tr>
@@ -59,6 +62,14 @@
         <td style="border: 1px solid #000; text-align: center; color: {{ $student->is_verified ? 'green' : 'red' }};">
             <b>{{ $student->is_verified ? 'Sudah Verifikasi' : 'Belum Verifikasi' }}</b>
         </td>
+        @foreach($docTypes as $type)
+        @php
+            $hasDoc = $student->documents->contains('document_type', $type->name);
+        @endphp
+        <td style="border: 1px solid #000; text-align: center; color: {{ $hasDoc ? 'green' : 'red' }};">
+            {{ $hasDoc ? 'Sudah Upload' : 'Belum Upload' }}
+        </td>
+        @endforeach
     </tr>
     @endforeach
 </table>

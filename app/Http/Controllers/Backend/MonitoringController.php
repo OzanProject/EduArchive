@@ -158,6 +158,7 @@ class MonitoringController extends Controller
     $all_tenants = Tenant::where('id', '!=', $id)->orderBy('nama_sekolah')->get();
     
     $required_types = DocumentType::where(['is_required' => true, 'is_active' => true])->pluck('name')->toArray();
+    $docTypes = DocumentType::where('is_active', true)->get();
 
     return view('backend.superadmin.monitoring.students', compact(
       'tenant',
@@ -165,7 +166,8 @@ class MonitoringController extends Controller
       'graduation_years',
       'per_page',
       'all_tenants',
-      'required_types'
+      'required_types',
+      'docTypes'
     ));
   }
 
@@ -951,6 +953,8 @@ class MonitoringController extends Controller
         }
     }
 
+    $docTypes = \App\Models\DocumentType::where('is_active', true)->get();
+
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('backend.superadmin.monitoring.export_pdf', [
         'tenant' => $tenant,
         'data' => $data,
@@ -960,6 +964,7 @@ class MonitoringController extends Controller
         'totalSiswa' => $totalSiswa,
         'sudahVerifikasi' => $sudahVerifikasi,
         'belumVerifikasi' => $belumVerifikasi,
+        'docTypes' => $docTypes,
     ])->setPaper('a4', 'landscape');
 
     return $pdf->download('Rekap_Siswa_' . str_replace(' ', '_', $tenant->nama_sekolah) . '_' . date('Y-m-d') . '.pdf');

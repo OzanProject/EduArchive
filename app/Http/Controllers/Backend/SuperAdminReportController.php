@@ -56,8 +56,10 @@ class SuperAdminReportController extends Controller
   {
     if ($tenantId === 'all') {
       $sort = $request->input('sort', 'nama_asc');
-      $stats = $this->getComparativeStats($sort);
-      return view('backend.superadmin.reports.compare', compact('stats', 'sort'));
+      $comparativeData = $this->getComparativeStats($sort);
+      $stats = $comparativeData['data'];
+      $docTypes = $comparativeData['docTypes'];
+      return view('backend.superadmin.reports.compare', compact('stats', 'sort', 'docTypes'));
     } else {
       $tenant = Tenant::findOrFail($tenantId);
       $stats = $this->getStats($tenant);
@@ -69,8 +71,10 @@ class SuperAdminReportController extends Controller
   {
     if ($tenantId === 'all') {
       $sort = $request->input('sort', 'nama_asc');
-      $stats = $this->getComparativeStats($sort);
-      $pdf = Pdf::loadView('backend.superadmin.reports.compare_pdf', compact('stats'))
+      $comparativeData = $this->getComparativeStats($sort);
+      $stats = $comparativeData['data'];
+      $docTypes = $comparativeData['docTypes'];
+      $pdf = Pdf::loadView('backend.superadmin.reports.compare_pdf', compact('stats', 'docTypes'))
         ->setPaper('a4', 'landscape');
       
       return $pdf->download('Laporan_Perbandingan_Lembaga_' . date('Ymd_His') . '.pdf');
@@ -239,8 +243,25 @@ class SuperAdminReportController extends Controller
 
     $pipStats = $getCountsByTenant(\App\Models\PipData::class);
 
+    // Document types and counts
+    $docTypes = \App\Models\DocumentType::where('is_active', true)->pluck('name');
+    $docCountsRaw = \App\Models\Document::withoutGlobalScope($tenantScope)
+        ->selectRaw('tenant_id, document_type, count(*) as total')
+        ->groupBy('tenant_id', 'document_type')
+        ->get();
+        
+    $docCounts = [];
+    foreach ($docCountsRaw as $row) {
+        $docCounts[$row->tenant_id][$row->document_type] = $row->total;
+    }
+
     $results = [];
     foreach($tenants as $t) {
+        $docs = [];
+        foreach ($docTypes as $type) {
+            $docs[$type] = $docCounts[$t->id][$type] ?? 0;
+        }
+
         $results[] = [
             'id' => $t->id,
             'nama_sekolah' => $t->nama_sekolah ?? $t->id,
@@ -252,18 +273,19 @@ class SuperAdminReportController extends Controller
             'pending_infrastructure' => $infrastructures[$t->id] ?? 0,
             'total_learning' => $learningActivities[$t->id] ?? 0,
             'total_pip' => $pipStats[$t->id] ?? 0,
+            'documents' => $docs,
         ];
     }
     
     $collection = collect($results);
     
     if ($sort === 'students_desc') {
-        return $collection->sortByDesc('active_students')->values();
+        return ['docTypes' => $docTypes, 'data' => $collection->sortByDesc('active_students')->values()];
     } elseif ($sort === 'students_asc') {
-        return $collection->sortBy('active_students')->values();
+        return ['docTypes' => $docTypes, 'data' => $collection->sortBy('active_students')->values()];
     }
     
-    return $collection;
+    return ['docTypes' => $docTypes, 'data' => $collection];
   }
 
 }
