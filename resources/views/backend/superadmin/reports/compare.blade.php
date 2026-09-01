@@ -65,7 +65,7 @@
                 <th rowspan="2" class="align-middle text-center" style="width: 50px;">No</th>
                 <th rowspan="2" class="align-middle">Nama Sekolah</th>
                 <th rowspan="2" class="align-middle text-center">Jenjang</th>
-                <th colspan="2" class="text-center bg-primary text-white">Siswa</th>
+                <th colspan="4" class="text-center bg-primary text-white">Siswa</th>
                 <th colspan="{{ count($docTypes) }}" class="text-center bg-secondary text-white">Upload Dokumen</th>
                 <th rowspan="2" class="align-middle text-center bg-warning">Total Guru</th>
                 <th rowspan="2" class="align-middle text-center bg-info text-white">Act. Pembelajaran</th>
@@ -74,7 +74,9 @@
                 <th rowspan="2" class="align-middle text-center">Aksi</th>
               </tr>
               <tr>
-                 <th class="text-center bg-primary text-white" style="border-top:1px solid #fff">Aktif</th>
+                 <th class="text-center bg-primary text-white" style="border-top:1px solid #fff">Total Aktif</th>
+                 <th class="text-center bg-primary text-white" style="border-top:1px solid #fff">Usia &lt; 25</th>
+                 <th class="text-center bg-primary text-white" style="border-top:1px solid #fff">Usia &ge; 25</th>
                  <th class="text-center bg-primary text-white" style="border-top:1px solid #fff">Lulusan</th>
                  @foreach($docTypes as $type)
                    <th class="text-center bg-secondary text-white" style="border-top:1px solid #fff">{{ $type }}</th>
@@ -88,6 +90,8 @@
                   <td class="font-weight-bold">{{ $row['nama_sekolah'] }} <br><small class="text-muted">NPSN: {{ $row['npsn'] }}</small></td>
                   <td class="text-center">{{ $row['jenjang'] }}</td>
                   <td class="text-center text-primary font-weight-bold">{{ $row['active_students'] }}</td>
+                  <td class="text-center">{{ $row['active_students_under_25'] }}</td>
+                  <td class="text-center">{{ $row['active_students_over_25'] }}</td>
                   <td class="text-center">{{ $row['graduated_students'] }}</td>
                   @foreach($docTypes as $type)
                     <td class="text-center">{{ $row['documents'][$type] ?? 0 }}</td>

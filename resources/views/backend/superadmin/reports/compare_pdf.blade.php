@@ -70,7 +70,7 @@
             <th rowspan="2">Nama Sekolah</th>
             <th rowspan="2">NPSN</th>
             <th rowspan="2">Jenjang</th>
-            <th colspan="2">Siswa</th>
+            <th colspan="4">Siswa</th>
             <th colspan="{{ count($docTypes) }}">Upload Dokumen</th>
             <th rowspan="2">Total Guru</th>
             <th rowspan="2">Proposal Sarpras</th>
@@ -78,7 +78,9 @@
             <th rowspan="2">Total PIP</th>
         </tr>
         <tr>
-            <th>Aktif</th>
+            <th>Total Aktif</th>
+            <th>Usia &lt; 25</th>
+            <th>Usia &ge; 25</th>
             <th>Lulusan</th>
             @foreach($docTypes as $type)
               <th>{{ $type }}</th>
@@ -93,6 +95,8 @@
           <td style="text-align: center;">{{ $row['npsn'] }}</td>
           <td style="text-align: center;">{{ $row['jenjang'] }}</td>
           <td style="text-align: center;">{{ $row['active_students'] }}</td>
+          <td style="text-align: center;">{{ $row['active_students_under_25'] }}</td>
+          <td style="text-align: center;">{{ $row['active_students_over_25'] }}</td>
           <td style="text-align: center;">{{ $row['graduated_students'] }}</td>
           @foreach($docTypes as $type)
             <td style="text-align: center;">{{ $row['documents'][$type] ?? 0 }}</td>
@@ -104,7 +108,7 @@
         </tr>
       @empty
         <tr>
-          <td colspan="{{ 9 + count($docTypes) }}" class="text-center">Belum ada data sekolah.</td>
+          <td colspan="{{ 11 + count($docTypes) }}" class="text-center">Belum ada data sekolah.</td>
         </tr>
       @endforelse
     </tbody>

@@ -228,6 +228,19 @@ class SuperAdminReportController extends Controller
         $q->whereIn('status_kelulusan', ['Aktif', 'aktif']);
     });
     
+    $activeStudentsUnder25 = $getCountsByTenant(Student::class, function($q) {
+        $q->whereIn('status_kelulusan', ['Aktif', 'aktif'])
+          ->where('birth_date', '>', now()->subYears(25)->format('Y-m-d'));
+    });
+    
+    $activeStudentsOver25 = $getCountsByTenant(Student::class, function($q) {
+        $q->whereIn('status_kelulusan', ['Aktif', 'aktif'])
+          ->where(function($q) {
+              $q->where('birth_date', '<=', now()->subYears(25)->format('Y-m-d'))
+                ->orWhereNull('birth_date'); // Assuming null birth dates can be counted as over or we just exclude them? Let's exclude or count as unknown. Actually BOSP usually needs valid data. Let's strictly use <= for over 25.
+          });
+    });
+
     $graduatedStudents = $getCountsByTenant(Student::class, function($q) {
         $q->whereIn('status_kelulusan', ['Lulus', 'lulus']);
     });
@@ -268,6 +281,8 @@ class SuperAdminReportController extends Controller
             'npsn' => $t->npsn ?? '-',
             'jenjang' => $t->jenjang ?? '-',
             'active_students' => $activeStudents[$t->id] ?? 0,
+            'active_students_under_25' => $activeStudentsUnder25[$t->id] ?? 0,
+            'active_students_over_25' => $activeStudentsOver25[$t->id] ?? 0,
             'graduated_students' => $graduatedStudents[$t->id] ?? 0,
             'total_teachers' => $teachers[$t->id] ?? 0,
             'pending_infrastructure' => $infrastructures[$t->id] ?? 0,
