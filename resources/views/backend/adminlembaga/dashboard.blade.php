@@ -139,7 +139,7 @@
                             (NISN: {{ $details['student_nisn'] }})
                           @endif
                         @else
-                          {{ Str::limit($log->details, 50) }}
+                          {{ Str::limit(is_array($log->details) ? json_encode($log->details) : (string)$log->details, 50) }}
                         @endif
                       </td>
                     </tr>
