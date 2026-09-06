@@ -60,22 +60,24 @@
                       <span class="badge badge-success">Dikembalikan</span>
                     @endif
                   </td>
-                  <td>
-                    @if(($mutation->status === 'moved' && $mutation->student && $mutation->fromTenant && $mutation->toTenant) || ($mutation->status === 'dropped_out' && $mutation->student && $mutation->fromTenant))
-                      <form action="{{ route('superadmin.mutations.return', $mutation->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin {{ $mutation->status === 'dropped_out' ? 'mengaktifkan kembali' : 'mengembalikan' }} siswa ini?');">
+                  <td class="text-nowrap">
+                    <div class="d-flex" style="gap: 5px;">
+                      @if(($mutation->status === 'moved' && $mutation->student && $mutation->fromTenant && $mutation->toTenant) || ($mutation->status === 'dropped_out' && $mutation->student && $mutation->fromTenant))
+                        <form action="{{ route('superadmin.mutations.return', $mutation->id) }}" method="POST" class="m-0" onsubmit="return confirm('Yakin ingin {{ $mutation->status === 'dropped_out' ? 'mengaktifkan kembali' : 'mengembalikan' }} siswa ini?');">
+                          @csrf
+                          <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-undo"></i> {{ $mutation->status === 'dropped_out' ? 'Aktifkan Kembali' : 'Kembalikan' }}
+                          </button>
+                        </form>
+                      @endif
+                      <form action="{{ route('superadmin.mutations.destroy', $mutation->id) }}" method="POST" class="m-0" onsubmit="return confirm('Yakin ingin menghapus riwayat mutasi ini? Data yang dihapus tidak dapat dikembalikan.');">
                         @csrf
-                        <button type="submit" class="btn btn-sm btn-primary">
-                          <i class="fas fa-undo"></i> {{ $mutation->status === 'dropped_out' ? 'Aktifkan Kembali' : 'Kembalikan' }}
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger">
+                          <i class="fas fa-trash"></i> Hapus
                         </button>
                       </form>
-                    @endif
-                    <form action="{{ route('superadmin.mutations.destroy', $mutation->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus riwayat mutasi ini? Data yang dihapus tidak dapat dikembalikan.');">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger">
-                        <i class="fas fa-trash"></i> Hapus
-                      </button>
-                    </form>
+                    </div>
                   </td>
                 </tr>
               @endforeach
