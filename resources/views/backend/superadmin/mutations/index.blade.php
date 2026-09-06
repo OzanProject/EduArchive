@@ -37,21 +37,29 @@
                   <td>{{ $mutation->student->nisn ?? '-' }}</td>
                   <td>{{ $mutation->student->nama ?? 'Siswa Terhapus' }}</td>
                   <td>{{ $mutation->fromTenant->nama_sekolah ?? 'Tidak Diketahui' }}</td>
-                  <td>{{ $mutation->toTenant->nama_sekolah ?? 'Tidak Diketahui' }}</td>
+                  <td>
+                    @if($mutation->status === 'dropped_out')
+                      <span class="text-muted"><i>Keluar/Inaktif</i></span>
+                    @else
+                      {{ $mutation->toTenant->nama_sekolah ?? 'Tidak Diketahui' }}
+                    @endif
+                  </td>
                   <td>{{ $mutation->created_at->format('d M Y H:i') }}</td>
                   <td>
                     @if($mutation->status === 'moved')
                       <span class="badge badge-warning">Pindah</span>
+                    @elseif($mutation->status === 'dropped_out')
+                      <span class="badge badge-danger">Inaktif/Drop Out</span>
                     @else
                       <span class="badge badge-success">Dikembalikan</span>
                     @endif
                   </td>
                   <td>
-                    @if($mutation->status === 'moved' && $mutation->student && $mutation->fromTenant && $mutation->toTenant)
-                      <form action="{{ route('superadmin.mutations.return', $mutation->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin mengembalikan siswa ini ke lembaga asalnya?');">
+                    @if(($mutation->status === 'moved' && $mutation->student && $mutation->fromTenant && $mutation->toTenant) || ($mutation->status === 'dropped_out' && $mutation->student && $mutation->fromTenant))
+                      <form action="{{ route('superadmin.mutations.return', $mutation->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin {{ $mutation->status === 'dropped_out' ? 'mengaktifkan kembali' : 'mengembalikan' }} siswa ini?');">
                         @csrf
                         <button type="submit" class="btn btn-sm btn-primary">
-                          <i class="fas fa-undo"></i> Kembalikan
+                          <i class="fas fa-undo"></i> {{ $mutation->status === 'dropped_out' ? 'Aktifkan Kembali' : 'Kembalikan' }}
                         </button>
                       </form>
                     @endif

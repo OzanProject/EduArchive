@@ -341,6 +341,14 @@ class MonitoringController extends Controller
       $student->status_kelulusan = 'drop_out';
       $student->save();
 
+      \App\Models\StudentMutation::create([
+          'student_id' => $student->id,
+          'from_tenant_id' => $tenant->id,
+          'to_tenant_id' => null,
+          'moved_by_user_id' => auth()->id(),
+          'status' => 'dropped_out',
+      ]);
+
       $this->logAction(
         $tenant->id,
         $student->id,

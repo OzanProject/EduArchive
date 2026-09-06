@@ -24,7 +24,46 @@ class SuperAdminMutationController extends Controller
         $mutation = StudentMutation::findOrFail($id);
 
         if ($mutation->status === 'returned') {
-            return back()->with('error', 'Siswa sudah dikembalikan ke lembaga asalnya.');
+            return back()->with('error', 'Siswa sudah dikembalikan/diaktifkan.');
+        }
+
+        if ($mutation->status === 'dropped_out') {
+            $targetTenant = Tenant::find($mutation->from_tenant_id);
+            if (!$targetTenant) {
+                return back()->with('error', 'Data lembaga asal sudah tidak valid.');
+            }
+            $error = null;
+            $targetTenant->run(function () use ($targetTenant, $mutation, &$error) {
+                $student = Student::find($mutation->student_id);
+                if (!$student) {
+                    $error = 'Siswa tidak ditemukan.';
+                    return;
+                }
+                
+                $student->status_kelulusan = 'aktif';
+                $student->save();
+                
+                $mutation->update(['status' => 'returned']);
+                
+                \App\Models\AuditLog::create([
+                    'user_id' => auth()->id(),
+                    'tenant_id' => $targetTenant->id,
+                    'action' => 'RESTORE_DROPOUT',
+                    'target_type' => Student::class,
+                    'target_id' => $student->id,
+                    'ip_address' => request()->ip(),
+                    'details' => [
+                      'student_id' => $student->id,
+                      'student_nisn' => $student->nisn ?? '-',
+                      'student_nama' => $student->nama,
+                      'user_agent' => request()->userAgent()
+                    ]
+                ]);
+            });
+            if ($error) {
+                return back()->with('error', $error);
+            }
+            return back()->with('success', 'Siswa berhasil diaktifkan kembali.');
         }
 
         $targetTenant = Tenant::find($mutation->from_tenant_id);
