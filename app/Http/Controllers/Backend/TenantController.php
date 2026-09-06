@@ -40,6 +40,14 @@ class TenantController extends Controller
     }
 
     /**
+     * Export tenants to Excel.
+     */
+    public function export()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\TenantsExport, 'Data_Sekolah_Terdaftar.xlsx');
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

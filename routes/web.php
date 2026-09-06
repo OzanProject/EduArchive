@@ -83,6 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'index'])->name('dashboard');
 
         // Tenant Management
+        Route::get('/tenants/export', [TenantController::class, 'export'])->name('tenants.export');
         Route::post('/tenants/bulk-action', [TenantController::class, 'bulkAction'])->name('tenants.bulk_action');
         Route::resource('tenants', TenantController::class);
         Route::patch('/tenants/{id}/status', [TenantController::class, 'updateStatus'])->name('tenants.status');

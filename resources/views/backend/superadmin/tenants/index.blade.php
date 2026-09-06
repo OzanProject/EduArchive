@@ -37,9 +37,14 @@
                 </div>
               </div>
             </form>
-            <a href="{{ route('superadmin.tenants.create') }}" class="btn btn-primary btn-sm text-nowrap">
-              <i class="fas fa-plus"></i> Tambah Sekolah
-            </a>
+            <div class="d-flex" style="gap: 5px;">
+              <a href="{{ route('superadmin.tenants.export') }}" class="btn btn-success btn-sm text-nowrap">
+                <i class="fas fa-file-excel"></i> Export Excel
+              </a>
+              <a href="{{ route('superadmin.tenants.create') }}" class="btn btn-primary btn-sm text-nowrap">
+                <i class="fas fa-plus"></i> Tambah Sekolah
+              </a>
+            </div>
           </div>
         </div>
         <!-- /.card-header -->
