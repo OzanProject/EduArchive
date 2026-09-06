@@ -14,7 +14,7 @@ class SuperAdminMutationController extends Controller
     {
         $mutations = StudentMutation::with(['student', 'fromTenant', 'toTenant'])
             ->latest()
-            ->paginate(15);
+            ->get();
 
         return view('backend.superadmin.mutations.index', compact('mutations'));
     }
@@ -113,5 +113,13 @@ class SuperAdminMutationController extends Controller
         }
 
         return back()->with('success', 'Siswa berhasil dikembalikan ke lembaga asalnya.');
+    }
+
+    public function destroy($id)
+    {
+        $mutation = StudentMutation::findOrFail($id);
+        $mutation->delete();
+
+        return back()->with('success', 'Riwayat mutasi berhasil dihapus.');
     }
 }

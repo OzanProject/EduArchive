@@ -170,6 +170,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('mutations')->name('mutations.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Backend\SuperAdminMutationController::class, 'index'])->name('index');
             Route::post('/{id}/return', [\App\Http\Controllers\Backend\SuperAdminMutationController::class, 'returnStudent'])->name('return');
+            Route::delete('/{id}', [\App\Http\Controllers\Backend\SuperAdminMutationController::class, 'destroy'])->name('destroy');
         });
 
         // Role Management (RBAC)

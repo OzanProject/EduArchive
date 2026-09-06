@@ -9,6 +9,12 @@
 @endsection
 
 @section('content')
+  @push('styles')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('adminlte3/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('adminlte3/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+  @endpush
+
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -16,8 +22,8 @@
           <h3 class="card-title">Riwayat Mutasi Siswa</h3>
         </div>
         <!-- /.card-header -->
-        <div class="card-body table-responsive p-0">
-          <table class="table table-hover text-nowrap">
+        <div class="card-body">
+          <table id="mutations-table" class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th>No</th>
@@ -31,9 +37,9 @@
               </tr>
             </thead>
             <tbody>
-              @forelse($mutations as $mutation)
+              @foreach($mutations as $index => $mutation)
                 <tr>
-                  <td>{{ $mutations->firstItem() + $loop->index }}</td>
+                  <td>{{ $index + 1 }}</td>
                   <td>{{ $mutation->student->nisn ?? '-' }}</td>
                   <td>{{ $mutation->student->nama ?? 'Siswa Terhapus' }}</td>
                   <td>{{ $mutation->fromTenant->nama_sekolah ?? 'Tidak Diketahui' }}</td>
@@ -63,24 +69,47 @@
                         </button>
                       </form>
                     @endif
+                    <form action="{{ route('superadmin.mutations.destroy', $mutation->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus riwayat mutasi ini? Data yang dihapus tidak dapat dikembalikan.');">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Hapus
+                      </button>
+                    </form>
                   </td>
                 </tr>
-              @empty
-                <tr>
-                  <td colspan="8" class="text-center">Belum ada riwayat mutasi siswa.</td>
-                </tr>
-              @endforelse
+              @endforeach
             </tbody>
           </table>
         </div>
         <!-- /.card-body -->
-        @if($mutations->hasPages())
-        <div class="card-footer clearfix">
-          {{ $mutations->links('pagination::bootstrap-4') }}
-        </div>
-        @endif
       </div>
       <!-- /.card -->
     </div>
   </div>
+
+  @push('scripts')
+    <!-- DataTables  & Plugins -->
+    <script src="{{ asset('adminlte3/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('adminlte3/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('adminlte3/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('adminlte3/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+    
+    <script>
+      $(function () {
+        $('#mutations-table').DataTable({
+          "paging": true,
+          "lengthChange": true,
+          "searching": true,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+          "responsive": true,
+          "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+          }
+        });
+      });
+    </script>
+  @endpush
 @endsection
