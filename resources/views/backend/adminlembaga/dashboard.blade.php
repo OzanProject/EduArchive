@@ -138,8 +138,23 @@
                           @if(isset($details['student_nisn']))
                             (NISN: {{ $details['student_nisn'] }})
                           @endif
+                        @elseif(isset($details['student_name']))
+                          Siswa: {{ $details['student_name'] }}
+                          @if(isset($details['status']))
+                            - Status: {{ $details['status'] }}
+                          @endif
                         @else
-                          {{ Str::limit(is_array($log->details) ? json_encode($log->details) : (string)$log->details, 50) }}
+                          @php
+                            $info = [];
+                            if (is_array($details)) {
+                                foreach ($details as $key => $val) {
+                                    if (!is_array($val) && !is_object($val)) {
+                                        $info[] = ucwords(str_replace('_', ' ', $key)) . ': ' . $val;
+                                    }
+                                }
+                            }
+                          @endphp
+                          {{ Str::limit(!empty($info) ? implode(', ', $info) : (is_string($log->details) ? $log->details : ''), 75) }}
                         @endif
                       </td>
                     </tr>
