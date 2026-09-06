@@ -129,7 +129,7 @@
                       $user = $log->user->name ?? 'System';
                     @endphp
                     <tr>
-                      <td>{{ $log->created_at->diffForHumans() }}</td>
+                      <td>{{ $log->created_at->locale('id')->diffForHumans() }}</td>
                       <td>{{ $log->user->name ?? 'System' }}</td>
                       <td><span class="badge badge-info">{{ $log->action }}</span></td>
                       <td>
