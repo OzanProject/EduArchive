@@ -111,42 +111,44 @@
                         <span class="badge badge-warning">Non-Aktif (Pending)</span>
                       @endif
                     </td>
-                    <td>
-                      <a href="{{ route('superadmin.tenants.edit', $tenant->id) }}" class="btn btn-warning btn-sm"
-                        title="Edit"><i class="fas fa-edit"></i></a>
+                    <td class="text-nowrap">
+                      <div class="d-flex" style="gap: 5px;">
+                        <a href="{{ route('superadmin.tenants.edit', $tenant->id) }}" class="btn btn-warning btn-sm m-0"
+                          title="Edit"><i class="fas fa-edit"></i></a>
 
-                      @if($tenant->status_aktif)
-                        <form action="{{ route('superadmin.tenants.status', $tenant->id) }}" method="POST"
-                          style="display:inline;">
-                          @csrf
-                          @method('PATCH')
-                          <input type="hidden" name="status" value="suspended">
-                          <button type="submit" class="btn btn-secondary btn-sm" title="Suspend Sekolah"
-                            onclick="return confirm('Suspend sekolah ini? Akses akan dibekukan.')">
-                            <i class="fas fa-ban"></i>
-                          </button>
-                        </form>
-                      @else
-                        <form action="{{ route('superadmin.tenants.status', $tenant->id) }}" method="POST"
-                          style="display:inline;">
-                          @csrf
-                          @method('PATCH')
-                          <input type="hidden" name="status" value="active">
-                          <button type="submit" class="btn btn-success btn-sm" title="Aktifkan Sekolah"
-                            onclick="return confirm('Aktifkan kembali sekolah ini?')">
-                            <i class="fas fa-check"></i>
-                          </button>
-                        </form>
-                      @endif
+                        @if($tenant->status_aktif)
+                          <form action="{{ route('superadmin.tenants.status', $tenant->id) }}" method="POST"
+                            class="m-0">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="suspended">
+                            <button type="submit" class="btn btn-secondary btn-sm" title="Suspend Sekolah"
+                              onclick="return confirm('Suspend sekolah ini? Akses akan dibekukan.')">
+                              <i class="fas fa-ban"></i>
+                            </button>
+                          </form>
+                        @else
+                          <form action="{{ route('superadmin.tenants.status', $tenant->id) }}" method="POST"
+                            class="m-0">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="active">
+                            <button type="submit" class="btn btn-success btn-sm" title="Aktifkan Sekolah"
+                              onclick="return confirm('Aktifkan kembali sekolah ini?')">
+                              <i class="fas fa-check"></i>
+                            </button>
+                          </form>
+                        @endif
 
-                      <form action="{{ route('superadmin.tenants.destroy', $tenant->id) }}" method="POST"
-                        style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm" title="Hapus Permanen"
-                          onclick="return confirm('Hapus sekolah ini? Data akan hilang permanen!')"><i
-                            class="fas fa-trash"></i></button>
-                      </form>
+                        <form action="{{ route('superadmin.tenants.destroy', $tenant->id) }}" method="POST"
+                          class="m-0">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-danger btn-sm" title="Hapus Permanen"
+                            onclick="return confirm('Hapus sekolah ini? Data akan hilang permanen!')"><i
+                              class="fas fa-trash"></i></button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 @empty
